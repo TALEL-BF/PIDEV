@@ -1,5 +1,7 @@
 package Entites;
 
+import java.sql.Date;
+
 public class RDV {
     private int id;
     private String nom;
@@ -63,5 +65,16 @@ public class RDV {
         this.prenom = prenom;
         this.age = age;
         this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "RDV{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", age=" + age +
+                ", date=" + date +
+                '}';
     }
 }
