@@ -1,26 +1,50 @@
 package test;
 
-//import Entites.RDV;
-//import Services.RDVServices;
 import Entites.Cours;
 import Services.CoursServices;
 import Utils.Mydatabase;
 
 public class Main {
     public static void main(String[] args) {
-        Mydatabase.getInstance();
 
-        // Création du service Cours
+        Mydatabase.getInstance();
         CoursServices cs = new CoursServices();
 
-        // Ajout d'un cours pour l'application des autistes
+
         Cours coursAutistes = new Cours(
-                "Communication et autonomie",
+                "arabe",
                 "Exercices pour améliorer la communication et l'autonomie des enfants autistes",
                 "Développement personnel",
-                "Facile"
+                "moyen"
         );
         cs.ajouter(coursAutistes);
+
+        // Récupérer l'ID du cours ajouté (dernier dans la liste)
+        int idCoursAjoute = cs.getAll().get(cs.getAll().size() - 1).getId_cours();
+
+
+       /* Cours coursModifie = new Cours(
+                idCoursAjoute, // ID du cours ajouté
+                "anglais",
+                "Exercices avancés pour améliorer les compétences logiques et la communication",
+                "Développement personnel",
+                "difficile"
+        );
+        cs.modifier(coursModifie);
+*/
+
+        boolean supprime = cs.supprimer(idCoursAjoute);
+        if (supprime) {
+            System.out.println("Le cours avec ID " + idCoursAjoute + " a été supprimé !");
+        } else {
+            System.out.println("Erreur lors de la suppression du cours avec ID " + idCoursAjoute);
+        }
+
+
+        System.out.println("\nListe actuelle des cours :");
+        for (Cours c : cs.getAll()) {
+            System.out.println(c);
+        }
 
         // -----------------------------
         // Code RDV laissé en commentaire
