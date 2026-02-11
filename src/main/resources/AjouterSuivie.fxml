@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controller.AjouterSuivie"
+            stylesheets="@styles/app.css">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" spacing="14">
+            <HBox styleClass="sidebar-header" spacing="10">
+                <ImageView fitWidth="36" fitHeight="36" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo.png"/>
+                    </image>
+                </ImageView>
+                <VBox>
+                    <Label text="AutiCare" styleClass="app-title"/>
+                    <Label text="Plateforme éducative" styleClass="app-subtitle"/>
+                </VBox>
+            </HBox>
+
+            <Label text="Connecté en tant que" styleClass="muted"/>
+            <Label text="Etudiant" styleClass="badge"/>
+
+            <VBox spacing="8">
+                <Button text="Gestion des suivies" styleClass="menu-item active"/>
+                <Button text="Gestion des consultations" styleClass="menu-item"/>
+                <Button text="Gestion des cours" styleClass="menu-item"/>
+                <Button text="Gestion des évaluations" styleClass="menu-item"/>
+                <Button text="Scores" styleClass="menu-item"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- CONTENT -->
+    <center>
+        <VBox styleClass="content" spacing="14">
+
+            <!-- Title -->
+            <VBox spacing="3">
+                <Label text="Gestion des Suivies" styleClass="page-title"/>
+                <Label text="Gérez les suivies et les informations associées" styleClass="page-subtitle"/>
+            </VBox>
+
+            <!-- Search + Filters -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Rechercher un suivi..." styleClass="search"/>
+                <HBox styleClass="filters" spacing="8">
+                    <ToggleButton text="Tous" selected="true"/>
+                    <ToggleButton text="Actif"/>
+                    <ToggleButton text="Terminé"/>
+                    <ToggleButton text="Annulé"/>
+                </HBox>
+            </HBox>
+
+            <Label fx:id="countLabel" text="0 Suivies" styleClass="count"/>
+
+            <!-- Cards grid -->
+            <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>
