@@ -12,7 +12,7 @@ public class Mydatabase {
 
     private Mydatabase(){
         try {
-            con= DriverManager.getConnection("jdbc:mysql://localhost:3306/PIDEV","root","");
+            con= DriverManager.getConnection("jdbc:mysql://localhost:4306/pidev","root","");
             System.out.println("Connected to database successfully");
         } catch (SQLException e) {
             throw new RuntimeException(e);

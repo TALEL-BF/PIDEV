@@ -1,32 +1,46 @@
 package Entites;
 
 public class Cours {
+
     private int id_cours;
     private String titre;
     private String description;
     private String type_cours;
-    private String difficulte;
+    private String niveau;
+    private int duree;
+    private String image;  // Changé de 'difficulte' à 'image'
 
-    // Constructeurs
+    // ================== Constructeur vide ==================
     public Cours() {
     }
 
-    public Cours(int id_cours, String titre, String description, String type_cours, String difficulte) {
+    // ================== Constructeur complet ==================
+    public Cours(int id_cours, String titre, String description,
+                 String type_cours, String niveau,
+                 int duree, String image) {
         this.id_cours = id_cours;
         this.titre = titre;
         this.description = description;
         this.type_cours = type_cours;
-        this.difficulte = difficulte;
+        this.niveau = niveau;
+        this.duree = duree;
+        this.image = image;
     }
 
-    public Cours(String titre, String description, String type_cours, String difficulte) {
+    // ================== Constructeur sans id (pour ajout) ==================
+    public Cours(String titre, String description,
+                 String type_cours, String niveau,
+                 int duree, String image) {
         this.titre = titre;
         this.description = description;
         this.type_cours = type_cours;
-        this.difficulte = difficulte;
+        this.niveau = niveau;
+        this.duree = duree;
+        this.image = image;
     }
 
-    // Getters et Setters
+    // ================== Getters & Setters ==================
+
     public int getId_cours() {
         return id_cours;
     }
@@ -59,15 +73,31 @@ public class Cours {
         this.type_cours = type_cours;
     }
 
-    public String getDifficulte() {
-        return difficulte;
+    public String getNiveau() {
+        return niveau;
     }
 
-    public void setDifficulte(String difficulte) {
-        this.difficulte = difficulte;
+    public void setNiveau(String niveau) {
+        this.niveau = niveau;
     }
 
-    // toString pour affichage
+    public int getDuree() {
+        return duree;
+    }
+
+    public void setDuree(int duree) {
+        this.duree = duree;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    // ================== toString ==================
     @Override
     public String toString() {
         return "Cours{" +
@@ -75,7 +105,9 @@ public class Cours {
                 ", titre='" + titre + '\'' +
                 ", description='" + description + '\'' +
                 ", type_cours='" + type_cours + '\'' +
-                ", difficulte='" + difficulte + '\'' +
+                ", niveau='" + niveau + '\'' +
+                ", duree=" + duree +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefWidth="1100.0" prefHeight="700.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllers.CoursAjout">
+
+    <children>
+
+        <!-- HBox ancré correctement -->
+        <HBox AnchorPane.topAnchor="0.0"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0">
+
+            <!-- ================= SIDEBAR ================= -->
+            <VBox prefWidth="220.0"
+                  minWidth="220.0"
+                  maxWidth="220.0"
+                  spacing="15"
+                  style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding:20;">
+
+                <HBox alignment="CENTER_LEFT" spacing="5">
+                    <VBox alignment="CENTER">
+                        <ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                            <image>
+                                <Image url="@images/logo.png"/>
+                            </image>
+                        </ImageView>
+                    </VBox>
+
+                    <Label text="AutiCare"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;">
+                        <font>
+                            <Font size="20.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+
+                <Separator/>
+
+                <Button text="Gestion des utilisateurs"
+                        style="-fx-background-color: transparent; -fx-text-fill:white;"/>
+
+                <Button text="Gestion des cours"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10;"/>
+
+                <Button text="Gestion des évaluations"
+                        style="-fx-background-color: transparent; -fx-text-fill:white;"/>
+
+                <Button text="Gestion des événements"
+                        style="-fx-background-color: transparent; -fx-text-fill:white;"/>
+
+                <Button text="Gestion des suivie consultation"
+                        style="-fx-background-color: transparent; -fx-text-fill:white;"/>
+
+                <Button text="Gestion des jeux"
+                        style="-fx-background-color: transparent; -fx-text-fill:white;"/>
+
+            </VBox>
+
+            <!-- ================= CONTENU PRINCIPAL ================= -->
+            <ScrollPane fitToWidth="true"
+                        HBox.hgrow="ALWAYS"
+                        style="-fx-background:#F4F5F7;">
+
+                <content>
+
+                    <VBox spacing="20"
+                          style="-fx-background-color:#F4F5F7; -fx-padding:30;">
+
+                        <!-- Titre -->
+                        <Label text="Gestion des Cours"
+                               style="-fx-font-size:24px; -fx-font-weight:bold;"/>
+
+                        <!-- ================= CARTE AJOUT COURS ================= -->
+                        <VBox spacing="15"
+                              style="-fx-background-color:white;
+                                     -fx-background-radius:15;
+                                     -fx-border-radius:15;
+                                     -fx-border-color:#8A3FFC;
+                                     -fx-border-width:2;
+                                     -fx-padding:25;">
+
+                            <Label text="Ajouter un nouveau cours"
+                                   style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+
+                            <VBox spacing="5">
+                                <Label text="Titre du cours"
+                                       style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                <TextField fx:id="titreField"
+                                           promptText="Ex: Introduction à la communication sociale"
+                                           style="-fx-background-radius:10; -fx-border-radius:10;"/>
+                            </VBox>
+
+                            <HBox spacing="10">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Type de cours"
+                                           style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                    <ComboBox fx:id="typeCoursCombo"
+                                              prefWidth="200"
+                                              promptText="Sélectionnez un type"
+                                              style="-fx-background-radius:10;"/>
+                                </VBox>
+
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Niveau"
+                                           style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                    <ComboBox fx:id="niveauCombo"
+                                              prefWidth="200"
+                                              promptText="Sélectionnez un niveau"
+                                              style="-fx-background-radius:10;"/>
+                                </VBox>
+                            </HBox>
+
+                            <VBox spacing="5">
+                                <Label text="Durée (en minutes)"
+                                       style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                <TextField fx:id="dureeField"
+                                           promptText="Ex: 120"
+                                           style="-fx-background-radius:10; -fx-border-radius:10;"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Description"
+                                       style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                <TextArea fx:id="descriptionArea"
+                                          promptText="Décrivez votre cours..."
+                                          prefRowCount="4"
+                                          style="-fx-background-radius:10; -fx-border-radius:10;"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Image du cours"
+                                       style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <TextField fx:id="imageField"
+                                               promptText="Chemin ou URL de l'image"
+                                               HBox.hgrow="ALWAYS"
+                                               style="-fx-background-radius:10; -fx-border-radius:10;"/>
+                                    <Button text="Parcourir..."
+                                            style="-fx-background-color:#7B2FF7;
+                                                   -fx-text-fill:white;
+                                                   -fx-background-radius:10;"/>
+                                </HBox>
+                            </VBox>
+
+                            <Separator/>
+
+                            <HBox spacing="15" alignment="CENTER_RIGHT">
+                                <Button text="Annuler"
+                                        fx:id="annulerButton"
+                                        style="-fx-background-color:transparent;
+                                               -fx-border-color:#7B2FF7;
+                                               -fx-text-fill:#7B2FF7;
+                                               -fx-border-width:2;
+                                               -fx-border-radius:20;
+                                               -fx-background-radius:20;
+                                               -fx-padding:10 25;"/>
+
+                                <Button text="Ajouter le cours"
+                                        fx:id="ajouterButton"
+                                        style="-fx-background-color:#7B2FF7;
+                                               -fx-text-fill:white;
+                                               -fx-background-radius:20;
+                                               -fx-padding:10 25;"/>
+                            </HBox>
+
+                        </VBox>
+
+                        <!-- ================= CARTE LISTE DES COURS ================= -->
+                        <VBox spacing="15"
+                              style="-fx-background-color:white;
+                                     -fx-background-radius:15;
+                                     -fx-border-radius:15;
+                                     -fx-border-color:#8A3FFC;
+                                     -fx-border-width:2;
+                                     -fx-padding:25;">
+
+                            <Label text="Liste des cours disponibles"
+                                   style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+
+                            <TableView fx:id="coursTable" prefHeight="300">
+                                <columns>
+                                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                                    <TableColumn fx:id="titreColumn" text="Titre" prefWidth="200"/>
+                                    <TableColumn fx:id="typeColumn" text="Type" prefWidth="150"/>
+                                    <TableColumn fx:id="niveauColumn" text="Niveau" prefWidth="120"/>
+                                    <TableColumn fx:id="dureeColumn" text="Durée (min)" prefWidth="100"/>
+                                    <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250"/>
+                                    <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
+                                </columns>
+                            </TableView>
+
+                            <HBox spacing="10" alignment="CENTER_RIGHT">
+                                <Button text="Modifier"
+                                        style="-fx-background-color:transparent;
+                                               -fx-border-color:#FFA500;
+                                               -fx-text-fill:#FFA500;
+                                               -fx-border-radius:20;
+                                               -fx-background-radius:20;"/>
+                                <Button text="Supprimer"
+                                        style="-fx-background-color:transparent;
+                                               -fx-border-color:#FF4444;
+                                               -fx-text-fill:#FF4444;
+                                               -fx-border-radius:20;
+                                               -fx-background-radius:20;"/>
+                                <Button text="Actualiser"
+                                        style="-fx-background-color:transparent;
+                                               -fx-border-color:#7B2FF7;
+                                               -fx-text-fill:#7B2FF7;
+                                               -fx-border-radius:20;
+                                               -fx-background-radius:20;"/>
+                            </HBox>
+
+                        </VBox>
+
+                    </VBox>
+
+                </content>
+
+            </ScrollPane>
+
+        </HBox>
+
+    </children>
+</AnchorPane>

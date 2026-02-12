@@ -1,0 +1,58 @@
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+    -fx-background-color: linear-gradient(to bottom, #6A5AE0, #8E7BFF);
+    -fx-padding: 18;
+    -fx-pref-width: 260;
+}
+
+/* Header */
+.sidebar-header {
+    -fx-padding: 10 0 20 0;
+}
+
+/* Titre application */
+.app-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.app-subtitle {
+    -fx-text-fill: #E0E0FF;
+    -fx-font-size: 12px;
+}
+
+/* Texte discret */
+.muted {
+    -fx-text-fill: #E5E5FF;
+    -fx-font-size: 11px;
+}
+
+/* Badge utilisateur */
+.badge {
+    -fx-background-color: rgba(255,255,255,0.25);
+    -fx-text-fill: white;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+/* Boutons menu */
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15;
+    -fx-background-radius: 8;
+}
+
+/* Hover */
+.menu-item:hover {
+    -fx-background-color: rgba(255,255,255,0.15);
+}
+
+/* Actif */
+.menu-item.active {
+    -fx-background-color: rgba(255,255,255,0.22);
+}
