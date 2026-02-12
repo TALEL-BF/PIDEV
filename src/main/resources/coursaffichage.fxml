@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane prefWidth="1300.0" prefHeight="800.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllers.CoursAffichage">
+
+    <children>
+
+        <HBox prefWidth="1300.0" prefHeight="800.0">
+
+            <!-- ================= SIDEBAR ================= -->
+            <VBox prefWidth="220.0"
+                  minWidth="220.0"
+                  maxWidth="220.0"
+                  spacing="15"
+                  style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding:20;">
+
+                <HBox alignment="CENTER_LEFT" spacing="5">
+                    <VBox alignment="CENTER">
+                        <ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                            <image>
+                                <Image url="@images/logo.png"/>
+                            </image>
+                        </ImageView>
+                    </VBox>
+                    <Label text="AutiCare"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;">
+                        <font>
+                            <Font size="20.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+
+                <Separator/>
+
+                <Button text="Gestion des utilisateurs"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des cours"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des évaluations"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des événements"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des suivie consultation"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand; -fx-wrap-text: true;"/>
+
+                <Button text="Gestion des jeux"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <VBox VBox.vgrow="ALWAYS" />
+
+                <Button text="Déconnexion"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill:white; -fx-cursor: hand; -fx-background-radius:10;"/>
+
+            </VBox>
+
+            <!-- ================= CONTENU PRINCIPAL (AFFICHAGE COURS) ================= -->
+            <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS"
+                        style="-fx-background: white; -fx-border-width: 0;">
+                <content>
+                    <VBox spacing="25" style="-fx-background-color: white; -fx-padding: 30;">
+
+                        <!-- ========== HEADER AVEC BOUTONS DE NAVIGATION ========== -->
+                        <HBox alignment="CENTER_LEFT" spacing="20">
+                            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                <Label text="Gestion des Cours"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;" />
+                                <Label text="Gérez les programmes éducatifs pour les apprenants AutiCare"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #666666;" />
+                            </VBox>
+
+                            <!-- BOUTON POUR AJOUTER (navigation vers admin) -->
+                            <Button text="+ Ajouter un cours"
+                                    fx:id="ajouterCoursButton"
+                                    style="-fx-background-color: #7B2FF7;
+                                           -fx-text-fill: white;
+                                           -fx-background-radius: 20;
+                                           -fx-padding: 12 25;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;
+                                           -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
+
+                            <!-- BOUTON POUR RETOUR À L'ADMIN -->
+                            <Button text="⚙ Administration"
+                                    fx:id="backToAdminButton"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 2;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 12 25;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;
+                                           -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 10, 0, 0, 5);"/>
+
+                            <!-- 🔴 SUPPRIMEZ LA BALISE <styles> !!! -->
+                        </HBox>
+
+                        <!-- Barre de recherche -->
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <TextField fx:id="searchField"
+                                       promptText="Rechercher un cours ou un instructeur..."
+                                       HBox.hgrow="ALWAYS"
+                                       style="-fx-background-radius: 25;
+                                             -fx-border-radius: 25;
+                                             -fx-padding: 12 20;
+                                             -fx-background-color: #F5F5F5;
+                                             -fx-border-color: transparent;
+                                             -fx-font-size: 14px;"/>
+                            <Button text="Rechercher"
+                                    style="-fx-background-color: #7B2FF7;
+                                           -fx-text-fill: white;
+                                           -fx-background-radius: 25;
+                                           -fx-padding: 12 30;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <!-- Filtres par catégorie -->
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Button fx:id="academicButton"
+                                    text="Académique"
+                                    style="-fx-background-color: #7B2FF7;
+                                           -fx-text-fill: white;
+                                           -fx-background-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                            <Button fx:id="socialButton"
+                                    text="Social"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 1.5;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                            <Button fx:id="autonomieButton"
+                                    text="Autonomie"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 1.5;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                            <Button fx:id="creativiteButton"
+                                    text="Créativité"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 1.5;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <!-- Compteur de cours -->
+                        <Label fx:id="coursCountLabel"
+                               text="0 Cours disponibles"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;" />
+
+                        <!-- Grille des cours -->
+                        <FlowPane fx:id="coursFlowPane"
+                                  hgap="20" vgap="20"
+                                  style="-fx-padding: 0 0 20 0;" />
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+        </HBox>
+
+    </children>
+
+</AnchorPane>
