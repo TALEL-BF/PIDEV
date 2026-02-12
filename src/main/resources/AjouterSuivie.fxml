@@ -39,31 +39,55 @@
 
     <!-- CONTENT -->
     <center>
-        <VBox styleClass="content" spacing="14">
+        <ScrollPane fx:id="mainScroll"
+                    fitToWidth="true"
+                    pannable="true"
+                    vbarPolicy="ALWAYS"
+                    hbarPolicy="NEVER"
+                    styleClass="main-scroll">
 
-            <!-- Title -->
-            <VBox spacing="3">
-                <Label text="Gestion des Suivies" styleClass="page-title"/>
-                <Label text="Gérez les suivies et les informations associées" styleClass="page-subtitle"/>
-            </VBox>
+            <content>
+                <VBox styleClass="content" spacing="14">
 
-            <!-- Search + Filters -->
-            <HBox spacing="12" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Rechercher un suivi..." styleClass="search"/>
-                <HBox styleClass="filters" spacing="8">
-                    <ToggleButton text="Tous" selected="true"/>
-                    <ToggleButton text="Actif"/>
-                    <ToggleButton text="Terminé"/>
-                    <ToggleButton text="Annulé"/>
-                </HBox>
-            </HBox>
+                    <!-- Title -->
+                    <VBox spacing="3">
+                        <Label text="Gestion des Suivies" styleClass="page-title"/>
+                        <Label text="Gérez les suivies et les informations associées"
+                               styleClass="page-subtitle"/>
+                    </VBox>
 
-            <Label fx:id="countLabel" text="0 Suivies" styleClass="count"/>
+                    <!-- Search + Filters + Add -->
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <TextField fx:id="searchField"
+                                   promptText="Rechercher un suivi..."
+                                   styleClass="search"/>
 
-            <!-- Cards grid -->
-            <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980"/>
+                        <HBox styleClass="filters" spacing="8">
+                            <ToggleButton fx:id="tbTous" text="Tous" selected="true"/>
+                            <ToggleButton fx:id="tbActif" text="Actif"/>
+                            <ToggleButton fx:id="tbTermine" text="Terminé"/>
+                            <ToggleButton fx:id="tbAnnule" text="Annulé"/>
+                        </HBox>
 
-        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnAjouter" text="+ Ajouter" styleClass="btn-add"/>
+                    </HBox>
+
+                    <!-- ✅ Remis (sinon NPE) -->
+                    <Label fx:id="countLabel" text="0 Suivies" styleClass="count"/>
+
+                    <!-- Empty state -->
+                    <VBox fx:id="emptyBox" visible="false" managed="false"
+                          styleClass="empty-box" spacing="6">
+                        <Label text="Aucun suivi trouvé" styleClass="empty-title"/>
+                        <Label text="Essayez un autre filtre ou ajoutez un suivi." styleClass="empty-sub"/>
+                    </VBox>
+
+                    <!-- Cards -->
+                    <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980"/>
+
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
-
 </BorderPane>

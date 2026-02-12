@@ -2,8 +2,11 @@ package test;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 public class MainFX extends Application {
 
@@ -11,16 +14,30 @@ public class MainFX extends Application {
     public void start(Stage stage) throws Exception {
 
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/AjouterSuivie.fxml")
+                Objects.requireNonNull(getClass().getResource("/AjouterSuivie.fxml"),
+                        "❌ FXML introuvable : /AjouterSuivie.fxml (vérifie src/main/resources)")
         );
 
-        Scene scene = new Scene(loader.load());
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+
+        // ✅ CSS (sécurité, même si déjà dans FXML)
+        scene.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/styles/app.css"),
+                        "❌ CSS introuvable : /styles/app.css").toExternalForm()
+        );
+
         stage.setTitle("Gestion des Suivies");
+        stage.setMinWidth(1100);
+        stage.setMinHeight(700);
         stage.setScene(scene);
         stage.show();
+
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
+
