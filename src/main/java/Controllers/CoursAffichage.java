@@ -24,7 +24,7 @@ public class CoursAffichage implements Initializable {
     @FXML private FlowPane coursFlowPane;
     @FXML private TextField searchField;
     @FXML private Button academicButton, socialButton, autonomieButton, creativiteButton;
-    @FXML private Button ajouterCoursButton;  // ← Plus de backToAdminButton
+    @FXML private Button ajouterCoursButton;
 
     private CoursServices coursServices;
     private List<Cours> allCours;
@@ -39,8 +39,6 @@ public class CoursAffichage implements Initializable {
     }
 
     private void setupNavigation() {
-        // 🔴 SUPPRIMÉ : Le bloc if (backToAdminButton != null) a été enlevé
-
         if (ajouterCoursButton != null) {
             ajouterCoursButton.setOnAction(event -> {
                 System.out.println("➕ Navigation vers l'ajout de cours...");
@@ -119,7 +117,7 @@ public class CoursAffichage implements Initializable {
         return card;
     }
 
-    // Méthode pour afficher le contenu simplifié avec images
+    // Méthode pour afficher le contenu simplifié avec images et description
     private void afficherContenuSimplifie(Cours cours) {
         Stage contentStage = new Stage();
         contentStage.setTitle(cours.getTitre());
@@ -133,7 +131,7 @@ public class CoursAffichage implements Initializable {
         mainContainer.setStyle("-fx-background-color: #F0F8FF; -fx-padding: 40;");
         mainContainer.setAlignment(Pos.TOP_CENTER);
 
-        // En-tête
+        // En-tête avec bouton retour
         HBox headerBox = new HBox(20);
         headerBox.setAlignment(Pos.CENTER_LEFT);
         headerBox.setMaxWidth(1200);
@@ -150,7 +148,36 @@ public class CoursAffichage implements Initializable {
 
         headerBox.getChildren().addAll(backButton, spacer, titleLabel);
 
-        // Grille de mots
+        // Carte de description
+        VBox descriptionCard = new VBox(15);
+        descriptionCard.setMaxWidth(1200);
+        descriptionCard.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-border-radius: 20;" +
+                        "-fx-border-color: #7B2FF7;" +
+                        "-fx-border-width: 2;" +
+                        "-fx-padding: 25;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 10, 0, 0, 5);"
+        );
+
+        Label descriptionTitle = new Label("📝 Description du cours");
+        descriptionTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
+
+        Label descriptionContent = new Label(cours.getDescription());
+        descriptionContent.setWrapText(true);
+        descriptionContent.setStyle("-fx-font-size: 18px; -fx-text-fill: #444444; -fx-line-spacing: 5;");
+
+        descriptionCard.getChildren().addAll(descriptionTitle, descriptionContent);
+
+        // Section des mots
+        VBox motsSection = new VBox(15);
+        motsSection.setMaxWidth(1200);
+
+        Label motsTitle = new Label("🎯 Mots à apprendre");
+        motsTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7; -fx-padding: 10 0;");
+        motsSection.getChildren().add(motsTitle);
+
         FlowPane motsPane = new FlowPane();
         motsPane.setHgap(25);
         motsPane.setVgap(25);
@@ -165,8 +192,15 @@ public class CoursAffichage implements Initializable {
                 String mot = motsList[i].trim();
                 String image = (i < imagesList.length) ? imagesList[i].trim() : null;
 
-                VBox motCard = createMotCard(mot, image);
-                motsPane.getChildren().add(motCard);
+                // Gestion des images multiples pour un même mot
+                if (image != null && image.contains(";")) {
+                    String[] multipleImages = image.split(";");
+                    VBox motAvecMultiImages = createMotCardAvecMultiImages(mot, multipleImages);
+                    motsPane.getChildren().add(motAvecMultiImages);
+                } else {
+                    VBox motCard = createMotCard(mot, image);
+                    motsPane.getChildren().add(motCard);
+                }
             }
         }
 
@@ -176,7 +210,8 @@ public class CoursAffichage implements Initializable {
             motsPane.getChildren().add(emptyLabel);
         }
 
-        mainContainer.getChildren().addAll(headerBox, motsPane);
+        motsSection.getChildren().add(motsPane);
+        mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection);
         scrollPane.setContent(mainContainer);
 
         Scene scene = new Scene(scrollPane, 1300, 800);
@@ -184,7 +219,123 @@ public class CoursAffichage implements Initializable {
         contentStage.show();
     }
 
-    // Créer une carte pour chaque mot (sans audio)
+    // Créer une carte avec plusieurs images (scrollable horizontal)
+    private VBox createMotCardAvecMultiImages(String mot, String[] imageUrls) {
+        VBox card = new VBox(15);
+        card.setAlignment(Pos.CENTER);
+        card.setPrefWidth(300);
+        card.setPrefHeight(350);
+        card.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 30;" +
+                        "-fx-border-radius: 30;" +
+                        "-fx-border-color: #7B2FF7;" +
+                        "-fx-border-width: 3;" +
+                        "-fx-padding: 20;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
+        );
+
+        // Effet hover
+        card.setOnMouseEntered(e ->
+                card.setStyle(
+                        "-fx-background-color: #F0E6FF;" +
+                                "-fx-background-radius: 30;" +
+                                "-fx-border-radius: 30;" +
+                                "-fx-border-color: #7B2FF7;" +
+                                "-fx-border-width: 4;" +
+                                "-fx-padding: 20;" +
+                                "-fx-cursor: hand;" +
+                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.4), 20, 0, 0, 10);"
+                )
+        );
+
+        card.setOnMouseExited(e ->
+                card.setStyle(
+                        "-fx-background-color: white;" +
+                                "-fx-background-radius: 30;" +
+                                "-fx-border-radius: 30;" +
+                                "-fx-border-color: #7B2FF7;" +
+                                "-fx-border-width: 3;" +
+                                "-fx-padding: 20;" +
+                                "-fx-cursor: hand;" +
+                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
+                )
+        );
+
+        // Conteneur pour les images (scrollable horizontal)
+        ScrollPane imagesScroll = new ScrollPane();
+        imagesScroll.setFitToHeight(true);
+        imagesScroll.setPrefHeight(150);
+        imagesScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-width: 0;");
+
+        HBox imagesContainer = new HBox(10);
+        imagesContainer.setAlignment(Pos.CENTER);
+        imagesContainer.setStyle("-fx-padding: 10;");
+
+        if (imageUrls != null && imageUrls.length > 0) {
+            for (String imageUrl : imageUrls) {
+                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                    try {
+                        String imagePath = "/images/" + imageUrl.trim();
+                        URL imageResource = getClass().getResource(imagePath);
+
+                        if (imageResource != null) {
+                            Image img = new Image(imageResource.toExternalForm());
+                            ImageView imageView = new ImageView(img);
+                            imageView.setFitHeight(100);
+                            imageView.setFitWidth(100);
+                            imageView.setPreserveRatio(true);
+
+                            // Ajouter un effet de survol pour chaque image
+                            imageView.setOnMouseEntered(ev ->
+                                    imageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.5), 10, 0, 0, 5);")
+                            );
+                            imageView.setOnMouseExited(ev ->
+                                    imageView.setStyle("")
+                            );
+
+                            imagesContainer.getChildren().add(imageView);
+                        }
+                    } catch (Exception e) {
+                        // Ignorer les erreurs de chargement d'image
+                    }
+                }
+            }
+        }
+
+        // Si aucune image n'a été chargée, afficher un emoji
+        if (imagesContainer.getChildren().isEmpty()) {
+            Label emojiLabel = new Label(getEmojiForMot(mot));
+            emojiLabel.setStyle("-fx-font-size: 80px;");
+            imagesContainer.getChildren().add(emojiLabel);
+        }
+
+        imagesScroll.setContent(imagesContainer);
+
+        // Texte du mot
+        Label motLabel = new Label(mot);
+        motLabel.setWrapText(true);
+        motLabel.setStyle(
+                "-fx-font-size: 24px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-text-fill: #333333;" +
+                        "-fx-text-alignment: center;"
+        );
+
+        // Indicateur du nombre d'images
+        if (imageUrls != null && imageUrls.length > 1) {
+            Label countLabel = new Label("📸 " + imageUrls.length + " images");
+            countLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
+            card.getChildren().addAll(imagesScroll, motLabel, countLabel);
+        } else {
+            card.getChildren().addAll(imagesScroll, motLabel);
+        }
+
+        return card;
+    }
+
+    // Créer une carte pour chaque mot (version simple)
     private VBox createMotCard(String mot, String imageUrl) {
         VBox card = new VBox(15);
         card.setAlignment(Pos.CENTER);

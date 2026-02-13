@@ -7,14 +7,12 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefWidth="1100.0" prefHeight="700.0"
+<AnchorPane prefWidth="1100.0" prefHeight="800.0"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controllers.CoursAjout">
 
     <children>
-
-        <!-- HBox ancré correctement -->
         <HBox AnchorPane.topAnchor="0.0"
               AnchorPane.bottomAnchor="0.0"
               AnchorPane.leftAnchor="0.0"
@@ -35,7 +33,6 @@
                             </image>
                         </ImageView>
                     </VBox>
-
                     <Label text="AutiCare"
                            style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;">
                         <font>
@@ -52,7 +49,7 @@
                 <Button text="Gestion des cours"
                         style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10; -fx-cursor: hand;"/>
 
-                <Button text="Gestion des évaluations"
+                <Button text="Gestion des plans"
                         style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
 
                 <Button text="Gestion des événements"
@@ -64,6 +61,11 @@
                 <Button text="Gestion des jeux"
                         style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
 
+                <VBox VBox.vgrow="ALWAYS" />
+
+                <Button text="Déconnexion"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill:white; -fx-cursor: hand; -fx-background-radius:10;"/>
+
             </VBox>
 
             <!-- ================= CONTENU PRINCIPAL ================= -->
@@ -72,7 +74,6 @@
                         style="-fx-background:#F4F5F7;">
 
                 <content>
-
                     <VBox spacing="20"
                           style="-fx-background-color:#F4F5F7; -fx-padding:30;">
 
@@ -145,8 +146,7 @@
                                                promptText="Nom du fichier image"
                                                HBox.hgrow="ALWAYS"
                                                style="-fx-background-radius:10; -fx-border-radius:10;"/>
-                                    <Button fx:id="parcourirImageButton"
-                                            text="Parcourir..."
+                                    <Button text="Parcourir..."
                                             style="-fx-background-color:#7B2FF7;
                                                    -fx-text-fill:white;
                                                    -fx-background-radius:10;
@@ -154,7 +154,7 @@
                                 </HBox>
                             </VBox>
 
-                            <!-- NOUVEAUX CHAMPS (sans audio) -->
+                            <!-- MOTS DU COURS -->
                             <VBox spacing="5">
                                 <Label text="Mots du cours (séparés par ;)"
                                        style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
@@ -164,54 +164,67 @@
                                           style="-fx-background-radius:10; -fx-border-radius:10;"/>
                             </VBox>
 
-                            <VBox spacing="5">
-                                <Label text="Images des mots (séparées par ;)"
+                            <!-- IMAGES POUR CHAQUE MOT (MULTIPLES) -->
+                            <VBox spacing="10">
+                                <Label text="Images pour chaque mot (plusieurs images par mot séparées par ;)"
                                        style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
-                                <TextArea fx:id="imagesMotsField"
-                                          promptText="Ex: chocolat.png;toilettes.png;peluche.png;ballon.png"
-                                          prefRowCount="3"
-                                          style="-fx-background-radius:10; -fx-border-radius:10;"/>
+
+                                <!-- Conteneur pour les lignes d'images -->
+                                <VBox fx:id="imagesMotsContainer" spacing="10">
+                                    <!-- Les lignes seront ajoutées dynamiquement -->
+                                </VBox>
+
+                                <!-- Bouton pour ajouter une ligne -->
+                                <Button fx:id="ajouterLigneImageButton"
+                                        text="+ Ajouter des images pour un mot"
+                                        style="-fx-background-color: transparent;
+                                               -fx-border-color: #7B2FF7;
+                                               -fx-border-width: 2;
+                                               -fx-text-fill: #7B2FF7;
+                                               -fx-border-radius: 10;
+                                               -fx-background-radius: 10;
+                                               -fx-padding: 8 15;
+                                               -fx-cursor: hand;
+                                               -fx-font-weight: bold;"/>
                             </VBox>
 
                             <Separator/>
 
                             <HBox spacing="15" alignment="CENTER_RIGHT">
-                                <!-- NOUVEAU BOUTON : Voir les cours -->
                                 <Button text="👁 Voir les cours"
                                         fx:id="voirCoursButton"
                                         style="-fx-background-color: transparent;
-                   -fx-border-color: #7B2FF7;
-                   -fx-border-width: 2;
-                   -fx-text-fill: #7B2FF7;
-                   -fx-border-radius: 20;
-                   -fx-background-radius: 20;
-                   -fx-padding: 10 25;
-                   -fx-cursor: hand;
-                   -fx-font-weight: bold;"/>
+                                               -fx-border-color: #7B2FF7;
+                                               -fx-border-width: 2;
+                                               -fx-text-fill: #7B2FF7;
+                                               -fx-border-radius: 20;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 10 25;
+                                               -fx-cursor: hand;
+                                               -fx-font-weight: bold;"/>
 
                                 <Region HBox.hgrow="ALWAYS" />
 
                                 <Button text="Annuler"
                                         fx:id="annulerButton"
                                         style="-fx-background-color:transparent;
-                   -fx-border-color:#7B2FF7;
-                   -fx-text-fill:#7B2FF7;
-                   -fx-border-width:2;
-                   -fx-border-radius:20;
-                   -fx-background-radius:20;
-                   -fx-padding:10 25;
-                   -fx-cursor: hand;"/>
+                                               -fx-border-color:#7B2FF7;
+                                               -fx-text-fill:#7B2FF7;
+                                               -fx-border-width:2;
+                                               -fx-border-radius:20;
+                                               -fx-background-radius:20;
+                                               -fx-padding:10 25;
+                                               -fx-cursor: hand;"/>
 
                                 <Button text="Ajouter le cours"
                                         fx:id="ajouterButton"
                                         style="-fx-background-color:#7B2FF7;
-                   -fx-text-fill:white;
-                   -fx-background-radius:20;
-                   -fx-padding:10 25;
-                   -fx-cursor: hand;
-                   -fx-font-weight: bold;"/>
+                                               -fx-text-fill:white;
+                                               -fx-background-radius:20;
+                                               -fx-padding:10 25;
+                                               -fx-cursor: hand;
+                                               -fx-font-weight: bold;"/>
                             </HBox>
-
                         </VBox>
 
                         <!-- ================= CARTE LISTE DES COURS ================= -->
@@ -238,16 +251,10 @@
                                     <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
                                 </columns>
                             </TableView>
-
                         </VBox>
-
                     </VBox>
-
                 </content>
-
             </ScrollPane>
-
         </HBox>
-
     </children>
 </AnchorPane>
