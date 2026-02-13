@@ -117,7 +117,6 @@ public class CoursAffichage implements Initializable {
         return card;
     }
 
-    // Méthode pour afficher le contenu simplifié avec images et description
     private void afficherContenuSimplifie(Cours cours) {
         Stage contentStage = new Stage();
         contentStage.setTitle(cours.getTitre());
@@ -211,14 +210,35 @@ public class CoursAffichage implements Initializable {
         }
 
         motsSection.getChildren().add(motsPane);
-        mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection);
+
+        // ========== NOUVELLE SECTION : ÉVALUATIONS ==========
+        VBox evaluationsSection = new VBox(15);
+        evaluationsSection.setMaxWidth(1200);
+
+        Label evaluationsTitle = new Label("📊 Évaluations du cours");
+        evaluationsTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7; -fx-padding: 10 0;");
+
+        // Bouton pour voir les évaluations
+        Button voirEvaluationsBtn = new Button("Voir les évaluations");
+        voirEvaluationsBtn.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 25; -fx-font-weight: bold; -fx-cursor: hand;");
+
+        voirEvaluationsBtn.setOnAction(e -> {
+            // Fermer la fenêtre actuelle et ouvrir la page des évaluations pour ce cours
+            contentStage.close();
+            Navigation.navigateTo("evaluationaffichage.fxml?coursId=" + cours.getId_cours(),
+                    "Évaluations - " + cours.getTitre());
+        });
+
+        evaluationsSection.getChildren().addAll(evaluationsTitle, voirEvaluationsBtn);
+
+        // Ajouter toutes les sections au conteneur principal
+        mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationsSection);
         scrollPane.setContent(mainContainer);
 
         Scene scene = new Scene(scrollPane, 1300, 800);
         contentStage.setScene(scene);
         contentStage.show();
     }
-
     // Créer une carte avec plusieurs images (scrollable horizontal)
     private VBox createMotCardAvecMultiImages(String mot, String[] imageUrls) {
         VBox card = new VBox(15);

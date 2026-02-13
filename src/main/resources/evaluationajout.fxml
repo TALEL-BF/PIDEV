@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefWidth="1300.0" prefHeight="800.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllers.EvaluationAjout">
+
+    <children>
+        <HBox prefWidth="1300.0" prefHeight="800.0">
+            Customize Toolbar…
+
+            <!-- Contenu principal -->
+            <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS" style="-fx-background: #F4F5F7;">
+                <content>
+                    <VBox spacing="20" style="-fx-padding: 30;">
+
+                        <Label text="Nouvelle évaluation"
+                               style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+                        <!-- Formulaire -->
+                        <VBox spacing="15"
+                              style="-fx-background-color: white; -fx-background-radius: 15;
+                                     -fx-border-color: #7B2FF7; -fx-border-width: 2;
+                                     -fx-padding: 25; -fx-spacing: 15;">
+
+                            <VBox spacing="5">
+                                <Label text="Type d'évaluation *" style="-fx-font-weight: bold;"/>
+                                <ComboBox fx:id="typeEvaluationCombo"
+                                          prefWidth="300" promptText="Sélectionnez un type"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Score (0-20) *" style="-fx-font-weight: bold;"/>
+                                <TextField fx:id="scoreField"
+                                           promptText="Ex: 15.5" prefWidth="200"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Niveau de compréhension *" style="-fx-font-weight: bold;"/>
+                                <ComboBox fx:id="niveauComprehensionCombo"
+                                          prefWidth="300" promptText="Sélectionnez un niveau"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Date d'évaluation *" style="-fx-font-weight: bold;"/>
+                                <DatePicker fx:id="dateEvaluationPicker" prefWidth="200"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Cours associé *" style="-fx-font-weight: bold;"/>
+                                <ComboBox fx:id="coursCombo"
+                                          prefWidth="400" promptText="Sélectionnez un cours"/>
+                            </VBox>
+
+                            <Separator/>
+
+                            <HBox spacing="15" alignment="CENTER_RIGHT">
+                                <Button text="Annuler"
+                                        fx:id="annulerButton"
+                                        onAction="#annuler"
+                                        style="-fx-background-color: transparent;
+                                               -fx-border-color: #7B2FF7;
+                                               -fx-text-fill: #7B2FF7;
+                                               -fx-border-radius: 20;
+                                               -fx-padding: 10 25;"/>
+                                <Button text="Ajouter l'évaluation"
+                                        fx:id="ajouterButton"
+                                        onAction="#ajouterEvaluation"
+                                        style="-fx-background-color: #7B2FF7;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 10 25;
+                                               -fx-font-weight: bold;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </HBox>
+    </children>
+</AnchorPane>
