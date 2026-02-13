@@ -6,10 +6,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Navigation {
 
     private static Stage primaryStage;
+    private static Map<String, String> parameters = new HashMap<>();
 
     /**
      * Initialiser le stage principal
@@ -19,24 +22,60 @@ public class Navigation {
     }
 
     /**
+     * Définir les paramètres pour la navigation
+     */
+    public static void setParameters(Map<String, String> params) {
+        parameters = params;
+    }
+
+    /**
+     * Récupérer les paramètres de navigation
+     */
+    public static Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    /**
      * Changer de page dans la même fenêtre
      */
     public static void navigateTo(String fxmlFile, String title) {
         try {
+            // Extraire les paramètres de l'URL si présents
+            String fxmlPath = fxmlFile;
+            Map<String, String> params = new HashMap<>();
+
+            if (fxmlFile.contains("?")) {
+                String[] parts = fxmlFile.split("\\?");
+                fxmlPath = parts[0];
+
+                if (parts.length > 1) {
+                    String[] paramPairs = parts[1].split("&");
+                    for (String pair : paramPairs) {
+                        String[] keyValue = pair.split("=");
+                        if (keyValue.length == 2) {
+                            params.put(keyValue[0], keyValue[1]);
+                        }
+                    }
+                }
+            }
+
+            // Sauvegarder les paramètres
+            setParameters(params);
+
             // Construire le chemin du fichier FXML
-            String path = "/" + fxmlFile;
+            String path = "/" + fxmlPath;
             if (!path.endsWith(".fxml")) {
                 path += ".fxml";
             }
 
             System.out.println("🔍 Chargement de : " + path);
+            System.out.println("📋 Paramètres : " + params);
 
             // Vérifier si le fichier existe
             if (Navigation.class.getResource(path) == null) {
                 System.err.println("❌ Fichier FXML introuvable : " + path);
                 System.err.println("📁 Chemins recherchés :");
                 System.err.println("   - " + path);
-                System.err.println("   - /resources" + path);
                 return;
             }
 
@@ -51,13 +90,11 @@ public class Navigation {
             primaryStage.centerOnScreen();
             primaryStage.show();
 
-            System.out.println("✅ Navigation vers : " + fxmlFile + " (" + title + ")");
+            System.out.println("✅ Navigation vers : " + fxmlPath + " (" + title + ")");
 
         } catch (IOException e) {
             System.err.println("❌ Erreur navigation vers " + fxmlFile + " : " + e.getMessage());
             e.printStackTrace();
-
-            // Afficher une alerte en cas d'erreur
             showErrorAlert("Erreur de navigation",
                     "Impossible de charger la page : " + fxmlFile + "\n" + e.getMessage());
         } catch (IllegalStateException e) {
@@ -110,8 +147,6 @@ public class Navigation {
         } catch (IOException e) {
             System.err.println("❌ Erreur ouverture fenêtre " + fxmlFile + " : " + e.getMessage());
             e.printStackTrace();
-
-            // Afficher une alerte en cas d'erreur
             showErrorAlert("Erreur d'ouverture",
                     "Impossible d'ouvrir la fenêtre : " + fxmlFile + "\n" + e.getMessage());
         }

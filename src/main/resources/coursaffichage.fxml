@@ -6,7 +6,8 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.effect.DropShadow?>
 
 <AnchorPane prefWidth="1300.0" prefHeight="800.0"
             xmlns="http://javafx.com/javafx/17"
@@ -73,6 +74,41 @@
                 <content>
                     <VBox spacing="25" style="-fx-background-color: white; -fx-padding: 30;">
 
+                        <!-- ========== EN-TÊTE AVEC IMAGE EN CERCLE ========== -->
+                        <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #F9F5FF, #FFFFFF); -fx-padding: 30; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 10, 0, 0, 5);">
+
+                            <HBox alignment="CENTER_LEFT" spacing="25">
+                                <!-- Image en cercle avec effet -->
+                                <StackPane>
+                                    <ImageView fitHeight="100.0" fitWidth="100.0" preserveRatio="true">
+                                        <image>
+                                            <Image url="@images/cours-bienvenue.png"/>
+                                        </image>
+                                        <effect>
+                                            <DropShadow color="#7B2FF7" radius="10" spread="0.2"/>
+                                        </effect>
+                                    </ImageView>
+                                    <clip>
+                                        <Circle radius="50" centerX="48" centerY="60" />
+                                    </clip>
+
+                                </StackPane>
+
+                                <VBox spacing="8">
+                                    <Label text="Bienvenue dans nos cours adaptés 🎓"
+                                           style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;"/>
+                                    <Label text="Découvrez des programmes éducatifs conçus avec bienveillance pour les apprenants AutiCare"
+                                           style="-fx-font-size: 16px; -fx-text-fill: #666666; -fx-wrap-text: true;"/>
+
+                                    <!-- Badge optionnel -->
+                                    <HBox style="-fx-padding: 10 0 0 0;">
+                                        <Label text="✨ Nouveaux cours disponibles"
+                                               style="-fx-background-color: #F0E6FF; -fx-text-fill: #7B2FF7; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
                         <!-- ========== HEADER AVEC BOUTONS DE NAVIGATION ========== -->
                         <HBox alignment="CENTER_LEFT" spacing="20">
                             <VBox spacing="10" HBox.hgrow="ALWAYS">
@@ -82,7 +118,7 @@
                                        style="-fx-font-size: 14px; -fx-text-fill: #666666;" />
                             </VBox>
 
-                            <!-- BOUTON POUR AJOUTER (navigation vers admin) -->
+                            <!-- BOUTON POUR AJOUTER -->
                             <Button text="+ Ajouter un cours"
                                     fx:id="ajouterCoursButton"
                                     style="-fx-background-color: #7B2FF7;
@@ -92,8 +128,6 @@
                                            -fx-font-weight: bold;
                                            -fx-cursor: hand;
                                            -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
-
-
                         </HBox>
 
                         <!-- Barre de recherche -->

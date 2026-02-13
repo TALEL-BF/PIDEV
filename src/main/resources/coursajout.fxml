@@ -7,7 +7,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefWidth="1100.0" prefHeight="800.0"
+<AnchorPane prefWidth="1300.0" prefHeight="800.0"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controllers.CoursAjout">
@@ -141,16 +141,18 @@
                             <VBox spacing="5">
                                 <Label text="Image du cours"
                                        style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
+                                <!-- Dans la section Image du cours, modifiez le bouton comme ceci : -->
                                 <HBox spacing="10" alignment="CENTER_LEFT">
                                     <TextField fx:id="imageField"
                                                promptText="Nom du fichier image"
                                                HBox.hgrow="ALWAYS"
                                                style="-fx-background-radius:10; -fx-border-radius:10;"/>
-                                    <Button text="Parcourir..."
+                                    <Button fx:id="parcourirImageButton"
+                                            text="Parcourir..."
                                             style="-fx-background-color:#7B2FF7;
-                                                   -fx-text-fill:white;
-                                                   -fx-background-radius:10;
-                                                   -fx-cursor: hand;"/>
+                       -fx-text-fill:white;
+                       -fx-background-radius:10;
+                       -fx-cursor: hand;"/>
                                 </HBox>
                             </VBox>
 

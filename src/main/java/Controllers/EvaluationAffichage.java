@@ -22,20 +22,44 @@ import java.util.Map;
 
 public class EvaluationAffichage implements Initializable {
 
-    @FXML private TableView<Evaluation> evaluationTable;
-    @FXML private TableColumn<Evaluation, Integer> idColumn;
-    @FXML private TableColumn<Evaluation, String> typeColumn;
-    @FXML private TableColumn<Evaluation, Float> scoreColumn;
-    @FXML private TableColumn<Evaluation, String> niveauColumn;
-    @FXML private TableColumn<Evaluation, LocalDate> dateColumn;
-    @FXML private TableColumn<Evaluation, String> coursColumn;
-    @FXML private TableColumn<Evaluation, Void> actionsColumn;
+    @FXML
+    private TableView<Evaluation> evaluationTable;
 
-    @FXML private ComboBox<String> filterCoursCombo;
-    @FXML private Label totalEvaluationsLabel;
-    @FXML private Button ajouterEvaluationButton;
-    @FXML private Label coursTitreLabel;
-    @FXML private Button retourButton;
+    @FXML
+    private TableColumn<Evaluation, Integer> idColumn;
+
+    @FXML
+    private TableColumn<Evaluation, String> typeColumn;
+
+    @FXML
+    private TableColumn<Evaluation, Float> scoreColumn;
+
+    @FXML
+    private TableColumn<Evaluation, String> niveauColumn;
+
+    @FXML
+    private TableColumn<Evaluation, LocalDate> dateColumn;
+
+    @FXML
+    private TableColumn<Evaluation, String> coursColumn;
+
+    @FXML
+    private TableColumn<Evaluation, Void> actionsColumn;
+
+    @FXML
+    private ComboBox<String> filterCoursCombo;
+
+    @FXML
+    private Label totalEvaluationsLabel;
+
+    @FXML
+    private Button ajouterEvaluationButton;
+
+    @FXML
+    private Label coursTitreLabel;
+
+    @FXML
+    private Button retourButton;
 
     private EvaluationServices evaluationServices;
     private CoursServices coursServices;
@@ -207,8 +231,13 @@ public class EvaluationAffichage implements Initializable {
     }
 
     private void modifierEvaluation(Evaluation evaluation) {
-        System.out.println("Modifier évaluation ID: " + evaluation.getId_evaluation());
         // TODO: Implémenter la modification
+        System.out.println("Modifier évaluation ID: " + evaluation.getId_evaluation());
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setHeaderText("Modification");
+        alert.setContentText("Fonctionnalité de modification en cours de développement");
+        alert.showAndWait();
     }
 
     private void supprimerEvaluation(Evaluation evaluation) {

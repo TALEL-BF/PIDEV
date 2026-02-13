@@ -35,6 +35,10 @@ public class CoursAjout implements Initializable {
     @FXML
     private TextField imageField;
 
+    // Ajouter ce champ pour le bouton parcourir de l'image du cours
+    @FXML
+    private Button parcourirImageButton; // À ajouter dans le FXML
+
     // NOUVEAUX CHAMPS POUR LES MOTS AVEC IMAGES MULTIPLES
     @FXML
     private TextArea motsField;
@@ -205,6 +209,22 @@ public class CoursAjout implements Initializable {
         }
     }
 
+    // Méthode pour choisir une image pour le cours
+    private void choisirImageCours() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image pour le cours");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(null);
+
+        if (selectedFile != null) {
+            // Mettre juste le nom du fichier dans le champ
+            imageField.setText(selectedFile.getName());
+        }
+    }
+
     private void choisirImagesMultiples(TextField imagesField) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir des images");
@@ -237,7 +257,7 @@ public class CoursAjout implements Initializable {
 
     private void initializeComboBoxes() {
         ObservableList<String> types = FXCollections.observableArrayList(
-                "Présentiel", "En ligne", "Hybride", "Vidéo", "PDF"
+                "Académique", "Social", "Autonomie", "Créativité"
         );
         typeCoursCombo.setItems(types);
 
@@ -317,6 +337,12 @@ public class CoursAjout implements Initializable {
     private void configureActions() {
         ajouterButton.setOnAction(event -> ajouterCours());
         annulerButton.setOnAction(event -> annuler());
+
+        // Ajouter l'action pour le bouton parcourir de l'image du cours
+        // Note: Il faut ajouter fx:id="parcourirImageButton" dans le FXML
+        if (parcourirImageButton != null) {
+            parcourirImageButton.setOnAction(event -> choisirImageCours());
+        }
 
         if (voirCoursButton != null) {
             voirCoursButton.setOnAction(event -> {
