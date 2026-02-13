@@ -11,14 +11,16 @@ public class Main {
         Mydatabase.getInstance();
         CoursServices cs = new CoursServices();
 
-        // Création d'un cours avec tous les paramètres
+        // Création d'un cours avec tous les paramètres (y compris mots et images_mots)
         Cours coursAutistes = new Cours(
-                "arabe",
-                "Exercices pour améliorer la communication et l'autonomie des enfants autistes",
-                "Développement personnel",
-                "Intermédiaire",  // niveau
-                10,               // durée en heures
-                "Moyen"           // difficulté
+                "arabe",                    // titre
+                "Exercices pour améliorer la communication et l'autonomie des enfants autistes", // description
+                "Développement personnel",  // type_cours
+                "Intermédiaire",             // niveau
+                10,                          // duree
+                "Moyen",                     // image
+                "",                          // mots (vide pour l'instant)
+                ""                           // images_mots (vide pour l'instant)
         );
 
         cs.ajouter(coursAutistes);
@@ -34,7 +36,9 @@ public class Main {
                 "Développement personnel",
                 "Avancé",      // niveau
                 12,            // durée
-                "Difficile"    // difficulté
+                "Difficile",   // image
+                "",            // mots
+                ""             // images_mots
         );
         cs.modifier(coursModifie);
         */

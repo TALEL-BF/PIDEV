@@ -93,21 +93,7 @@
                                            -fx-cursor: hand;
                                            -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
 
-                            <!-- BOUTON POUR RETOUR À L'ADMIN -->
-                            <Button text="⚙ Administration"
-                                    fx:id="backToAdminButton"
-                                    style="-fx-background-color: transparent;
-                                           -fx-border-color: #7B2FF7;
-                                           -fx-border-width: 2;
-                                           -fx-text-fill: #7B2FF7;
-                                           -fx-background-radius: 20;
-                                           -fx-border-radius: 20;
-                                           -fx-padding: 12 25;
-                                           -fx-font-weight: bold;
-                                           -fx-cursor: hand;
-                                           -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 10, 0, 0, 5);"/>
 
-                            <!-- 🔴 SUPPRIMEZ LA BALISE <styles> !!! -->
                         </HBox>
 
                         <!-- Barre de recherche -->

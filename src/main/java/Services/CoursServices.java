@@ -1,114 +1,77 @@
 package Services;
 
 import Entites.Cours;
-import IServices.IServices;
-import Utils.Mydatabase;
-
+import Utils.Mydatabase;  // ← CORRIGÉ
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoursServices implements IServices<Cours> {
+public class CoursServices {
 
-    private Connection con;
+    private Connection connection;
 
     public CoursServices() {
-        con = Mydatabase.getInstance().getConnection();
+        connection = Mydatabase.getInstance().getConnection();  // ← CORRIGÉ
     }
 
-    // ================== AJOUTER ==================
-    @Override
+    // Ajouter un cours
     public boolean ajouter(Cours cours) {
-
-        String req = "INSERT INTO Cours (titre, description, type_cours, niveau, duree, image) VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement ps = con.prepareStatement(req)) {
-
+        String req = "INSERT INTO cours (titre, description, type_cours, niveau, duree, image, mots, images_mots) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement ps = connection.prepareStatement(req);
             ps.setString(1, cours.getTitre());
             ps.setString(2, cours.getDescription());
             ps.setString(3, cours.getType_cours());
             ps.setString(4, cours.getNiveau());
             ps.setInt(5, cours.getDuree());
-            ps.setString(6, cours.getImage());  // Changé de difficulte à image
+            ps.setString(6, cours.getImage());
+            ps.setString(7, cours.getMots());
+            ps.setString(8, cours.getImages_mots());
 
-            ps.executeUpdate();
+            int result = ps.executeUpdate();
             System.out.println("✅ Cours ajouté avec succès !");
-            return true;
+            return result > 0;
 
         } catch (SQLException e) {
-            System.out.println("❌ Erreur ajout cours : " + e.getMessage());
+            System.err.println("❌ Erreur lors de l'ajout du cours : " + e.getMessage());
             return false;
         }
     }
 
-    // ================== MODIFIER ==================
-    @Override
+    // Modifier un cours
     public boolean modifier(Cours cours) {
-
-        String req = "UPDATE Cours SET titre=?, description=?, type_cours=?, niveau=?, duree=?, image=? WHERE id_cours=?";
-
-        try (PreparedStatement ps = con.prepareStatement(req)) {
-
+        String req = "UPDATE cours SET titre = ?, description = ?, type_cours = ?, niveau = ?, duree = ?, image = ?, mots = ?, images_mots = ? WHERE id_cours = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(req);
             ps.setString(1, cours.getTitre());
             ps.setString(2, cours.getDescription());
             ps.setString(3, cours.getType_cours());
             ps.setString(4, cours.getNiveau());
             ps.setInt(5, cours.getDuree());
-            ps.setString(6, cours.getImage());  // Changé de difficulte à image
-            ps.setInt(7, cours.getId_cours());
+            ps.setString(6, cours.getImage());
+            ps.setString(7, cours.getMots());
+            ps.setString(8, cours.getImages_mots());
+            ps.setInt(9, cours.getId_cours());
 
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("✅ Cours modifié avec succès !");
-                return true;
-            } else {
-                System.out.println("⚠️ Aucun cours trouvé avec l'ID : " + cours.getId_cours());
-                return false;
-            }
+            int result = ps.executeUpdate();
+            System.out.println("✅ Cours modifié avec succès !");
+            return result > 0;
 
         } catch (SQLException e) {
-            System.out.println("❌ Erreur modification : " + e.getMessage());
+            System.err.println("❌ Erreur lors de la modification du cours : " + e.getMessage());
             return false;
         }
     }
 
-    // ================== SUPPRIMER ==================
-    @Override
-    public boolean supprimer(int id) {
-
-        String req = "DELETE FROM Cours WHERE id_cours=?";
-
-        try (PreparedStatement ps = con.prepareStatement(req)) {
-
-            ps.setInt(1, id);
-            int rowsAffected = ps.executeUpdate();
-
-            if (rowsAffected > 0) {
-                System.out.println("✅ Cours supprimé !");
-                return true;
-            } else {
-                System.out.println("⚠️ Aucun cours trouvé avec l'ID : " + id);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            System.out.println("❌ Erreur suppression : " + e.getMessage());
-            return false;
-        }
-    }
-
-    // ================== AFFICHER ==================
-    @Override
+    // Récupérer tous les cours
     public List<Cours> getAll() {
-
         List<Cours> coursList = new ArrayList<>();
-        String req = "SELECT * FROM Cours";
-
-        try (Statement ste = con.createStatement();
-             ResultSet rs = ste.executeQuery(req)) {
+        String req = "SELECT * FROM cours";
+        try {
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(req);
 
             while (rs.next()) {
-
                 Cours cours = new Cours(
                         rs.getInt("id_cours"),
                         rs.getString("titre"),
@@ -116,27 +79,23 @@ public class CoursServices implements IServices<Cours> {
                         rs.getString("type_cours"),
                         rs.getString("niveau"),
                         rs.getInt("duree"),
-                        rs.getString("image")  // Changé de difficulte à image
+                        rs.getString("image"),
+                        rs.getString("mots"),
+                        rs.getString("images_mots")
                 );
-
                 coursList.add(cours);
             }
-
-            System.out.println("✅ " + coursList.size() + " cours chargés");
-
         } catch (SQLException e) {
-            System.out.println("❌ Erreur affichage : " + e.getMessage());
+            System.err.println("❌ Erreur lors de la récupération des cours : " + e.getMessage());
         }
-
         return coursList;
     }
 
-    // ================== MÉTHODES SUPPLÉMENTAIRES UTILES ==================
-
+    // Récupérer un cours par son ID
     public Cours getById(int id) {
-        String req = "SELECT * FROM Cours WHERE id_cours = ?";
-
-        try (PreparedStatement ps = con.prepareStatement(req)) {
+        String req = "SELECT * FROM cours WHERE id_cours = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(req);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -148,38 +107,30 @@ public class CoursServices implements IServices<Cours> {
                         rs.getString("type_cours"),
                         rs.getString("niveau"),
                         rs.getInt("duree"),
-                        rs.getString("image")
+                        rs.getString("image"),
+                        rs.getString("mots"),
+                        rs.getString("images_mots")
                 );
             }
         } catch (SQLException e) {
-            System.out.println("❌ Erreur recherche par ID : " + e.getMessage());
+            System.err.println("❌ Erreur lors de la récupération du cours : " + e.getMessage());
         }
         return null;
     }
 
-    public List<Cours> getByNiveau(String niveau) {
-        List<Cours> coursList = new ArrayList<>();
-        String req = "SELECT * FROM Cours WHERE niveau = ?";
+    // Supprimer un cours
+    public boolean supprimer(int id) {
+        String req = "DELETE FROM cours WHERE id_cours = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(req);
+            ps.setInt(1, id);
+            int result = ps.executeUpdate();
+            System.out.println("✅ Cours supprimé avec succès !");
+            return result > 0;
 
-        try (PreparedStatement ps = con.prepareStatement(req)) {
-            ps.setString(1, niveau);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Cours cours = new Cours(
-                        rs.getInt("id_cours"),
-                        rs.getString("titre"),
-                        rs.getString("description"),
-                        rs.getString("type_cours"),
-                        rs.getString("niveau"),
-                        rs.getInt("duree"),
-                        rs.getString("image")
-                );
-                coursList.add(cours);
-            }
         } catch (SQLException e) {
-            System.out.println("❌ Erreur recherche par niveau : " + e.getMessage());
+            System.err.println("❌ Erreur lors de la suppression du cours : " + e.getMessage());
+            return false;
         }
-        return coursList;
     }
 }

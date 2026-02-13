@@ -2,13 +2,18 @@ package Controllers;
 
 import Entites.Cours;
 import Services.CoursServices;
+import Utils.Navigation;  // ← AJOUTER CET IMPORT
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -26,6 +31,14 @@ public class CoursAjout implements Initializable {
     private TextArea descriptionArea;
     @FXML
     private TextField imageField;
+
+    // NOUVEAUX CHAMPS
+    @FXML
+    private TextArea motsField;
+    @FXML
+    private TextArea imagesMotsField;
+    @FXML
+    private Button parcourirImageButton;
 
     @FXML
     private TableView<Cours> coursTable;
@@ -51,6 +64,10 @@ public class CoursAjout implements Initializable {
     @FXML
     private Button annulerButton;
 
+    // NOUVEAU BOUTON
+    @FXML
+    private Button voirCoursButton;  // ← AJOUTER CETTE LIGNE
+
     private CoursServices coursServices;
     private ObservableList<Cours> coursList;
 
@@ -58,29 +75,21 @@ public class CoursAjout implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         coursServices = new CoursServices();
 
-        // Initialiser les ComboBox
         initializeComboBoxes();
-
-        // Initialiser la table
         initializeTable();
-
-        // Charger les données
         loadCoursData();
-
-        // Configurer les actions
-        configureActions();
+        configureActions();  // Cette méthode sera modifiée
+        setupParcourirButton();
     }
 
     private void initializeComboBoxes() {
-        // Types de cours
         ObservableList<String> types = FXCollections.observableArrayList(
                 "Présentiel", "En ligne", "Hybride", "Vidéo", "PDF"
         );
         typeCoursCombo.setItems(types);
 
-        // Niveaux
         ObservableList<String> niveaux = FXCollections.observableArrayList(
-                "Débutant", "Intermédiaire", "Avancé", "Expert"
+                "Débutant", "Intermédiaire", "Avancé"
         );
         niveauCombo.setItems(niveaux);
     }
@@ -92,6 +101,59 @@ public class CoursAjout implements Initializable {
         niveauColumn.setCellValueFactory(new PropertyValueFactory<>("niveau"));
         dureeColumn.setCellValueFactory(new PropertyValueFactory<>("duree"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        imageColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
+
+        ajouterBoutonsActions();
+    }
+
+    private void ajouterBoutonsActions() {
+        actionsColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button modifierButton = new Button("Modifier");
+            private final Button supprimerButton = new Button("Supprimer");
+            private final HBox pane = new HBox(10, modifierButton, supprimerButton);
+
+            {
+                modifierButton.setStyle(
+                        "-fx-background-color: transparent;" +
+                                "-fx-border-color: #FFA500;" +
+                                "-fx-text-fill: #FFA500;" +
+                                "-fx-border-radius: 20;" +
+                                "-fx-background-radius: 20;" +
+                                "-fx-padding: 5 15;"
+                );
+
+                supprimerButton.setStyle(
+                        "-fx-background-color: transparent;" +
+                                "-fx-border-color: #FF4444;" +
+                                "-fx-text-fill: #FF4444;" +
+                                "-fx-border-radius: 20;" +
+                                "-fx-background-radius: 20;" +
+                                "-fx-padding: 5 15;"
+                );
+
+                pane.setAlignment(Pos.CENTER);
+
+                modifierButton.setOnAction(event -> {
+                    Cours cours = getTableView().getItems().get(getIndex());
+                    modifierCours(cours);
+                });
+
+                supprimerButton.setOnAction(event -> {
+                    Cours cours = getTableView().getItems().get(getIndex());
+                    supprimerCours(cours);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(pane);
+                }
+            }
+        });
     }
 
     private void loadCoursData() {
@@ -99,36 +161,64 @@ public class CoursAjout implements Initializable {
         coursTable.setItems(coursList);
     }
 
+    // 🔴 MODIFICATION ICI : Ajouter l'action pour le bouton "Voir les cours"
     private void configureActions() {
         ajouterButton.setOnAction(event -> ajouterCours());
         annulerButton.setOnAction(event -> annuler());
+
+        // Action pour le bouton "Voir les cours"
+        if (voirCoursButton != null) {
+            voirCoursButton.setOnAction(event -> {
+                System.out.println("👁 Navigation vers l'affichage des cours...");
+                Navigation.navigateTo("coursaffichage.fxml", "Liste des cours");
+            });
+        }
+    }
+
+    private void setupParcourirButton() {
+        if (parcourirImageButton != null) {
+            parcourirImageButton.setOnAction(event -> {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Choisir une image");
+
+                FileChooser.ExtensionFilter extFilter =
+                        new FileChooser.ExtensionFilter("Images (*.png, *.jpg, *.jpeg)", "*.png", "*.jpg", "*.jpeg");
+                fileChooser.getExtensionFilters().add(extFilter);
+
+                File selectedFile = fileChooser.showOpenDialog(null);
+
+                if (selectedFile != null) {
+                    imageField.setText(selectedFile.getName());
+                }
+            });
+        }
     }
 
     @FXML
     private void ajouterCours() {
-        // Validation des champs
         if (!validateFields()) {
             return;
         }
 
         try {
-            // Créer un nouveau cours
+            // Créer un nouveau cours avec les 2 nouveaux champs
             Cours nouveauCours = new Cours(
                     titreField.getText(),
                     descriptionArea.getText(),
                     typeCoursCombo.getValue(),
                     niveauCombo.getValue(),
                     Integer.parseInt(dureeField.getText()),
-                    imageField.getText()
+                    imageField.getText(),
+                    motsField.getText(),
+                    imagesMotsField.getText()
             );
 
-            // Ajouter à la base de données
             boolean success = coursServices.ajouter(nouveauCours);
 
             if (success) {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours ajouté avec succès!");
                 clearFields();
-                loadCoursData(); // Rafraîchir la table
+                loadCoursData();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de l'ajout du cours.");
             }
@@ -176,6 +266,45 @@ public class CoursAjout implements Initializable {
         dureeField.clear();
         descriptionArea.clear();
         imageField.clear();
+        motsField.clear();
+        imagesMotsField.clear();
+    }
+
+    private void modifierCours(Cours cours) {
+        remplirFormulairePourModification(cours);
+        ajouterButton.setText("Modifier");
+        showAlert(Alert.AlertType.INFORMATION, "Modification",
+                "Fonctionnalité de modification en cours de développement");
+    }
+
+    private void supprimerCours(Cours cours) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation de suppression");
+        alert.setHeaderText("Supprimer le cours");
+        alert.setContentText("Voulez-vous vraiment supprimer le cours \"" + cours.getTitre() + "\" ?");
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                boolean success = coursServices.supprimer(cours.getId_cours());
+                if (success) {
+                    showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours supprimé avec succès!");
+                    loadCoursData();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la suppression du cours.");
+                }
+            }
+        });
+    }
+
+    private void remplirFormulairePourModification(Cours cours) {
+        titreField.setText(cours.getTitre());
+        typeCoursCombo.setValue(cours.getType_cours());
+        niveauCombo.setValue(cours.getNiveau());
+        dureeField.setText(String.valueOf(cours.getDuree()));
+        descriptionArea.setText(cours.getDescription());
+        imageField.setText(cours.getImage());
+        motsField.setText(cours.getMots());
+        imagesMotsField.setText(cours.getImages_mots());
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
