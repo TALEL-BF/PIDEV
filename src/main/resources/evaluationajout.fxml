@@ -46,7 +46,7 @@
                 <Button text="Gestion des cours"
                         style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10; -fx-cursor: hand;"/>
 
-                <Button text="Gestion des plans"
+                <Button text="Gestion des emplois"
                         style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
 
                 <Button text="Gestion des événements"
@@ -161,12 +161,13 @@
 
                             <TableView fx:id="questionsTable" prefHeight="300">
                                 <columns>
-                                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
-                                    <TableColumn fx:id="questionColumn" text="Question" prefWidth="300"/>
-                                    <TableColumn fx:id="choix1Column" text="Choix 1" prefWidth="120"/>
-                                    <TableColumn fx:id="choix2Column" text="Choix 2" prefWidth="120"/>
-                                    <TableColumn fx:id="choix3Column" text="Choix 3" prefWidth="120"/>
-                                    <TableColumn fx:id="bonneReponseColumn" text="Bonne réponse" prefWidth="120"/>
+                                    <!-- Colonne ID supprimée -->
+                                    <TableColumn fx:id="questionColumn" text="Question" prefWidth="250"/>
+                                    <TableColumn fx:id="coursColumn" text="Cours" prefWidth="150"/>
+                                    <TableColumn fx:id="choix1Column" text="Choix 1" prefWidth="100"/>
+                                    <TableColumn fx:id="choix2Column" text="Choix 2" prefWidth="100"/>
+                                    <TableColumn fx:id="choix3Column" text="Choix 3" prefWidth="100"/>
+                                    <TableColumn fx:id="bonneReponseColumn" text="Bonne réponse" prefWidth="100"/>
                                     <TableColumn fx:id="scoreColumn" text="Score" prefWidth="70"/>
                                     <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
                                 </columns>

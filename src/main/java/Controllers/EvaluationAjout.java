@@ -5,6 +5,7 @@ import Entites.Evaluation;
 import Services.CoursServices;
 import Services.EvaluationServices;
 import Utils.Navigation;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,8 +43,8 @@ public class EvaluationAjout implements Initializable {
     @FXML private Button retourButton;
 
     @FXML private TableView<Evaluation> questionsTable;
-    @FXML private TableColumn<Evaluation, Integer> idColumn;
     @FXML private TableColumn<Evaluation, String> questionColumn;
+    @FXML private TableColumn<Evaluation, String> coursColumn;  // Nouvelle colonne pour le cours
     @FXML private TableColumn<Evaluation, String> choix1Column;
     @FXML private TableColumn<Evaluation, String> choix2Column;
     @FXML private TableColumn<Evaluation, String> choix3Column;
@@ -64,6 +65,9 @@ public class EvaluationAjout implements Initializable {
     private ObservableList<Cours> coursList;
     private Integer coursFiltreId = null;
     private Evaluation questionEnModification = null;
+
+    // Map pour stocker tous les cours et les retrouver facilement
+    private Map<Integer, Cours> coursMap = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -440,8 +444,31 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void initializeTable() {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id_eval"));
+        // Configuration des colonnes
         questionColumn.setCellValueFactory(new PropertyValueFactory<>("question"));
+
+        // Configuration spéciale pour la colonne Cours - utilise coursMap pour trouver le cours
+        coursColumn.setCellValueFactory(cellData -> {
+            Evaluation evaluation = cellData.getValue();
+            Cours cours = evaluation.getCours();
+
+            // Si le cours n'est pas directement associé, utiliser la map
+            if (cours == null && evaluation.getId_cours() > 0) {
+                cours = coursMap.get(evaluation.getId_cours());
+                evaluation.setCours(cours);
+            }
+
+            // Vérifier si cours n'est pas null avant d'accéder à ses méthodes
+            String coursInfo;
+            if (cours != null) {
+                coursInfo = cours.getTitre() + " (" + cours.getNiveau() + ")";
+            } else {
+                coursInfo = "Non assigné";
+            }
+
+            return new SimpleStringProperty(coursInfo);
+        });
+
         choix1Column.setCellValueFactory(new PropertyValueFactory<>("choix1"));
         choix2Column.setCellValueFactory(new PropertyValueFactory<>("choix2"));
         choix3Column.setCellValueFactory(new PropertyValueFactory<>("choix3"));
@@ -486,6 +513,12 @@ public class EvaluationAjout implements Initializable {
         coursList = FXCollections.observableArrayList(cours);
         coursCombo.setItems(coursList);
 
+        // Remplir la map des cours pour un accès facile
+        coursMap.clear();
+        for (Cours c : cours) {
+            coursMap.put(c.getId_cours(), c);
+        }
+
         // Configuration du filtre
         ObservableList<String> coursNoms = FXCollections.observableArrayList();
         coursNoms.add("📚 Tous les cours");
@@ -523,6 +556,15 @@ public class EvaluationAjout implements Initializable {
         } else {
             questions = evaluationServices.getAll();
         }
+
+        // Charger les cours pour chaque question en utilisant la map
+        for (Evaluation question : questions) {
+            if (question.getCours() == null && question.getId_cours() > 0) {
+                Cours cours = coursMap.get(question.getId_cours());
+                question.setCours(cours);
+            }
+        }
+
         questionsList = FXCollections.observableArrayList(questions);
         questionsTable.setItems(questionsList);
         totalQuestionsLabel.setText(questions.size() + " question(s)");
@@ -569,6 +611,7 @@ public class EvaluationAjout implements Initializable {
         try {
             Evaluation question = new Evaluation();
             question.setId_cours(coursCombo.getValue().getId_cours());
+            question.setCours(coursCombo.getValue()); // Associer le cours directement
             question.setQuestion(questionArea.getText().trim());
             question.setChoix1(choix1Field.getText().trim());
             question.setChoix2(choix2Field.getText().trim());
@@ -644,6 +687,7 @@ public class EvaluationAjout implements Initializable {
             if (questionEnModification == null) return;
 
             questionEnModification.setId_cours(coursCombo.getValue().getId_cours());
+            questionEnModification.setCours(coursCombo.getValue()); // Mettre à jour le cours
             questionEnModification.setQuestion(questionArea.getText().trim());
             questionEnModification.setChoix1(choix1Field.getText().trim());
             questionEnModification.setChoix2(choix2Field.getText().trim());
