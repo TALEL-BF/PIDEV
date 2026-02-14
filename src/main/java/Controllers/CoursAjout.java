@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -17,7 +18,9 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Optional;
 
@@ -72,6 +75,9 @@ public class CoursAjout implements Initializable {
     @FXML
     private Button voirCoursButton;
 
+    // Map pour stocker les labels d'erreur associés à chaque champ
+    private Map<Control, Label> errorLabels = new HashMap<>();
+
     private CoursServices coursServices;
     private ObservableList<Cours> coursList;
 
@@ -79,6 +85,10 @@ public class CoursAjout implements Initializable {
 
     // Variable pour suivre si on est en mode modification
     private Cours coursEnModification = null;
+
+    // Styles pour la validation
+    private static final String STYLE_VALIDE = "-fx-border-color: #00C853; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private static final String STYLE_INVALIDE = "-fx-border-color: #D32F2F; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -88,20 +98,131 @@ public class CoursAjout implements Initializable {
         initializeTable();
         loadCoursData();
         configureActions();
+        setupValidation();
 
         ajouterLigneImageButton.setOnAction(e -> ajouterNouvelleLigneImage());
 
         motsField.textProperty().addListener((observable, oldValue, newValue) -> {
             mettreAJourLignesImages();
         });
+
+        // Ajouter les labels d'erreur après l'initialisation de la scène
+        javafx.application.Platform.runLater(this::addErrorLabels);
+
+        // Ajouter un listener pour rafraîchir la table quand elle devient visible
+        coursTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                refreshTable();
+            }
+        });
     }
 
-    // Classe interne pour gérer une ligne de sélection d'images pour un mot
+    /**
+     * Rafraîchit la table des cours
+     */
+    private void refreshTable() {
+        try {
+            List<Cours> cours = coursServices.getAll();
+            if (cours != null) {
+                coursList = FXCollections.observableArrayList(cours);
+                coursTable.setItems(coursList);
+                coursTable.refresh();
+                System.out.println("Table rafraîchie avec " + cours.size() + " cours");
+            } else {
+                System.out.println("Aucun cours trouvé");
+                coursList = FXCollections.observableArrayList();
+                coursTable.setItems(coursList);
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lors du rafraîchissement de la table: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Ajoute les labels d'erreur après chaque champ
+     */
+    private void addErrorLabels() {
+        addErrorLabelAfter(titreField, "Titre du cours");
+        addErrorLabelAfter(typeCoursCombo, "Type de cours");
+        addErrorLabelAfter(niveauCombo, "Niveau");
+        addErrorLabelAfter(dureeField, "Durée (en minutes)");
+        addErrorLabelAfter(descriptionArea, "Description");
+        addErrorLabelAfter(imageField, "Image du cours");
+        addErrorLabelAfter(motsField, "Mots du cours");
+    }
+
+    /**
+     * Ajoute un label d'erreur après un champ spécifique
+     */
+    private void addErrorLabelAfter(Control field, String fieldName) {
+        // Créer le label d'erreur
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: #D32F2F; -fx-font-size: 11px; -fx-wrap-text: true;");
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+
+        // Trouver le parent du champ
+        Node parent = field.getParent();
+        if (parent instanceof VBox) {
+            VBox vbox = (VBox) parent;
+            int index = vbox.getChildren().indexOf(field);
+            if (index >= 0 && index + 1 < vbox.getChildren().size()) {
+                vbox.getChildren().add(index + 1, errorLabel);
+            } else {
+                vbox.getChildren().add(errorLabel);
+            }
+        } else if (parent instanceof HBox) {
+            // Si le champ est dans un HBox, remonter au VBox parent
+            Node grandParent = parent.getParent();
+            if (grandParent instanceof VBox) {
+                VBox vbox = (VBox) grandParent;
+                int index = vbox.getChildren().indexOf(parent);
+                if (index >= 0 && index + 1 < vbox.getChildren().size()) {
+                    vbox.getChildren().add(index + 1, errorLabel);
+                } else {
+                    vbox.getChildren().add(errorLabel);
+                }
+            }
+        }
+
+        // Stocker le label dans la map
+        errorLabels.put(field, errorLabel);
+    }
+
+    /**
+     * Affiche un message d'erreur pour un champ
+     */
+    private void showError(Control field, String message) {
+        Label errorLabel = errorLabels.get(field);
+        if (errorLabel != null) {
+            errorLabel.setText("❌ " + message);
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
+        }
+    }
+
+    /**
+     * Cache le message d'erreur pour un champ
+     */
+    private void hideError(Control field) {
+        Label errorLabel = errorLabels.get(field);
+        if (errorLabel != null) {
+            errorLabel.setVisible(false);
+            errorLabel.setManaged(false);
+        }
+    }
+
+    /**
+     * Classe interne pour gérer une ligne de sélection d'images pour un mot
+     */
     private class ImageMotLigne {
         private Label motLabel;
         private TextField imagesField;
         private Button parcourirButton;
+        private Label errorLabel;
         private HBox ligne;
+        private VBox ligneContainer;
 
         public ImageMotLigne(String mot) {
             motLabel = new Label(mot);
@@ -111,6 +232,11 @@ public class CoursAjout implements Initializable {
             imagesField = new TextField();
             imagesField.setPromptText("Images (séparées par ;)");
             imagesField.setPrefWidth(300);
+            imagesField.setStyle(STYLE_INVALIDE);
+
+            errorLabel = new Label();
+            errorLabel.setStyle("-fx-text-fill: #D32F2F; -fx-font-size: 11px;");
+            errorLabel.setVisible(false);
 
             parcourirButton = new Button("Parcourir...");
             parcourirButton.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 10;");
@@ -121,20 +247,44 @@ public class CoursAjout implements Initializable {
             ligne = new HBox(10, motLabel, imagesField, parcourirButton, supprimerButton);
             ligne.setAlignment(Pos.CENTER_LEFT);
 
+            ligneContainer = new VBox(5, ligne, errorLabel);
+            ligneContainer.setStyle("-fx-padding: 5 0;");
+
             parcourirButton.setOnAction(e -> choisirImagesMultiples(imagesField));
             supprimerButton.setOnAction(e -> supprimerLigne(this));
+
+            // Ajouter la validation pour ce champ
+            imagesField.textProperty().addListener((obs, old, newValue) -> {
+                validerChampImageMot(this);
+            });
         }
 
-        public HBox getLigne() { return ligne; }
+        public VBox getLigneContainer() { return ligneContainer; }
         public String getMot() { return motLabel.getText(); }
         public String getImages() { return imagesField.getText(); }
         public void setImages(String images) { imagesField.setText(images); }
+        public void showError(String message) {
+            errorLabel.setText("❌ " + message);
+            errorLabel.setVisible(true);
+        }
+        public void hideError() {
+            errorLabel.setVisible(false);
+        }
+        public TextField getImagesField() { return imagesField; }
     }
 
+    /**
+     * Met à jour les lignes d'images en fonction des mots saisis
+     */
     private void mettreAJourLignesImages() {
         String motsText = motsField.getText();
-        String[] mots = motsText.split(";");
+        if (motsText == null || motsText.trim().isEmpty()) {
+            imagesMotLignes.clear();
+            imagesMotsContainer.getChildren().clear();
+            return;
+        }
 
+        String[] mots = motsText.split(";");
         List<String> motsActuels = new ArrayList<>();
         for (String mot : mots) {
             if (!mot.trim().isEmpty()) {
@@ -151,7 +301,7 @@ public class CoursAjout implements Initializable {
 
         for (ImageMotLigne ligne : aSupprimer) {
             imagesMotLignes.remove(ligne);
-            imagesMotsContainer.getChildren().remove(ligne.getLigne());
+            imagesMotsContainer.getChildren().remove(ligne.getLigneContainer());
         }
 
         for (String mot : motsActuels) {
@@ -161,11 +311,14 @@ public class CoursAjout implements Initializable {
             if (!motExiste) {
                 ImageMotLigne nouvelleLigne = new ImageMotLigne(mot);
                 imagesMotLignes.add(nouvelleLigne);
-                imagesMotsContainer.getChildren().add(nouvelleLigne.getLigne());
+                imagesMotsContainer.getChildren().add(nouvelleLigne.getLigneContainer());
             }
         }
     }
 
+    /**
+     * Ajoute une nouvelle ligne d'image pour un mot
+     */
     private void ajouterNouvelleLigneImage() {
         String motsText = motsField.getText();
         if (motsText == null || motsText.trim().isEmpty()) {
@@ -174,13 +327,20 @@ public class CoursAjout implements Initializable {
             dialog.setHeaderText("Saisissez le mot pour lequel vous voulez ajouter des images");
             dialog.setContentText("Mot :");
 
-            dialog.showAndWait().ifPresent(mot -> {
-                if (!mot.trim().isEmpty()) {
-                    ImageMotLigne nouvelleLigne = new ImageMotLigne(mot.trim());
-                    imagesMotLignes.add(nouvelleLigne);
-                    imagesMotsContainer.getChildren().add(nouvelleLigne.getLigne());
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent() && !result.get().trim().isEmpty()) {
+                String mot = result.get().trim();
+                ImageMotLigne nouvelleLigne = new ImageMotLigne(mot);
+                imagesMotLignes.add(nouvelleLigne);
+                imagesMotsContainer.getChildren().add(nouvelleLigne.getLigneContainer());
+
+                // Mettre à jour le champ mots
+                if (motsField.getText().isEmpty()) {
+                    motsField.setText(mot);
+                } else {
+                    motsField.setText(motsField.getText() + ";" + mot);
                 }
-            });
+            }
         } else {
             String[] mots = motsText.split(";");
             for (String mot : mots) {
@@ -191,13 +351,16 @@ public class CoursAjout implements Initializable {
                     if (!motExiste) {
                         ImageMotLigne nouvelleLigne = new ImageMotLigne(mot.trim());
                         imagesMotLignes.add(nouvelleLigne);
-                        imagesMotsContainer.getChildren().add(nouvelleLigne.getLigne());
+                        imagesMotsContainer.getChildren().add(nouvelleLigne.getLigneContainer());
                     }
                 }
             }
         }
     }
 
+    /**
+     * Ouvre un FileChooser pour sélectionner une image pour le cours
+     */
     private void choisirImageCours() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour le cours");
@@ -209,9 +372,13 @@ public class CoursAjout implements Initializable {
 
         if (selectedFile != null) {
             imageField.setText(selectedFile.getName());
+            validerImage();
         }
     }
 
+    /**
+     * Ouvre un FileChooser pour sélectionner plusieurs images
+     */
     private void choisirImagesMultiples(TextField imagesField) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir des images");
@@ -237,23 +404,45 @@ public class CoursAjout implements Initializable {
         }
     }
 
+    /**
+     * Supprime une ligne d'image
+     */
     private void supprimerLigne(ImageMotLigne ligne) {
         imagesMotLignes.remove(ligne);
-        imagesMotsContainer.getChildren().remove(ligne.getLigne());
+        imagesMotsContainer.getChildren().remove(ligne.getLigneContainer());
+
+        // Mettre à jour le champ mots
+        String[] mots = motsField.getText().split(";");
+        StringBuilder newMots = new StringBuilder();
+        for (String mot : mots) {
+            if (!mot.trim().equals(ligne.getMot()) && !mot.trim().isEmpty()) {
+                if (newMots.length() > 0) newMots.append(";");
+                newMots.append(mot.trim());
+            }
+        }
+        motsField.setText(newMots.toString());
     }
 
+    /**
+     * Initialise les ComboBox avec leurs valeurs
+     */
     private void initializeComboBoxes() {
         ObservableList<String> types = FXCollections.observableArrayList(
                 "Académique", "Social", "Autonomie", "Créativité"
         );
         typeCoursCombo.setItems(types);
+        typeCoursCombo.setStyle(STYLE_INVALIDE);
 
         ObservableList<String> niveaux = FXCollections.observableArrayList(
                 "Débutant", "Intermédiaire", "Avancé"
         );
         niveauCombo.setItems(niveaux);
+        niveauCombo.setStyle(STYLE_INVALIDE);
     }
 
+    /**
+     * Initialise la table des cours
+     */
     private void initializeTable() {
         // Configuration des colonnes
         titreColumn.setCellValueFactory(new PropertyValueFactory<>("titre"));
@@ -267,8 +456,18 @@ public class CoursAjout implements Initializable {
         idColumn.setVisible(false);
 
         ajouterBoutonsActions();
+
+        // Ajouter un listener pour les changements de sélection
+        coursTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                System.out.println("Cours sélectionné: " + newSelection.getTitre());
+            }
+        });
     }
 
+    /**
+     * Ajoute les boutons d'action dans la table
+     */
     private void ajouterBoutonsActions() {
         actionsColumn.setCellFactory(param -> new TableCell<>() {
             private final Button modifierButton = new Button("Modifier");
@@ -321,18 +520,37 @@ public class CoursAjout implements Initializable {
         });
     }
 
+    /**
+     * Charge les données des cours dans la table
+     */
     private void loadCoursData() {
-        coursList = FXCollections.observableArrayList(coursServices.getAll());
-        coursTable.setItems(coursList);
+        try {
+            List<Cours> cours = coursServices.getAll();
+            if (cours != null) {
+                coursList = FXCollections.observableArrayList(cours);
+                coursTable.setItems(coursList);
+                System.out.println("Données chargées: " + cours.size() + " cours");
+            } else {
+                System.err.println("Aucune donnée reçue du service");
+                coursList = FXCollections.observableArrayList();
+                coursTable.setItems(coursList);
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement des données: " + e.getMessage());
+            e.printStackTrace();
+            coursList = FXCollections.observableArrayList();
+            coursTable.setItems(coursList);
+        }
     }
 
+    /**
+     * Configure les actions des boutons
+     */
     private void configureActions() {
         ajouterButton.setOnAction(event -> {
             if (coursEnModification != null) {
-                // Mode modification
                 modifierCoursExistant();
             } else {
-                // Mode ajout
                 ajouterCours();
             }
         });
@@ -351,9 +569,343 @@ public class CoursAjout implements Initializable {
         }
     }
 
+    /**
+     * Configure la validation en temps réel pour tous les champs
+     */
+    private void setupValidation() {
+        // Validation du titre
+        titreField.textProperty().addListener((obs, old, newValue) -> {
+            validerTitre();
+        });
+        titreField.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerTitre();
+            }
+        });
+
+        // Validation du type de cours
+        typeCoursCombo.valueProperty().addListener((obs, old, newValue) -> {
+            validerTypeCours();
+        });
+
+        // Validation du niveau
+        niveauCombo.valueProperty().addListener((obs, old, newValue) -> {
+            validerNiveau();
+        });
+
+        // Validation de la durée
+        dureeField.textProperty().addListener((obs, old, newValue) -> {
+            validerDuree();
+        });
+        dureeField.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerDuree();
+            }
+        });
+
+        // Validation de la description
+        descriptionArea.textProperty().addListener((obs, old, newValue) -> {
+            validerDescription();
+        });
+        descriptionArea.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerDescription();
+            }
+        });
+
+        // Validation de l'image
+        imageField.textProperty().addListener((obs, old, newValue) -> {
+            validerImage();
+        });
+
+        // Validation des mots
+        motsField.textProperty().addListener((obs, old, newValue) -> {
+            validerMots();
+        });
+    }
+
+    /**
+     * Valide le champ titre
+     */
+    private boolean validerTitre() {
+        String titre = titreField.getText();
+        if (titre == null || titre.trim().isEmpty()) {
+            titreField.setStyle(STYLE_INVALIDE);
+            showError(titreField, "Le titre est obligatoire");
+            return false;
+        } else if (titre.length() < 3) {
+            titreField.setStyle(STYLE_INVALIDE);
+            showError(titreField, "Le titre doit contenir au moins 3 caractères");
+            return false;
+        } else if (titre.length() > 100) {
+            titreField.setStyle(STYLE_INVALIDE);
+            showError(titreField, "Le titre ne doit pas dépasser 100 caractères");
+            return false;
+        } else {
+            titreField.setStyle(STYLE_VALIDE);
+            hideError(titreField);
+            return true;
+        }
+    }
+
+    /**
+     * Valide le type de cours
+     */
+    private boolean validerTypeCours() {
+        String type = typeCoursCombo.getValue();
+        if (type == null || type.isEmpty()) {
+            typeCoursCombo.setStyle(STYLE_INVALIDE);
+            showError(typeCoursCombo, "Veuillez sélectionner un type de cours");
+            return false;
+        } else {
+            typeCoursCombo.setStyle(STYLE_VALIDE);
+            hideError(typeCoursCombo);
+            return true;
+        }
+    }
+
+    /**
+     * Valide le niveau
+     */
+    private boolean validerNiveau() {
+        String niveau = niveauCombo.getValue();
+        if (niveau == null || niveau.isEmpty()) {
+            niveauCombo.setStyle(STYLE_INVALIDE);
+            showError(niveauCombo, "Veuillez sélectionner un niveau");
+            return false;
+        } else {
+            niveauCombo.setStyle(STYLE_VALIDE);
+            hideError(niveauCombo);
+            return true;
+        }
+    }
+
+    /**
+     * Valide la durée
+     */
+    private boolean validerDuree() {
+        String dureeText = dureeField.getText();
+        if (dureeText == null || dureeText.trim().isEmpty()) {
+            dureeField.setStyle(STYLE_INVALIDE);
+            showError(dureeField, "La durée est obligatoire");
+            return false;
+        }
+
+        try {
+            int duree = Integer.parseInt(dureeText.trim());
+            if (duree <= 0) {
+                dureeField.setStyle(STYLE_INVALIDE);
+                showError(dureeField, "La durée doit être supérieure à 0");
+                return false;
+            } else if (duree > 480) {
+                dureeField.setStyle(STYLE_INVALIDE);
+                showError(dureeField, "La durée ne doit pas dépasser 480 minutes (8 heures)");
+                return false;
+            } else {
+                dureeField.setStyle(STYLE_VALIDE);
+                hideError(dureeField);
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            dureeField.setStyle(STYLE_INVALIDE);
+            showError(dureeField, "La durée doit être un nombre entier");
+            return false;
+        }
+    }
+
+    /**
+     * Valide la description
+     */
+    private boolean validerDescription() {
+        String description = descriptionArea.getText();
+        if (description == null || description.trim().isEmpty()) {
+            descriptionArea.setStyle(STYLE_INVALIDE);
+            showError(descriptionArea, "La description est obligatoire");
+            return false;
+        } else if (description.length() < 10) {
+            descriptionArea.setStyle(STYLE_INVALIDE);
+            showError(descriptionArea, "La description doit contenir au moins 10 caractères");
+            return false;
+        } else if (description.length() > 1000) {
+            descriptionArea.setStyle(STYLE_INVALIDE);
+            showError(descriptionArea, "La description ne doit pas dépasser 1000 caractères");
+            return false;
+        } else {
+            descriptionArea.setStyle(STYLE_VALIDE);
+            hideError(descriptionArea);
+            return true;
+        }
+    }
+
+    /**
+     * Valide l'image (obligatoire)
+     */
+    private boolean validerImage() {
+        String image = imageField.getText();
+        if (image == null || image.trim().isEmpty()) {
+            imageField.setStyle(STYLE_INVALIDE);
+            showError(imageField, "L'image est obligatoire");
+            return false;
+        }
+
+        String lowercase = image.toLowerCase();
+        if (lowercase.endsWith(".png") || lowercase.endsWith(".jpg") ||
+                lowercase.endsWith(".jpeg") || lowercase.endsWith(".gif") ||
+                lowercase.endsWith(".bmp")) {
+            imageField.setStyle(STYLE_VALIDE);
+            hideError(imageField);
+            return true;
+        } else {
+            imageField.setStyle(STYLE_INVALIDE);
+            showError(imageField, "Format d'image non supporté (utilisez PNG, JPG, JPEG, GIF ou BMP)");
+            return false;
+        }
+    }
+
+    /**
+     * Valide les mots du cours
+     */
+    private boolean validerMots() {
+        String mots = motsField.getText();
+        if (mots == null || mots.trim().isEmpty()) {
+            motsField.setStyle(STYLE_INVALIDE);
+            showError(motsField, "Les mots sont obligatoires");
+            return false;
+        }
+
+        String[] motsArray = mots.split(";");
+        boolean valide = true;
+        StringBuilder erreurs = new StringBuilder();
+
+        for (String mot : motsArray) {
+            String motTrim = mot.trim();
+            if (!motTrim.isEmpty()) {
+                if (motTrim.length() < 2) {
+                    valide = false;
+                    erreurs.append("Le mot '").append(motTrim).append("' est trop court (min 2 caractères). ");
+                } else if (motTrim.length() > 50) {
+                    valide = false;
+                    erreurs.append("Le mot '").append(motTrim).append("' est trop long (max 50 caractères). ");
+                }
+            }
+        }
+
+        if (valide) {
+            motsField.setStyle(STYLE_VALIDE);
+            hideError(motsField);
+        } else {
+            motsField.setStyle(STYLE_INVALIDE);
+            showError(motsField, erreurs.toString());
+        }
+
+        return valide;
+    }
+
+    /**
+     * Valide toutes les lignes d'images pour les mots
+     */
+    private boolean validerImagesMots() {
+        boolean toutesValides = true;
+
+        if (imagesMotLignes.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Validation",
+                    "Veuillez ajouter des images pour chaque mot en cliquant sur 'Ajouter des images pour un mot'");
+            return false;
+        }
+
+        for (ImageMotLigne ligne : imagesMotLignes) {
+            String images = ligne.getImages();
+            if (images == null || images.trim().isEmpty()) {
+                toutesValides = false;
+                ligne.getImagesField().setStyle(STYLE_INVALIDE);
+                ligne.showError("Au moins une image est requise pour ce mot");
+            } else {
+                String[] imagesArray = images.split(";");
+                boolean imagesValides = true;
+                for (String img : imagesArray) {
+                    String imgTrim = img.trim();
+                    if (!imgTrim.isEmpty()) {
+                        String lowercase = imgTrim.toLowerCase();
+                        if (!(lowercase.endsWith(".png") || lowercase.endsWith(".jpg") ||
+                                lowercase.endsWith(".jpeg") || lowercase.endsWith(".gif"))) {
+                            imagesValides = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (imagesValides && imagesArray.length > 0) {
+                    ligne.getImagesField().setStyle(STYLE_VALIDE);
+                    ligne.hideError();
+                } else {
+                    toutesValides = false;
+                    ligne.getImagesField().setStyle(STYLE_INVALIDE);
+                    ligne.showError("Formats d'image non supportés (PNG, JPG, JPEG, GIF uniquement)");
+                }
+            }
+        }
+
+        return toutesValides;
+    }
+
+    /**
+     * Valide un champ d'image pour un mot spécifique
+     */
+    private void validerChampImageMot(ImageMotLigne ligne) {
+        String images = ligne.getImages();
+        if (images == null || images.trim().isEmpty()) {
+            ligne.getImagesField().setStyle(STYLE_INVALIDE);
+            ligne.showError("Au moins une image est requise pour ce mot");
+        } else {
+            String[] imagesArray = images.split(";");
+            boolean valide = true;
+            for (String img : imagesArray) {
+                String imgTrim = img.trim();
+                if (!imgTrim.isEmpty()) {
+                    String lowercase = imgTrim.toLowerCase();
+                    if (!(lowercase.endsWith(".png") || lowercase.endsWith(".jpg") ||
+                            lowercase.endsWith(".jpeg") || lowercase.endsWith(".gif"))) {
+                        valide = false;
+                        break;
+                    }
+                }
+            }
+
+            if (valide && imagesArray.length > 0) {
+                ligne.getImagesField().setStyle(STYLE_VALIDE);
+                ligne.hideError();
+            } else {
+                ligne.getImagesField().setStyle(STYLE_INVALIDE);
+                ligne.showError("Formats d'image non supportés (PNG, JPG, JPEG, GIF uniquement)");
+            }
+        }
+    }
+
+    /**
+     * Valide tous les champs du formulaire
+     */
+    private boolean validateAllFields() {
+        boolean titreValide = validerTitre();
+        boolean typeValide = validerTypeCours();
+        boolean niveauValide = validerNiveau();
+        boolean dureeValide = validerDuree();
+        boolean descriptionValide = validerDescription();
+        boolean imageValide = validerImage();
+        boolean motsValide = validerMots();
+        boolean imagesMotsValide = validerImagesMots();
+
+        return titreValide && typeValide && niveauValide && dureeValide &&
+                descriptionValide && imageValide && motsValide && imagesMotsValide;
+    }
+
+    /**
+     * Ajoute un nouveau cours
+     */
     @FXML
     private void ajouterCours() {
-        if (!validateFields()) {
+        if (!validateAllFields()) {
+            showAlert(Alert.AlertType.WARNING, "Validation",
+                    "Veuillez corriger les erreurs dans le formulaire (champs en rouge)");
             return;
         }
 
@@ -376,10 +928,10 @@ public class CoursAjout implements Initializable {
             if (success) {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours ajouté avec succès!");
                 clearFields();
-                loadCoursData();
+                refreshTable(); // Rafraîchir la table après ajout
 
-                // Navigation automatique vers l'affichage après ajout réussi
-                Navigation.navigateTo("coursaffichage.fxml", "Liste des cours");
+                // Navigation optionnelle (vous pouvez commenter si vous voulez rester sur la même page)
+                // Navigation.navigateTo("coursaffichage.fxml", "Liste des cours");
             } else {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de l'ajout du cours.");
             }
@@ -388,19 +940,23 @@ public class CoursAjout implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La durée doit être un nombre valide.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de l'ajout: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // Nouvelle méthode pour la modification
+    /**
+     * Modifie un cours existant
+     */
     private void modifierCoursExistant() {
-        if (!validateFields()) {
+        if (!validateAllFields()) {
+            showAlert(Alert.AlertType.WARNING, "Validation",
+                    "Veuillez corriger les erreurs dans le formulaire (champs en rouge)");
             return;
         }
 
         try {
             String imagesMotsString = construireImagesMotsString();
 
-            // Mettre à jour l'objet cours existant
             coursEnModification.setTitre(titreField.getText());
             coursEnModification.setDescription(descriptionArea.getText());
             coursEnModification.setType_cours(typeCoursCombo.getValue());
@@ -415,13 +971,13 @@ public class CoursAjout implements Initializable {
             if (success) {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours modifié avec succès!");
 
-                // Réinitialiser le mode modification
                 coursEnModification = null;
                 ajouterButton.setText("Ajouter le cours");
 
-                // Recharger les données et vider le formulaire
                 clearFields();
-                loadCoursData();
+                refreshTable(); // Rafraîchir la table après modification
+
+                System.out.println("Modification réussie, table rafraîchie");
             } else {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la modification du cours.");
             }
@@ -430,10 +986,13 @@ public class CoursAjout implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La durée doit être un nombre valide.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la modification: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // Méthode utilitaire pour construire la chaîne des images de mots
+    /**
+     * Construit la chaîne des images de mots
+     */
     private String construireImagesMotsString() {
         StringBuilder imagesMotsBuilder = new StringBuilder();
         List<String> motsList = new ArrayList<>();
@@ -468,34 +1027,12 @@ public class CoursAjout implements Initializable {
         return imagesMotsBuilder.toString();
     }
 
-    private boolean validateFields() {
-        if (titreField.getText().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir un titre.");
-            return false;
-        }
-        if (typeCoursCombo.getValue() == null) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez sélectionner un type de cours.");
-            return false;
-        }
-        if (niveauCombo.getValue() == null) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez sélectionner un niveau.");
-            return false;
-        }
-        if (dureeField.getText().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir une durée.");
-            return false;
-        }
-        if (descriptionArea.getText().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir une description.");
-            return false;
-        }
-        return true;
-    }
-
+    /**
+     * Annule la saisie en cours
+     */
     @FXML
     private void annuler() {
         if (coursEnModification != null) {
-            // Demander confirmation avant d'annuler une modification en cours
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmation");
             alert.setHeaderText("Annuler la modification");
@@ -512,33 +1049,54 @@ public class CoursAjout implements Initializable {
         }
     }
 
+    /**
+     * Vide tous les champs du formulaire
+     */
     private void clearFields() {
         titreField.clear();
+        titreField.setStyle(STYLE_INVALIDE);
+        hideError(titreField);
+
         typeCoursCombo.setValue(null);
+        typeCoursCombo.setStyle(STYLE_INVALIDE);
+        hideError(typeCoursCombo);
+
         niveauCombo.setValue(null);
+        niveauCombo.setStyle(STYLE_INVALIDE);
+        hideError(niveauCombo);
+
         dureeField.clear();
+        dureeField.setStyle(STYLE_INVALIDE);
+        hideError(dureeField);
+
         descriptionArea.clear();
+        descriptionArea.setStyle(STYLE_INVALIDE);
+        hideError(descriptionArea);
+
         imageField.clear();
+        imageField.setStyle(STYLE_INVALIDE);
+        hideError(imageField);
+
         motsField.clear();
+        motsField.setStyle(STYLE_INVALIDE);
+        hideError(motsField);
 
         imagesMotLignes.clear();
         imagesMotsContainer.getChildren().clear();
     }
 
+    /**
+     * Prépare le formulaire pour la modification d'un cours
+     */
     private void modifierCours(Cours cours) {
-        // Remplir le formulaire avec les données du cours sélectionné
         remplirFormulairePourModification(cours);
-
-        // Changer le texte du bouton
         ajouterButton.setText("Modifier le cours");
-
-        // Stocker le cours en cours de modification
         coursEnModification = cours;
-
-        // Faire défiler jusqu'au formulaire
-        // (Optionnel : vous pouvez ajouter ici du code pour faire défiler la vue)
     }
 
+    /**
+     * Supprime un cours
+     */
     private void supprimerCours(Cours cours) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation de suppression");
@@ -550,14 +1108,15 @@ public class CoursAjout implements Initializable {
                 boolean success = coursServices.supprimer(cours.getId_cours());
                 if (success) {
                     showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours supprimé avec succès!");
-                    loadCoursData();
+                    refreshTable(); // Rafraîchir la table après suppression
 
-                    // Si on était en train de modifier ce cours, réinitialiser
                     if (coursEnModification != null && coursEnModification.getId_cours() == cours.getId_cours()) {
                         clearFields();
                         coursEnModification = null;
                         ajouterButton.setText("Ajouter le cours");
                     }
+
+                    System.out.println("Suppression réussie, table rafraîchie");
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la suppression du cours.");
                 }
@@ -565,14 +1124,30 @@ public class CoursAjout implements Initializable {
         });
     }
 
+    /**
+     * Remplit le formulaire avec les données d'un cours pour modification
+     */
     private void remplirFormulairePourModification(Cours cours) {
         titreField.setText(cours.getTitre());
+        validerTitre();
+
         typeCoursCombo.setValue(cours.getType_cours());
+        validerTypeCours();
+
         niveauCombo.setValue(cours.getNiveau());
+        validerNiveau();
+
         dureeField.setText(String.valueOf(cours.getDuree()));
+        validerDuree();
+
         descriptionArea.setText(cours.getDescription());
+        validerDescription();
+
         imageField.setText(cours.getImage());
+        validerImage();
+
         motsField.setText(cours.getMots());
+        validerMots();
 
         imagesMotLignes.clear();
         imagesMotsContainer.getChildren().clear();
@@ -582,21 +1157,24 @@ public class CoursAjout implements Initializable {
             String[] images = cours.getImages_mots().split(";");
 
             for (int i = 0; i < mots.length; i++) {
-                if (i < mots.length) {
-                    String mot = mots[i].trim();
-                    if (!mot.isEmpty()) {
-                        ImageMotLigne ligne = new ImageMotLigne(mot);
-                        if (i < images.length) {
-                            ligne.setImages(images[i].trim());
-                        }
-                        imagesMotLignes.add(ligne);
-                        imagesMotsContainer.getChildren().add(ligne.getLigne());
+                String mot = mots[i].trim();
+                if (!mot.isEmpty()) {
+                    ImageMotLigne ligne = new ImageMotLigne(mot);
+                    if (i < images.length) {
+                        ligne.setImages(images[i].trim());
                     }
+                    imagesMotLignes.add(ligne);
+                    imagesMotsContainer.getChildren().add(ligne.getLigneContainer());
+
+                    validerChampImageMot(ligne);
                 }
             }
         }
     }
 
+    /**
+     * Affiche une alerte
+     */
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

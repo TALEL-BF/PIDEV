@@ -9,13 +9,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
 import javafx.util.StringConverter;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -48,6 +51,13 @@ public class EvaluationAjout implements Initializable {
     @FXML private TableColumn<Evaluation, Integer> scoreColumn;
     @FXML private TableColumn<Evaluation, Void> actionsColumn;
 
+    // Map pour les labels d'erreur
+    private Map<Control, Label> errorLabels = new HashMap<>();
+
+    // Styles pour la validation
+    private static final String STYLE_VALIDE = "-fx-border-color: #00C853; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private static final String STYLE_INVALIDE = "-fx-border-color: #D32F2F; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+
     private EvaluationServices evaluationServices;
     private CoursServices coursServices;
     private ObservableList<Evaluation> questionsList;
@@ -74,7 +84,330 @@ public class EvaluationAjout implements Initializable {
         initializeTable();
         loadCours();
         loadQuestions();
+        setupValidation();
         setupListeners();
+
+        // Ajouter les labels d'erreur après l'initialisation
+        javafx.application.Platform.runLater(this::addErrorLabels);
+    }
+
+    /**
+     * Ajoute les labels d'erreur après chaque champ
+     */
+    private void addErrorLabels() {
+        addErrorLabelAfter(questionArea, "Question");
+        addErrorLabelAfter(choix1Field, "Choix 1");
+        addErrorLabelAfter(choix2Field, "Choix 2");
+        addErrorLabelAfter(choix3Field, "Choix 3");
+        addErrorLabelAfter(bonneReponseCombo, "Bonne réponse");
+        addErrorLabelAfter(scoreField, "Score");
+        addErrorLabelAfter(coursCombo, "Cours");
+    }
+
+    /**
+     * Ajoute un label d'erreur après un champ spécifique
+     */
+    private void addErrorLabelAfter(Control field, String fieldName) {
+        // Créer le label d'erreur
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: #D32F2F; -fx-font-size: 11px; -fx-wrap-text: true;");
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+
+        // Trouver le parent du champ
+        Node parent = field.getParent();
+        if (parent instanceof VBox) {
+            VBox vbox = (VBox) parent;
+            int index = vbox.getChildren().indexOf(field);
+            if (index >= 0 && index + 1 < vbox.getChildren().size()) {
+                vbox.getChildren().add(index + 1, errorLabel);
+            } else {
+                vbox.getChildren().add(errorLabel);
+            }
+        } else if (parent instanceof HBox) {
+            // Si le champ est dans un HBox, remonter au VBox parent
+            Node grandParent = parent.getParent();
+            if (grandParent instanceof VBox) {
+                VBox vbox = (VBox) grandParent;
+                int index = vbox.getChildren().indexOf(parent);
+                if (index >= 0 && index + 1 < vbox.getChildren().size()) {
+                    vbox.getChildren().add(index + 1, errorLabel);
+                } else {
+                    vbox.getChildren().add(errorLabel);
+                }
+            }
+        }
+
+        // Stocker le label dans la map
+        errorLabels.put(field, errorLabel);
+    }
+
+    /**
+     * Affiche un message d'erreur pour un champ
+     */
+    private void showError(Control field, String message) {
+        Label errorLabel = errorLabels.get(field);
+        if (errorLabel != null) {
+            errorLabel.setText("❌ " + message);
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
+        }
+    }
+
+    /**
+     * Cache le message d'erreur pour un champ
+     */
+    private void hideError(Control field) {
+        Label errorLabel = errorLabels.get(field);
+        if (errorLabel != null) {
+            errorLabel.setVisible(false);
+            errorLabel.setManaged(false);
+        }
+    }
+
+    /**
+     * Configure la validation en temps réel
+     */
+    private void setupValidation() {
+        // Validation de la question
+        questionArea.textProperty().addListener((obs, old, newValue) -> {
+            validerQuestion();
+        });
+        questionArea.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerQuestion();
+            }
+        });
+
+        // Validation du choix 1
+        choix1Field.textProperty().addListener((obs, old, newValue) -> {
+            validerChoix1();
+            updateBonneReponseCombo();
+        });
+        choix1Field.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerChoix1();
+            }
+        });
+
+        // Validation du choix 2
+        choix2Field.textProperty().addListener((obs, old, newValue) -> {
+            validerChoix2();
+            updateBonneReponseCombo();
+        });
+        choix2Field.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerChoix2();
+            }
+        });
+
+        // Validation du choix 3
+        choix3Field.textProperty().addListener((obs, old, newValue) -> {
+            validerChoix3();
+            updateBonneReponseCombo();
+        });
+        choix3Field.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerChoix3();
+            }
+        });
+
+        // Validation de la bonne réponse
+        bonneReponseCombo.valueProperty().addListener((obs, old, newValue) -> {
+            validerBonneReponse();
+        });
+
+        // Validation du score
+        scoreField.textProperty().addListener((obs, old, newValue) -> {
+            validerScore();
+        });
+        scoreField.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerScore();
+            }
+        });
+
+        // Validation du cours
+        coursCombo.valueProperty().addListener((obs, old, newValue) -> {
+            validerCours();
+        });
+    }
+
+    /**
+     * Valide la question
+     */
+    private boolean validerQuestion() {
+        String question = questionArea.getText();
+        if (question == null || question.trim().isEmpty()) {
+            questionArea.setStyle(STYLE_INVALIDE);
+            showError(questionArea, "La question est obligatoire");
+            return false;
+        } else if (question.length() < 5) {
+            questionArea.setStyle(STYLE_INVALIDE);
+            showError(questionArea, "La question doit contenir au moins 5 caractères");
+            return false;
+        } else if (question.length() > 500) {
+            questionArea.setStyle(STYLE_INVALIDE);
+            showError(questionArea, "La question ne doit pas dépasser 500 caractères");
+            return false;
+        } else {
+            questionArea.setStyle(STYLE_VALIDE);
+            hideError(questionArea);
+            return true;
+        }
+    }
+
+    /**
+     * Valide le choix 1
+     */
+    private boolean validerChoix1() {
+        String choix = choix1Field.getText();
+        if (choix == null || choix.trim().isEmpty()) {
+            choix1Field.setStyle(STYLE_INVALIDE);
+            showError(choix1Field, "Le choix 1 est obligatoire");
+            return false;
+        } else if (choix.length() < 1) {
+            choix1Field.setStyle(STYLE_INVALIDE);
+            showError(choix1Field, "Le choix doit contenir au moins 1 caractère");
+            return false;
+        } else if (choix.length() > 200) {
+            choix1Field.setStyle(STYLE_INVALIDE);
+            showError(choix1Field, "Le choix ne doit pas dépasser 200 caractères");
+            return false;
+        } else {
+            choix1Field.setStyle(STYLE_VALIDE);
+            hideError(choix1Field);
+            return true;
+        }
+    }
+
+    /**
+     * Valide le choix 2
+     */
+    private boolean validerChoix2() {
+        String choix = choix2Field.getText();
+        if (choix == null || choix.trim().isEmpty()) {
+            choix2Field.setStyle(STYLE_INVALIDE);
+            showError(choix2Field, "Le choix 2 est obligatoire");
+            return false;
+        } else if (choix.length() < 1) {
+            choix2Field.setStyle(STYLE_INVALIDE);
+            showError(choix2Field, "Le choix doit contenir au moins 1 caractère");
+            return false;
+        } else if (choix.length() > 200) {
+            choix2Field.setStyle(STYLE_INVALIDE);
+            showError(choix2Field, "Le choix ne doit pas dépasser 200 caractères");
+            return false;
+        } else {
+            choix2Field.setStyle(STYLE_VALIDE);
+            hideError(choix2Field);
+            return true;
+        }
+    }
+
+    /**
+     * Valide le choix 3
+     */
+    private boolean validerChoix3() {
+        String choix = choix3Field.getText();
+        if (choix == null || choix.trim().isEmpty()) {
+            choix3Field.setStyle(STYLE_INVALIDE);
+            showError(choix3Field, "Le choix 3 est obligatoire");
+            return false;
+        } else if (choix.length() < 1) {
+            choix3Field.setStyle(STYLE_INVALIDE);
+            showError(choix3Field, "Le choix doit contenir au moins 1 caractère");
+            return false;
+        } else if (choix.length() > 200) {
+            choix3Field.setStyle(STYLE_INVALIDE);
+            showError(choix3Field, "Le choix ne doit pas dépasser 200 caractères");
+            return false;
+        } else {
+            choix3Field.setStyle(STYLE_VALIDE);
+            hideError(choix3Field);
+            return true;
+        }
+    }
+
+    /**
+     * Valide la bonne réponse
+     */
+    private boolean validerBonneReponse() {
+        String bonneReponse = bonneReponseCombo.getValue();
+        if (bonneReponse == null || bonneReponse.isEmpty()) {
+            bonneReponseCombo.setStyle(STYLE_INVALIDE);
+            showError(bonneReponseCombo, "Veuillez sélectionner la bonne réponse");
+            return false;
+        } else {
+            bonneReponseCombo.setStyle(STYLE_VALIDE);
+            hideError(bonneReponseCombo);
+            return true;
+        }
+    }
+
+    /**
+     * Valide le score
+     */
+    private boolean validerScore() {
+        String scoreText = scoreField.getText();
+        if (scoreText == null || scoreText.trim().isEmpty()) {
+            scoreField.setStyle(STYLE_INVALIDE);
+            showError(scoreField, "Le score est obligatoire");
+            return false;
+        }
+
+        try {
+            int score = Integer.parseInt(scoreText.trim());
+            if (score <= 0) {
+                scoreField.setStyle(STYLE_INVALIDE);
+                showError(scoreField, "Le score doit être supérieur à 0");
+                return false;
+            } else if (score > 100) {
+                scoreField.setStyle(STYLE_INVALIDE);
+                showError(scoreField, "Le score ne doit pas dépasser 100 points");
+                return false;
+            } else {
+                scoreField.setStyle(STYLE_VALIDE);
+                hideError(scoreField);
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            scoreField.setStyle(STYLE_INVALIDE);
+            showError(scoreField, "Le score doit être un nombre entier");
+            return false;
+        }
+    }
+
+    /**
+     * Valide la sélection du cours
+     */
+    private boolean validerCours() {
+        Cours cours = coursCombo.getValue();
+        if (cours == null) {
+            coursCombo.setStyle(STYLE_INVALIDE);
+            showError(coursCombo, "Veuillez sélectionner un cours");
+            return false;
+        } else {
+            coursCombo.setStyle(STYLE_VALIDE);
+            hideError(coursCombo);
+            return true;
+        }
+    }
+
+    /**
+     * Valide tous les champs du formulaire
+     */
+    private boolean validateAllFields() {
+        boolean questionValide = validerQuestion();
+        boolean choix1Valide = validerChoix1();
+        boolean choix2Valide = validerChoix2();
+        boolean choix3Valide = validerChoix3();
+        boolean bonneReponseValide = validerBonneReponse();
+        boolean scoreValide = validerScore();
+        boolean coursValide = validerCours();
+
+        return questionValide && choix1Valide && choix2Valide &&
+                choix3Valide && bonneReponseValide && scoreValide && coursValide;
     }
 
     private void initializeComboBoxes() {
@@ -90,11 +423,6 @@ public class EvaluationAjout implements Initializable {
                 return null;
             }
         });
-
-        // Mettre à jour la bonne réponse quand les choix changent
-        choix1Field.textProperty().addListener((obs, old, newVal) -> updateBonneReponseCombo());
-        choix2Field.textProperty().addListener((obs, old, newVal) -> updateBonneReponseCombo());
-        choix3Field.textProperty().addListener((obs, old, newVal) -> updateBonneReponseCombo());
     }
 
     private void updateBonneReponseCombo() {
@@ -103,6 +431,12 @@ public class EvaluationAjout implements Initializable {
         if (!choix2Field.getText().trim().isEmpty()) choix.add(choix2Field.getText().trim());
         if (!choix3Field.getText().trim().isEmpty()) choix.add(choix3Field.getText().trim());
         bonneReponseCombo.setItems(choix);
+
+        // Si la valeur sélectionnée n'est plus dans la liste, la réinitialiser
+        if (bonneReponseCombo.getValue() != null && !choix.contains(bonneReponseCombo.getValue())) {
+            bonneReponseCombo.setValue(null);
+            validerBonneReponse();
+        }
     }
 
     private void initializeTable() {
@@ -173,6 +507,7 @@ public class EvaluationAjout implements Initializable {
             for (Cours c : cours) {
                 if (c.getId_cours() == coursFiltreId) {
                     coursCombo.setValue(c);
+                    validerCours();
                     break;
                 }
             }
@@ -225,14 +560,13 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void ajouterQuestion() {
-        if (!validateQuestionFields()) return;
+        if (!validateAllFields()) {
+            showAlert(Alert.AlertType.WARNING, "Validation",
+                    "Veuillez corriger les erreurs dans le formulaire (champs en rouge)");
+            return;
+        }
 
         try {
-            if (coursCombo.getValue() == null) {
-                showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez sélectionner un cours");
-                return;
-            }
-
             Evaluation question = new Evaluation();
             question.setId_cours(coursCombo.getValue().getId_cours());
             question.setQuestion(questionArea.getText().trim());
@@ -276,9 +610,18 @@ public class EvaluationAjout implements Initializable {
         choix3Field.setText(evaluation.getChoix3());
         scoreField.setText(String.valueOf(evaluation.getScore()));
 
+        // Valider tous les champs remplis
+        validerQuestion();
+        validerChoix1();
+        validerChoix2();
+        validerChoix3();
+        validerScore();
+        validerCours();
+
         // Mettre à jour la combo des bonnes réponses
         updateBonneReponseCombo();
         bonneReponseCombo.setValue(evaluation.getBonne_reponse());
+        validerBonneReponse();
 
         // Changer l'interface
         formTitleLabel.setText("✏️ Modifier la question");
@@ -291,7 +634,11 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void modifierQuestion() {
-        if (!validateQuestionFields()) return;
+        if (!validateAllFields()) {
+            showAlert(Alert.AlertType.WARNING, "Validation",
+                    "Veuillez corriger les erreurs dans le formulaire (champs en rouge)");
+            return;
+        }
 
         try {
             if (questionEnModification == null) return;
@@ -357,44 +704,42 @@ public class EvaluationAjout implements Initializable {
 
     private void clearForm() {
         questionArea.clear();
+        questionArea.setStyle(STYLE_INVALIDE);
+        hideError(questionArea);
+
         choix1Field.clear();
+        choix1Field.setStyle(STYLE_INVALIDE);
+        hideError(choix1Field);
+
         choix2Field.clear();
+        choix2Field.setStyle(STYLE_INVALIDE);
+        hideError(choix2Field);
+
         choix3Field.clear();
+        choix3Field.setStyle(STYLE_INVALIDE);
+        hideError(choix3Field);
+
         bonneReponseCombo.setValue(null);
+        bonneReponseCombo.setStyle(STYLE_INVALIDE);
+        hideError(bonneReponseCombo);
+
         scoreField.clear();
+        scoreField.setStyle(STYLE_INVALIDE);
+        hideError(scoreField);
 
         if (coursFiltreId != null && coursList != null) {
             for (Cours c : coursList) {
                 if (c.getId_cours() == coursFiltreId) {
                     coursCombo.setValue(c);
+                    validerCours();
                     break;
                 }
             }
         } else {
             coursCombo.setValue(null);
+            coursCombo.setStyle(STYLE_INVALIDE);
+            hideError(coursCombo);
         }
-    }
-
-    private boolean validateQuestionFields() {
-        if (questionArea.getText().trim().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir une question");
-            return false;
-        }
-        if (choix1Field.getText().trim().isEmpty() ||
-                choix2Field.getText().trim().isEmpty() ||
-                choix3Field.getText().trim().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir les 3 choix");
-            return false;
-        }
-        if (bonneReponseCombo.getValue() == null) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez sélectionner la bonne réponse");
-            return false;
-        }
-        if (scoreField.getText().trim().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir un score");
-            return false;
-        }
-        return true;
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
