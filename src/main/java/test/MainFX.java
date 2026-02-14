@@ -11,11 +11,12 @@ public class MainFX extends Application {
     public void start(Stage stage) throws Exception {
 
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/AjouterSuivie.fxml")
+                getClass().getResource("/Home.fxml")
         );
 
         Scene scene = new Scene(loader.load());
-        stage.setTitle("Gestion des Suivies");
+        stage.setTitle("AutiCare - Plateforme éducative");
+        stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
     }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Controller.EmploiManagementController"
+      spacing="14">
+
+    <!-- Title -->
+    <VBox spacing="3">
+        <Label text="Emploi du Temps 🕐" styleClass="page-title"/>
+        <Label text="Gérez les emplois du temps et plannings hebdomadaires" styleClass="page-subtitle"/>
+    </VBox>
+
+    <!-- Filters + Add Button -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Filtrer par:" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4b5563;"/>
+
+        <ComboBox fx:id="filterJour" promptText="Jour"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 8 16; -fx-border-color: #d1fae5; -fx-border-width: 2; -fx-border-radius: 12;"/>
+
+        <ComboBox fx:id="filterTranche" promptText="Tranche horaire"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 8 16; -fx-border-color: #d1fae5; -fx-border-width: 2; -fx-border-radius: 12;"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="➕ Nouvel Emploi" onAction="#addNewEmploi"
+                style="-fx-background-color: linear-gradient(to right, #10b981, #059669); -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 10 20; -fx-font-weight: 700; -fx-font-size: 14; -fx-effect: dropshadow(gaussian, rgba(16,185,129,0.4), 12, 0, 0, 4);"/>
+    </HBox>
+
+    <Label fx:id="countLabel" text="0 Emplois" styleClass="count"/>
+
+    <!-- Cards grid -->
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980">
+            <padding>
+                <Insets bottom="20"/>
+            </padding>
+        </FlowPane>
+    </ScrollPane>
+
+</VBox>
+

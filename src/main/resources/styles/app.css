@@ -1,5 +1,5 @@
 .root{
-    -fx-font-family: "Segoe UI";
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
     -fx-background-color: #f6f7fb;
 }
 
@@ -8,94 +8,305 @@
     -fx-padding: 18;
     -fx-pref-width: 250;
     -fx-background-color: linear-gradient(to bottom, #8b5cf6, #a78bfa);
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 20, 0, 4, 0);
 }
 
 .sidebar-header{
-    -fx-padding: 10;
+    -fx-padding: 12;
     -fx-background-radius: 14;
     -fx-background-color: rgba(255,255,255,0.15);
 }
 
-.app-title{ -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: 800; }
-.app-subtitle{ -fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11; }
-
-.muted{ -fx-text-fill: rgba(255,255,255,0.85); }
-.badge{
-    -fx-background-color: rgba(255,255,255,0.20);
+.app-title{
     -fx-text-fill: white;
-    -fx-padding: 6 10;
+    -fx-font-size: 18;
+    -fx-font-weight: 900;
+}
+
+.app-subtitle{
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 11;
+}
+
+.muted{
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 12;
+}
+
+.badge{
+    -fx-background-color: rgba(255,255,255,0.22);
+    -fx-text-fill: white;
+    -fx-padding: 6 12;
     -fx-background-radius: 999;
+    -fx-font-weight: 700;
+    -fx-font-size: 11;
 }
 
 .menu-item{
     -fx-background-color: transparent;
     -fx-text-fill: white;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 10 12;
+    -fx-padding: 12 16;
     -fx-background-radius: 10;
+    -fx-font-size: 13;
+    -fx-cursor: hand;
 }
-.menu-item:hover{ -fx-background-color: rgba(255,255,255,0.16); }
-.menu-item.active{ -fx-background-color: rgba(255,255,255,0.22); }
+
+.menu-item:hover{
+    -fx-background-color: rgba(255,255,255,0.16);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.menu-item.active{
+    -fx-background-color: rgba(255,255,255,0.25);
+    -fx-font-weight: 700;
+}
 
 /* Content */
-.content{ -fx-padding: 22; }
+.content{
+    -fx-padding: 22;
+}
 
-.page-title{ -fx-font-size: 26; -fx-font-weight: 900; }
-.page-subtitle{ -fx-text-fill: #7b7f8a; }
+.page-title{
+    -fx-font-size: 28;
+    -fx-font-weight: 900;
+    -fx-text-fill: #2d3748;
+}
+
+.page-subtitle{
+    -fx-text-fill: #7b7f8a;
+    -fx-font-size: 14;
+}
 
 .search{
     -fx-pref-width: 340;
-    -fx-padding: 10 12;
+    -fx-padding: 12 16;
     -fx-background-radius: 12;
     -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-font-size: 13;
+}
+
+.search:focused{
+    -fx-border-color: #8b5cf6;
+    -fx-border-width: 2;
 }
 
 /* Filter chips */
 .filters .toggle-button{
     -fx-background-radius: 999;
-    -fx-padding: 8 14;
+    -fx-padding: 10 18;
     -fx-background-color: white;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: 600;
+    -fx-font-size: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
 }
+
+.filters .toggle-button:hover{
+    -fx-background-color: #f8f9fa;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
 .filters .toggle-button:selected{
     -fx-background-color: #8b5cf6;
     -fx-text-fill: white;
+    -fx-border-color: #8b5cf6;
 }
 
-.count{ -fx-font-weight: 800; -fx-font-size: 16; }
+.count{
+    -fx-font-weight: 800;
+    -fx-font-size: 18;
+    -fx-text-fill: #2d3748;
+}
 
-/* Card style like template */
+/* Card style */
 .suivie-card{
     -fx-background-color: white;
     -fx-background-radius: 18;
     -fx-padding: 0;
     -fx-pref-width: 360;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 14, 0, 0, 6);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.suivie-card:hover{
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 24, 0, 0, 8);
 }
 
 /* Colored header band */
 .suivie-band{
     -fx-background-radius: 18 18 0 0;
-    -fx-padding: 14;
+    -fx-padding: 16;
 }
 
 /* Card body */
 .suivie-body{
-    -fx-padding: 14;
+    -fx-padding: 16;
 }
 
-.suivie-title{ -fx-font-weight: 900; -fx-font-size: 14; }
-.suivie-info{ -fx-text-fill: #646b76; }
+.suivie-title{
+    -fx-font-weight: 900;
+    -fx-font-size: 15;
+    -fx-text-fill: #2d3748;
+}
 
-/* Buttons like template */
+.suivie-info{
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12;
+    -fx-line-spacing: 4;
+}
+
+/* Buttons */
+.button{
+    -fx-cursor: hand;
+    -fx-font-weight: 600;
+}
+
+.button:hover{
+    -fx-opacity: 0.9;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
 .btn-voir{
     -fx-background-radius: 10;
     -fx-background-color: #8b5cf6;
     -fx-text-fill: white;
-    -fx-padding: 8 18;
+    -fx-padding: 10 20;
+    -fx-font-weight: 700;
+    -fx-font-size: 12;
 }
+
 .btn-edit{
     -fx-background-radius: 10;
     -fx-background-color: #ff77aa;
     -fx-text-fill: white;
-    -fx-padding: 8 18;
+    -fx-padding: 10 20;
+    -fx-font-weight: 700;
+    -fx-font-size: 12;
+}
+
+.btn-delete{
+    -fx-background-radius: 10;
+    -fx-background-color: #ff4757;
+    -fx-text-fill: white;
+    -fx-padding: 10 14;
+    -fx-font-weight: 700;
+    -fx-font-size: 12;
+}
+
+/* Form Elements */
+.text-field, .text-area, .combo-box, .date-picker, .spinner{
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-font-size: 13;
+}
+
+.text-field:focused, .text-area:focused{
+    -fx-border-color: #8b5cf6;
+    -fx-border-width: 2;
+}
+
+.combo-box{
+    -fx-background-radius: 10;
+}
+
+.combo-box .list-cell{
+    -fx-padding: 8 12;
+}
+
+.date-picker{
+    -fx-background-radius: 10;
+}
+
+.spinner {
+    -fx-background-radius: 10;
+}
+
+.spinner .text-field{
+    -fx-background-radius: 10;
+}
+
+/* ScrollPane */
+.scroll-pane{
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .content{
+    -fx-background-color: transparent;
+}
+
+/* Stat Cards */
+.stat-card:hover{
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 24, 0, 0, 8);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { -fx-opacity: 0; }
+    to { -fx-opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { -fx-translate-y: 20; }
+    to { -fx-translate-y: 0; }
+}
+
+/* Separator */
+.separator{
+    -fx-background-color: rgba(255,255,255,0.2);
+}
+
+/* Field Error Styling */
+.field-error {
+    -fx-text-fill: #dc2626 !important; /* force red */
+    -fx-opacity: 1 !important;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 6 10;
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 8;
+}
+
+/* Make error labels explicit and high-specificity so they can't be overridden by parent -fx-text-fill */
+Label.field-error, .label.field-error, .form-field Label.field-error, .field-error.label {
+    -fx-text-fill: #dc2626 !important;
+    -fx-opacity: 1 !important;
+    -fx-font-size: 12px !important;
+    -fx-font-weight: 700 !important;
+}
+
+/* Also ensure error text inside forms (VBox.form-field) shows correct color */
+.form-field .field-error {
+    -fx-text-fill: #dc2626 !important;
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+    0%, 100% { -fx-translate-x: 0; }
+    10%, 30%, 50%, 70%, 90% { -fx-translate-x: -4; }
+    20%, 40%, 60%, 80% { -fx-translate-x: 4; }
+}
+
+.error-shake {
+    -fx-border-color: #dc2626 !important;
+    -fx-border-width: 2.5 !important;
+    -fx-background-color: #fee2e2 !important;
 }

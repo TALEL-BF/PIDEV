@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c47d2301-4c1f-4502-98cf-ce3baf6f0166" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database_schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database_schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/EmploiFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/EmploiFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/EmploiManagementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/EmploiManagementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/HomeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/RDVFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/RDVFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/RDVManagementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/RDVManagementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/SeanceDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/SeanceDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/SeanceFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/SeanceFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/SeanceManagementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/SeanceManagementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Entites/EmploiDuTemps.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Entites/EmploiDuTemps.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Entites/RDV.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Entites/RDV.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Entites/Seance.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Entites/Seance.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/IServices/IEmploiDuTempsServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/IServices/IEmploiDuTempsServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/IServices/IRDVServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/IServices/IRDVServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/IServices/ISeanceServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/IServices/ISeanceServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Services/EmploiDuTempsServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Services/EmploiDuTempsServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Services/RDVServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Services/RDVServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Services/SeanceServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Services/SeanceServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/test/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/test/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/test/MainFX.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/test/MainFX.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/EmploiForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/EmploiForm.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/EmploiManagement.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/EmploiManagement.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Home.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Home.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/RDVForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/RDVForm.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/RDVManagement.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/RDVManagement.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/SeanceDetails.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/SeanceDetails.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/SeanceForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/SeanceForm.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/SeanceManagement.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/SeanceManagement.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/styles/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/styles/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/Services/RDVServicesTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/Services/RDVServicesTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/Services/SeanceServicesTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/Services/SeanceServicesTest.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/user/Desktop/PIDEV" value="39fDrqRT3WePnmaEY0XzEgipQkq" />
+    </persistenceIdMap>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="$PROJECT_DIR$/../../../../xampp1/php/php.exe" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="39fDrqRT3WePnmaEY0XzEgipQkq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.MainFX.executor": "Run",
+    "Application.javafx.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "gestion__emploi",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/user/Desktop/PIDEV",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="javafx" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="test.MainFX" />
+      <module name="PIDEV" />
+      <option name="VM_PARAMETERS" value="--module-path C:\javafx-sdk-21.0.10\lib --add-modules javafx.controls,javafx.fxml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c47d2301-4c1f-4502-98cf-ce3baf6f0166" name="Changes" comment="" />
+      <created>1771078433527</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1771078433527</updated>
+      <workItem from="1771078435331" duration="5704000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

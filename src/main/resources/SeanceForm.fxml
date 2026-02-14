@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Controller.SeanceFormController"
+      spacing="12" style="-fx-background-color: linear-gradient(to bottom, #faf5ff, #f3e8ff); -fx-padding: 18;"
+      prefWidth="650" prefHeight="650" maxHeight="700">
+
+    <!-- Title -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="📚" style="-fx-font-size: 32;"/>
+        <Label text="Formulaire Séance" style="-fx-font-size: 26; -fx-font-weight: 900; -fx-text-fill: #6b21a8;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <VBox spacing="18">
+            <padding><Insets bottom="20"/></padding>
+
+            <!-- Titre -->
+            <VBox spacing="6" styleClass="form-field">
+                <Label text="Titre de la séance *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                <TextField fx:id="txtTitre" promptText="Ex: Cours de mathématiques"
+                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-font-size: 14; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                <Label fx:id="errorTitre" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+            </VBox>
+
+            <!-- Description -->
+            <VBox spacing="6" styleClass="form-field">
+                <Label text="Description *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                <TextArea fx:id="txtDescription" promptText="Décrivez le contenu de la séance..."
+                          prefRowCount="3" wrapText="true"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-font-size: 14; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                <Label fx:id="errorDescription" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+            </VBox>
+
+            <!-- Date & Time -->
+            <HBox spacing="12">
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="form-field">
+                    <Label text="Date *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 10; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorDate" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+
+                <VBox spacing="6" styleClass="form-field">
+                    <Label text="Heure *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Spinner fx:id="spinnerHeure" prefWidth="75" editable="true"
+                                 style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 10;"/>
+                        <Label text=":" style="-fx-font-size: 18; -fx-font-weight: 900; -fx-text-fill: #7c3aed;"/>
+                        <Spinner fx:id="spinnerMinute" prefWidth="75" editable="true"
+                                 style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 10;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+            <!-- Jour & Durée -->
+            <HBox spacing="12">
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="form-field">
+                    <Label text="Jour de la semaine *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <ComboBox fx:id="comboJour" maxWidth="Infinity"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 10; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorJour" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+
+                <VBox spacing="6" styleClass="form-field">
+                    <Label text="Durée (minutes) *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <Spinner fx:id="spinnerDuree" prefWidth="140" editable="true"
+                             style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 10;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Statut -->
+            <VBox spacing="6" styleClass="form-field">
+                <Label text="Statut *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                <ComboBox fx:id="comboStatut" maxWidth="Infinity"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 10; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+            </VBox>
+
+            <!-- IDs -->
+            <GridPane hgap="10" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="33.33"/>
+                    <ColumnConstraints percentWidth="33.33"/>
+                    <ColumnConstraints percentWidth="33.33"/>
+                </columnConstraints>
+
+                <VBox spacing="6" GridPane.columnIndex="0" styleClass="form-field">
+                    <Label text="ID Autiste *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <TextField fx:id="txtIdAutiste" promptText="1"
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorIdAutiste" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1" styleClass="form-field">
+                    <Label text="ID Professeur *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <TextField fx:id="txtIdProfesseur" promptText="1"
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorIdProfesseur" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="2" styleClass="form-field">
+                    <Label text="ID Cours *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #4c1d95;"/>
+                    <TextField fx:id="txtIdCours" promptText="1"
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorIdCours" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+            </GridPane>
+
+        </VBox>
+    </ScrollPane>
+
+    <!-- Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+        <Button fx:id="btnCancel" text="✖ Annuler" onAction="#handleCancel"
+                style="-fx-background-color: linear-gradient(to right, #e5e7eb, #d1d5db); -fx-text-fill: #374151; -fx-background-radius: 10; -fx-padding: 10 28; -fx-font-weight: 700; -fx-font-size: 13;"/>
+        <Button fx:id="btnSave" text="✓ Sauvegarder" onAction="#handleSave"
+                style="-fx-background-color: linear-gradient(to right, #8b5cf6, #7c3aed); -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 10 28; -fx-font-weight: 700; -fx-font-size: 13; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 10, 0, 0, 3);"/>
+    </HBox>
+
+</VBox>

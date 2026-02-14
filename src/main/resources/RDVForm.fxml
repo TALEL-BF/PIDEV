@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Controller.RDVFormController"
+      spacing="18" style="-fx-background-color: linear-gradient(to bottom, #f0f9ff, #e0f2fe); -fx-padding: 28;"
+      prefWidth="650">
+
+    <!-- Title -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="📅" style="-fx-font-size: 32;"/>
+        <Label text="Formulaire Rendez-vous" style="-fx-font-size: 26; -fx-font-weight: 900; -fx-text-fill: #075985;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <VBox spacing="18">
+            <padding><Insets bottom="20"/></padding>
+
+            <!-- Type de consultation -->
+            <VBox spacing="6" styleClass="form-field">
+                <Label text="Type de consultation *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                <ComboBox fx:id="comboType" maxWidth="Infinity"
+                          promptText="Sélectionnez le type"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 10; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                <Label fx:id="errorType" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+            </VBox>
+
+            <!-- Date & Time -->
+            <HBox spacing="12">
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="form-field">
+                    <Label text="Date *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 10; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorDate" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+
+                <VBox spacing="6" styleClass="form-field">
+                    <Label text="Heure *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Spinner fx:id="spinnerHeure" prefWidth="75" editable="true"
+                                 style="-fx-background-color: white; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 10;"/>
+                        <Label text=":" style="-fx-font-size: 18; -fx-font-weight: 900; -fx-text-fill: #0284c7;"/>
+                        <Spinner fx:id="spinnerMinute" prefWidth="75" editable="true"
+                                 style="-fx-background-color: white; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 10;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+            <!-- Durée & Statut -->
+            <HBox spacing="12">
+                <VBox spacing="6" styleClass="form-field">
+                    <Label text="Durée (minutes) *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                    <Spinner fx:id="spinnerDuree" prefWidth="160" editable="true"
+                             style="-fx-background-color: white; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 10;"/>
+                </VBox>
+
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="form-field">
+                    <Label text="Statut *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                    <ComboBox fx:id="comboStatut" maxWidth="Infinity"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 10; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                </VBox>
+            </HBox>
+
+            <!-- IDs -->
+            <HBox spacing="12">
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="form-field">
+                    <Label text="ID Psychologue *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                    <TextField fx:id="txtIdPsychologue" promptText="1"
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorIdPsychologue" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="form-field">
+                    <Label text="ID Autiste *" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #0c4a6e;"/>
+                    <TextField fx:id="txtIdAutiste" promptText="1"
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 14; -fx-border-color: #bae6fd; -fx-border-width: 2; -fx-border-radius: 12;"/>
+                    <Label fx:id="errorIdAutiste" visible="false" wrapText="true" styleClass="field-error" style="-fx-text-fill: #dc2626 !important; -fx-font-weight: 700; -fx-font-size: 12;"/>
+                </VBox>
+            </HBox>
+
+        </VBox>
+    </ScrollPane>
+
+    <!-- Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+        <Button fx:id="btnCancel" text="✖ Annuler" onAction="#handleCancel"
+                style="-fx-background-color: linear-gradient(to right, #e5e7eb, #d1d5db); -fx-text-fill: #374151; -fx-background-radius: 10; -fx-padding: 10 28; -fx-font-weight: 700; -fx-font-size: 13;"/>
+        <Button fx:id="btnSave" text="✓ Sauvegarder" onAction="#handleSave"
+                style="-fx-background-color: linear-gradient(to right, #0ea5e9, #0284c7); -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 10 28; -fx-font-weight: 700; -fx-font-size: 13; -fx-effect: dropshadow(gaussian, rgba(14,165,233,0.4), 10, 0, 0, 3);"/>
+    </HBox>
+
+</VBox>

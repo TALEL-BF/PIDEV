@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Controller.SeanceDetailsController"
+      spacing="0" style="-fx-background-color: white;"
+      prefWidth="550" prefHeight="600">
+
+    <!-- Header with gradient -->
+    <VBox style="-fx-background-color: linear-gradient(to right, #8b5cf6, #a78bfa); -fx-padding: 24;">
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="📚" style="-fx-font-size: 36;"/>
+            <VBox>
+                <Label fx:id="lblTitre" text="Titre de la séance"
+                       style="-fx-text-fill: white; -fx-font-size: 22; -fx-font-weight: 900;"/>
+                <Label text="Détails de la séance"
+                       style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 13;"/>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- Content ScrollPane -->
+    <ScrollPane fitToWidth="true" style="-fx-background: white; -fx-background-color: white;" VBox.vgrow="ALWAYS">
+        <VBox spacing="0" style="-fx-padding: 24;">
+
+            <!-- Description Card -->
+            <VBox spacing="8" style="-fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 16;">
+                <Label text="📝 Description" style="-fx-font-weight: 700; -fx-font-size: 14; -fx-text-fill: #4c1d95;"/>
+                <Label fx:id="lblDescription" text="Description..." wrapText="true"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 13; -fx-line-spacing: 2;"/>
+            </VBox>
+
+            <Region prefHeight="16"/>
+
+            <!-- Date & Time Card -->
+            <GridPane hgap="12" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <VBox spacing="6" GridPane.columnIndex="0"
+                      style="-fx-background-color: #faf5ff; -fx-background-radius: 12; -fx-padding: 16;">
+                    <Label text="📅 Date" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #6b21a8;"/>
+                    <Label fx:id="lblDate" text="01/01/2024"
+                           style="-fx-font-size: 16; -fx-font-weight: 700; -fx-text-fill: #2d3748;"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1"
+                      style="-fx-background-color: #faf5ff; -fx-background-radius: 12; -fx-padding: 16;">
+                    <Label text="🕐 Heure" style="-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: #6b21a8;"/>
+                    <Label fx:id="lblHeure" text="10:00"
+                           style="-fx-font-size: 16; -fx-font-weight: 700; -fx-text-fill: #2d3748;"/>
+                </VBox>
+            </GridPane>
+
+            <Region prefHeight="16"/>
+
+            <!-- Info Grid -->
+            <GridPane hgap="12" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                      style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 16;">
+                    <Label text="📆 Jour" style="-fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: #7c3aed;"/>
+                    <Label fx:id="lblJour" text="Lundi"
+                           style="-fx-font-size: 14; -fx-font-weight: 600; -fx-text-fill: #2d3748;"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                      style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 16;">
+                    <Label text="⏱️ Durée" style="-fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: #7c3aed;"/>
+                    <Label fx:id="lblDuree" text="60 minutes"
+                           style="-fx-font-size: 14; -fx-font-weight: 600; -fx-text-fill: #2d3748;"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                      style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 16;">
+                    <Label text="🎯 Statut" style="-fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: #7c3aed;"/>
+                    <Label fx:id="lblStatut" text="Confirmé"
+                           style="-fx-font-size: 14; -fx-font-weight: 600; -fx-text-fill: #10b981;"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                      style="-fx-background-color: white; -fx-border-color: #e9d5ff; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 16;">
+                    <Label text="🆔 ID Séance" style="-fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: #7c3aed;"/>
+                    <Label fx:id="lblId" text="#001"
+                           style="-fx-font-size: 14; -fx-font-weight: 600; -fx-text-fill: #2d3748;"/>
+                </VBox>
+            </GridPane>
+
+            <Region prefHeight="16"/>
+
+            <!-- IDs Section -->
+            <VBox spacing="12" style="-fx-background-color: #f0f9ff; -fx-background-radius: 12; -fx-padding: 16;">
+                <Label text="👥 Participants" style="-fx-font-weight: 700; -fx-font-size: 14; -fx-text-fill: #0284c7;"/>
+
+                <HBox spacing="20">
+                    <VBox spacing="4">
+                        <Label text="ID Autiste" style="-fx-font-size: 11; -fx-text-fill: #64748b; -fx-font-weight: 600;"/>
+                        <Label fx:id="lblIdAutiste" text="1"
+                               style="-fx-font-size: 18; -fx-font-weight: 900; -fx-text-fill: #0284c7;"/>
+                    </VBox>
+
+                    <VBox spacing="4">
+                        <Label text="ID Professeur" style="-fx-font-size: 11; -fx-text-fill: #64748b; -fx-font-weight: 600;"/>
+                        <Label fx:id="lblIdProfesseur" text="2"
+                               style="-fx-font-size: 18; -fx-font-weight: 900; -fx-text-fill: #0284c7;"/>
+                    </VBox>
+
+                    <VBox spacing="4">
+                        <Label text="ID Cours" style="-fx-font-size: 11; -fx-text-fill: #64748b; -fx-font-weight: 600;"/>
+                        <Label fx:id="lblIdCours" text="3"
+                               style="-fx-font-size: 18; -fx-font-weight: 900; -fx-text-fill: #0284c7;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+    <!-- Footer with Close Button -->
+    <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 16; -fx-background-color: #f8f9fa; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
+        <Button text="✖ Fermer" onAction="#handleClose"
+                style="-fx-background-color: linear-gradient(to right, #e5e7eb, #d1d5db); -fx-text-fill: #374151; -fx-background-radius: 10; -fx-padding: 10 28; -fx-font-weight: 700; -fx-font-size: 13; -fx-cursor: hand;"/>
+    </HBox>
+
+</VBox>
+
