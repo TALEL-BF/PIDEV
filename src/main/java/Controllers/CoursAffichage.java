@@ -21,11 +21,16 @@ import java.util.ResourceBundle;
 
 public class CoursAffichage implements Initializable {
 
-    @FXML private Label coursCountLabel;
-    @FXML private FlowPane coursFlowPane;
-    @FXML private TextField searchField;
-    @FXML private Button academicButton, socialButton, autonomieButton, creativiteButton;
-    @FXML private Button ajouterCoursButton;
+    @FXML
+    private Label coursCountLabel;
+    @FXML
+    private FlowPane coursFlowPane;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private Button academicButton, socialButton, autonomieButton, creativiteButton;
+    @FXML
+    private Button ajouterCoursButton;
 
     private CoursServices coursServices;
     private List<Cours> allCours;
@@ -66,19 +71,19 @@ public class CoursAffichage implements Initializable {
     private VBox createCourseCard(Cours cours) {
         VBox card = new VBox(10);
         card.setPrefWidth(280);
-        card.setPrefHeight(320); // Légèrement plus haut pour l'image
+        card.setPrefHeight(380); // Augmenté pour accueillir les badges
         card.setStyle("-fx-background-color: white; " +
                 "-fx-background-radius: 15; " +
                 "-fx-border-radius: 15; " +
                 "-fx-border-color: #EEEEEE; " +
                 "-fx-border-width: 1; " +
-                "-fx-padding: 0 0 20 0; " + // Padding enlevé en haut pour l'image
+                "-fx-padding: 0 0 20 0; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);");
 
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-padding: 0 0 20 0; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 15, 0, 0, 5);"));
         card.setOnMouseExited(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #EEEEEE; -fx-border-width: 1; -fx-padding: 0 0 20 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);"));
 
-        // Image du cours (remplace l'emoji)
+        // Image du cours
         StackPane imageContainer = new StackPane();
         imageContainer.setPrefHeight(140);
         imageContainer.setStyle("-fx-background-color: linear-gradient(to bottom, #F5F0FF, #FFFFFF); " +
@@ -98,7 +103,6 @@ public class CoursAffichage implements Initializable {
                     Image img = new Image(imageResource.toExternalForm());
                     courseImageView.setImage(img);
                 } else {
-                    // Image par défaut si non trouvée
                     setDefaultCourseImage(courseImageView, cours);
                 }
             } catch (Exception e) {
@@ -111,23 +115,43 @@ public class CoursAffichage implements Initializable {
         imageContainer.getChildren().add(courseImageView);
 
         // Conteneur pour le contenu texte (avec padding)
-        VBox contentContainer = new VBox(10);
+        VBox contentContainer = new VBox(8);
         contentContainer.setStyle("-fx-padding: 0 20 0 20;");
 
+        // Titre du cours
         Label titleLabel = new Label(cours.getTitre());
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;");
+        titleLabel.setWrapText(true);
 
+        // Description
         Label descriptionLabel = new Label(cours.getDescription());
         descriptionLabel.setWrapText(true);
         descriptionLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666666;");
         descriptionLabel.setPrefHeight(40);
+        descriptionLabel.setMaxHeight(40);
 
+        // === BADGES POUR TYPE ET NIVEAU ===
+        HBox badgesBox = new HBox(8);
+        badgesBox.setAlignment(Pos.CENTER_LEFT);
+
+        // Badge pour le type de cours
+        Label typeBadge = new Label(cours.getType_cours());
+        typeBadge.setStyle(getTypeStyle(cours.getType_cours()));
+        typeBadge.setPadding(new Insets(4, 12, 4, 12));
+
+        // Badge pour le niveau
+        Label niveauBadge = new Label(cours.getNiveau());
+        niveauBadge.setStyle(getNiveauStyle(cours.getNiveau()));
+        niveauBadge.setPadding(new Insets(4, 12, 4, 12));
+
+        badgesBox.getChildren().addAll(typeBadge, niveauBadge);
+
+        // Footer avec évaluations
         HBox footer = new HBox(15);
         footer.setAlignment(Pos.CENTER_LEFT);
 
         HBox ratingBox = new HBox(5);
         ratingBox.setAlignment(Pos.CENTER_LEFT);
-
         Label starLabel = new Label("⭐");
         Label ratingLabel = new Label("4.8");
         ratingLabel.setStyle("-fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
@@ -135,7 +159,6 @@ public class CoursAffichage implements Initializable {
 
         HBox participantsBox = new HBox(5);
         participantsBox.setAlignment(Pos.CENTER_LEFT);
-
         Label usersLabel = new Label("👥");
         Label participantsLabel = new Label("124");
         participantsLabel.setStyle("-fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
@@ -143,6 +166,7 @@ public class CoursAffichage implements Initializable {
 
         footer.getChildren().addAll(ratingBox, participantsBox);
 
+        // Bouton Commencer
         Button commencerBtn = new Button("Commencer");
         commencerBtn.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; " +
                 "-fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; " +
@@ -165,7 +189,8 @@ public class CoursAffichage implements Initializable {
             afficherContenuSimplifie(cours);
         });
 
-        contentContainer.getChildren().addAll(titleLabel, descriptionLabel, footer);
+        // Ajouter tous les éléments au contentContainer
+        contentContainer.getChildren().addAll(titleLabel, descriptionLabel, badgesBox, footer);
         card.getChildren().addAll(imageContainer, contentContainer, commencerBtn);
 
         // Aligner le bouton au centre
@@ -174,7 +199,45 @@ public class CoursAffichage implements Initializable {
         return card;
     }
 
-    // Méthode utilitaire pour définir une image par défaut selon le type de cours
+    // Styles pour les badges de type
+    private String getTypeStyle(String type) {
+        if (type == null) return getDefaultBadgeStyle();
+
+        switch (type) {
+            case "Académique":
+                return "-fx-background-color: #E3F2FD; -fx-text-fill: #1976D2; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            case "Social":
+                return "-fx-background-color: #FCE4EC; -fx-text-fill: #C2185B; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            case "Autonomie":
+                return "-fx-background-color: #E8F5E8; -fx-text-fill: #2E7D32; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            case "Créativité":
+                return "-fx-background-color: #FFF3E0; -fx-text-fill: #F57C00; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            default:
+                return getDefaultBadgeStyle();
+        }
+    }
+
+    // Styles pour les badges de niveau
+    private String getNiveauStyle(String niveau) {
+        if (niveau == null) return getDefaultBadgeStyle();
+
+        switch (niveau) {
+            case "Débutant":
+                return "-fx-background-color: #E8F5E8; -fx-text-fill: #2E7D32; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            case "Intermédiaire":
+                return "-fx-background-color: #FFF8E1; -fx-text-fill: #F57C00; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            case "Avancé":
+                return "-fx-background-color: #FFEBEE; -fx-text-fill: #C62828; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+            default:
+                return getDefaultBadgeStyle();
+        }
+    }
+
+    private String getDefaultBadgeStyle() {
+        return "-fx-background-color: #F5F5F5; -fx-text-fill: #666666; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
+    }
+
+    // Méthode utilitaire pour définir une image par défaut
     private void setDefaultCourseImage(ImageView imageView, Cours cours) {
         String titre = cours.getTitre().toLowerCase();
         String defaultImage;
@@ -195,7 +258,6 @@ public class CoursAffichage implements Initializable {
             defaultImage = "course_default.png";
         }
 
-        // Essayer de charger l'image par défaut
         try {
             String imagePath = "/images/" + defaultImage;
             URL imageResource = getClass().getResource(imagePath);
@@ -203,7 +265,6 @@ public class CoursAffichage implements Initializable {
                 Image img = new Image(imageResource.toExternalForm());
                 imageView.setImage(img);
             } else {
-                // Si aucune image par défaut, utiliser un simple label avec emoji
                 imageView.setImage(null);
                 StackPane parent = (StackPane) imageView.getParent();
                 if (parent != null) {
@@ -217,6 +278,7 @@ public class CoursAffichage implements Initializable {
             imageView.setImage(null);
         }
     }
+
     private void afficherContenuSimplifie(Cours cours) {
         Stage contentStage = new Stage();
         contentStage.setTitle(cours.getTitre());
@@ -232,7 +294,7 @@ public class CoursAffichage implements Initializable {
 
         // En-tête avec bouton retour
         HBox headerBox = new HBox(20);
-        headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setAlignment(Pos.CENTER);
         headerBox.setMaxWidth(1200);
 
         Button backButton = new Button("← Retour");
@@ -291,7 +353,6 @@ public class CoursAffichage implements Initializable {
                 String mot = motsList[i].trim();
                 String image = (i < imagesList.length) ? imagesList[i].trim() : null;
 
-                // Gestion des images multiples pour un même mot
                 if (image != null && image.contains(";")) {
                     String[] multipleImages = image.split(";");
                     VBox motAvecMultiImages = createMotCardAvecMultiImages(mot, multipleImages);
@@ -311,19 +372,17 @@ public class CoursAffichage implements Initializable {
 
         motsSection.getChildren().add(motsPane);
 
-        // ========== NOUVELLE SECTION : ÉVALUATIONS ==========
+        // Section Évaluations
         VBox evaluationsSection = new VBox(15);
         evaluationsSection.setMaxWidth(1200);
 
         Label evaluationsTitle = new Label("📊 Évaluations du cours");
         evaluationsTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7; -fx-padding: 10 0;");
 
-        // Bouton pour voir les évaluations
         Button voirEvaluationsBtn = new Button("Voir les évaluations");
         voirEvaluationsBtn.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 25; -fx-font-weight: bold; -fx-cursor: hand;");
 
         voirEvaluationsBtn.setOnAction(e -> {
-            // Fermer la fenêtre actuelle et ouvrir la page des évaluations pour ce cours
             contentStage.close();
             Navigation.navigateTo("evaluationaffichage.fxml?coursId=" + cours.getId_cours(),
                     "Évaluations - " + cours.getTitre());
@@ -331,7 +390,6 @@ public class CoursAffichage implements Initializable {
 
         evaluationsSection.getChildren().addAll(evaluationsTitle, voirEvaluationsBtn);
 
-        // Ajouter toutes les sections au conteneur principal
         mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationsSection);
         scrollPane.setContent(mainContainer);
 
@@ -339,7 +397,7 @@ public class CoursAffichage implements Initializable {
         contentStage.setScene(scene);
         contentStage.show();
     }
-    // Créer une carte avec plusieurs images (scrollable horizontal)
+
     private VBox createMotCardAvecMultiImages(String mot, String[] imageUrls) {
         VBox card = new VBox(15);
         card.setAlignment(Pos.CENTER);
@@ -356,7 +414,6 @@ public class CoursAffichage implements Initializable {
                         "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
         );
 
-        // Effet hover
         card.setOnMouseEntered(e ->
                 card.setStyle(
                         "-fx-background-color: #F0E6FF;" +
@@ -383,7 +440,6 @@ public class CoursAffichage implements Initializable {
                 )
         );
 
-        // Conteneur pour les images (scrollable horizontal)
         ScrollPane imagesScroll = new ScrollPane();
         imagesScroll.setFitToHeight(true);
         imagesScroll.setPrefHeight(150);
@@ -407,7 +463,6 @@ public class CoursAffichage implements Initializable {
                             imageView.setFitWidth(100);
                             imageView.setPreserveRatio(true);
 
-                            // Ajouter un effet de survol pour chaque image
                             imageView.setOnMouseEntered(ev ->
                                     imageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.5), 10, 0, 0, 5);")
                             );
@@ -418,13 +473,12 @@ public class CoursAffichage implements Initializable {
                             imagesContainer.getChildren().add(imageView);
                         }
                     } catch (Exception e) {
-                        // Ignorer les erreurs de chargement d'image
+                        // Ignorer les erreurs
                     }
                 }
             }
         }
 
-        // Si aucune image n'a été chargée, afficher un emoji
         if (imagesContainer.getChildren().isEmpty()) {
             Label emojiLabel = new Label(getEmojiForMot(mot));
             emojiLabel.setStyle("-fx-font-size: 80px;");
@@ -433,7 +487,6 @@ public class CoursAffichage implements Initializable {
 
         imagesScroll.setContent(imagesContainer);
 
-        // Texte du mot
         Label motLabel = new Label(mot);
         motLabel.setWrapText(true);
         motLabel.setStyle(
@@ -443,7 +496,6 @@ public class CoursAffichage implements Initializable {
                         "-fx-text-alignment: center;"
         );
 
-        // Indicateur du nombre d'images
         if (imageUrls != null && imageUrls.length > 1) {
             Label countLabel = new Label("📸 " + imageUrls.length + " images");
             countLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
@@ -455,7 +507,6 @@ public class CoursAffichage implements Initializable {
         return card;
     }
 
-    // Créer une carte pour chaque mot (version simple)
     private VBox createMotCard(String mot, String imageUrl) {
         VBox card = new VBox(15);
         card.setAlignment(Pos.CENTER);
@@ -472,7 +523,6 @@ public class CoursAffichage implements Initializable {
                         "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
         );
 
-        // Effet hover
         card.setOnMouseEntered(e ->
                 card.setStyle(
                         "-fx-background-color: #F0E6FF;" +
@@ -499,7 +549,6 @@ public class CoursAffichage implements Initializable {
                 )
         );
 
-        // Image
         StackPane imageContainer = new StackPane();
         imageContainer.setPrefHeight(120);
 
@@ -531,7 +580,6 @@ public class CoursAffichage implements Initializable {
             imageContainer.getChildren().add(emojiLabel);
         }
 
-        // Texte du mot
         Label motLabel = new Label(mot);
         motLabel.setWrapText(true);
         motLabel.setStyle(
@@ -545,7 +593,6 @@ public class CoursAffichage implements Initializable {
         return card;
     }
 
-    // Emoji pour les mots
     private String getEmojiForMot(String mot) {
         mot = mot.toLowerCase();
         if (mot.contains("chocolat")) return "🍫";
@@ -578,10 +625,41 @@ public class CoursAffichage implements Initializable {
     }
 
     private void setupFilters() {
-        academicButton.setOnAction(e -> filterCours(null, "Académique"));
-        socialButton.setOnAction(e -> filterCours(null, "Social"));
-        autonomieButton.setOnAction(e -> filterCours(null, "Autonomie"));
-        creativiteButton.setOnAction(e -> filterCours(null, "Créativité"));
+        academicButton.setOnAction(e -> {
+            if (isButtonActive(academicButton)) {
+                resetFilters();
+            } else {
+                filterCours(null, "Académique");
+            }
+        });
+
+        socialButton.setOnAction(e -> {
+            if (isButtonActive(socialButton)) {
+                resetFilters();
+            } else {
+                filterCours(null, "Social");
+            }
+        });
+
+        autonomieButton.setOnAction(e -> {
+            if (isButtonActive(autonomieButton)) {
+                resetFilters();
+            } else {
+                filterCours(null, "Autonomie");
+            }
+        });
+
+        creativiteButton.setOnAction(e -> {
+            if (isButtonActive(creativiteButton)) {
+                resetFilters();
+            } else {
+                filterCours(null, "Créativité");
+            }
+        });
+    }
+
+    private boolean isButtonActive(Button button) {
+        return button.getStyle().contains("#7B2FF7") && !button.getStyle().contains("transparent");
     }
 
     private void filterCours(String searchText, String category) {
@@ -594,14 +672,76 @@ public class CoursAffichage implements Initializable {
                     .collect(java.util.stream.Collectors.toList());
         }
 
-        if (category != null) {
+        if (category != null && !category.isEmpty()) {
+            final String categoryFilter = category;
             filtered = filtered.stream()
-                    .filter(c -> c.getType_cours().equals(category) ||
-                            c.getNiveau().contains(category))
+                    .filter(c -> {
+                        String typeCours = c.getType_cours();
+                        return typeCours != null && typeCours.equals(categoryFilter);
+                    })
                     .collect(java.util.stream.Collectors.toList());
+
+            updateFilterButtons(category);
+        } else {
+            // Réinitialiser les boutons si pas de catégorie
+            resetFilterButtons();
         }
 
         coursCountLabel.setText(filtered.size() + " Cours disponibles");
         displayCours(filtered);
+    }
+
+    private void updateFilterButtons(String activeCategory) {
+        // Réinitialiser tous les boutons au style inactif d'abord
+        resetFilterButtons();
+
+        // Mettre en évidence le bouton actif
+        switch (activeCategory) {
+            case "Académique":
+                setButtonActive(academicButton);
+                break;
+            case "Social":
+                setButtonActive(socialButton);
+                break;
+            case "Autonomie":
+                setButtonActive(autonomieButton);
+                break;
+            case "Créativité":
+                setButtonActive(creativiteButton);
+                break;
+        }
+    }
+
+    private void setButtonActive(Button button) {
+        button.setStyle("-fx-background-color: #7B2FF7; " +
+                "-fx-text-fill: white; " +
+                "-fx-background-radius: 20; " +
+                "-fx-padding: 8 20; " +
+                "-fx-font-size: 14px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-cursor: hand;");
+    }
+
+    private void resetFilterButtons() {
+        Button[] buttons = {academicButton, socialButton, autonomieButton, creativiteButton};
+        for (Button button : buttons) {
+            button.setStyle("-fx-background-color: transparent; " +
+                    "-fx-border-color: #7B2FF7; " +
+                    "-fx-border-width: 1.5; " +
+                    "-fx-text-fill: #7B2FF7; " +
+                    "-fx-background-radius: 20; " +
+                    "-fx-border-radius: 20; " +
+                    "-fx-padding: 8 20; " +
+                    "-fx-font-size: 14px; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-cursor: hand;");
+        }
+    }
+
+    private void resetFilters() {
+        displayCours(allCours);
+        coursCountLabel.setText(allCours.size() + " Cours disponibles");
+        searchField.clear();
+        resetFilterButtons();
     }
 }

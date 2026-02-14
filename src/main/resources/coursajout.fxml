@@ -27,7 +27,7 @@
 
                 <HBox alignment="CENTER_LEFT" spacing="5">
                     <VBox alignment="CENTER">
-                        <ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <ImageView fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
                             <image>
                                 <Image url="@images/logo.png"/>
                             </image>

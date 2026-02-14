@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Optional;
 
 public class CoursAjout implements Initializable {
 
@@ -35,15 +36,13 @@ public class CoursAjout implements Initializable {
     @FXML
     private TextField imageField;
 
-    // Ajouter ce champ pour le bouton parcourir de l'image du cours
     @FXML
-    private Button parcourirImageButton; // À ajouter dans le FXML
+    private Button parcourirImageButton;
 
-    // NOUVEAUX CHAMPS POUR LES MOTS AVEC IMAGES MULTIPLES
     @FXML
     private TextArea motsField;
     @FXML
-    private VBox imagesMotsContainer;  // Conteneur pour les lignes d'images
+    private VBox imagesMotsContainer;
     @FXML
     private Button ajouterLigneImageButton;
 
@@ -76,8 +75,10 @@ public class CoursAjout implements Initializable {
     private CoursServices coursServices;
     private ObservableList<Cours> coursList;
 
-    // Liste pour stocker les lignes d'images
     private List<ImageMotLigne> imagesMotLignes = new ArrayList<>();
+
+    // Variable pour suivre si on est en mode modification
+    private Cours coursEnModification = null;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -88,13 +89,8 @@ public class CoursAjout implements Initializable {
         loadCoursData();
         configureActions();
 
-        // NE PAS ajouter de ligne par défaut
-        // Les lignes seront ajoutées uniquement quand l'utilisateur clique sur le bouton
-
-        // Configurer le bouton pour ajouter des lignes
         ajouterLigneImageButton.setOnAction(e -> ajouterNouvelleLigneImage());
 
-        // Ajouter un listener pour mettre à jour les lignes quand les mots changent
         motsField.textProperty().addListener((observable, oldValue, newValue) -> {
             mettreAJourLignesImages();
         });
@@ -135,12 +131,10 @@ public class CoursAjout implements Initializable {
         public void setImages(String images) { imagesField.setText(images); }
     }
 
-    // Nouvelle méthode pour mettre à jour les lignes d'images quand les mots changent
     private void mettreAJourLignesImages() {
         String motsText = motsField.getText();
         String[] mots = motsText.split(";");
 
-        // Créer une liste des mots actuels
         List<String> motsActuels = new ArrayList<>();
         for (String mot : mots) {
             if (!mot.trim().isEmpty()) {
@@ -148,7 +142,6 @@ public class CoursAjout implements Initializable {
             }
         }
 
-        // Supprimer les lignes pour les mots qui n'existent plus
         List<ImageMotLigne> aSupprimer = new ArrayList<>();
         for (ImageMotLigne ligne : imagesMotLignes) {
             if (!motsActuels.contains(ligne.getMot())) {
@@ -161,7 +154,6 @@ public class CoursAjout implements Initializable {
             imagesMotsContainer.getChildren().remove(ligne.getLigne());
         }
 
-        // Ajouter des lignes pour les nouveaux mots
         for (String mot : motsActuels) {
             boolean motExiste = imagesMotLignes.stream()
                     .anyMatch(ligne -> ligne.getMot().equals(mot));
@@ -177,8 +169,6 @@ public class CoursAjout implements Initializable {
     private void ajouterNouvelleLigneImage() {
         String motsText = motsField.getText();
         if (motsText == null || motsText.trim().isEmpty()) {
-            // Au lieu d'afficher une alerte, on crée une ligne avec un champ vide
-            // que l'utilisateur pourra remplir manuellement
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Ajouter un mot");
             dialog.setHeaderText("Saisissez le mot pour lequel vous voulez ajouter des images");
@@ -192,7 +182,6 @@ public class CoursAjout implements Initializable {
                 }
             });
         } else {
-            // Utiliser les mots existants
             String[] mots = motsText.split(";");
             for (String mot : mots) {
                 if (!mot.trim().isEmpty()) {
@@ -209,7 +198,6 @@ public class CoursAjout implements Initializable {
         }
     }
 
-    // Méthode pour choisir une image pour le cours
     private void choisirImageCours() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour le cours");
@@ -220,7 +208,6 @@ public class CoursAjout implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(null);
 
         if (selectedFile != null) {
-            // Mettre juste le nom du fichier dans le champ
             imageField.setText(selectedFile.getName());
         }
     }
@@ -268,13 +255,16 @@ public class CoursAjout implements Initializable {
     }
 
     private void initializeTable() {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id_cours"));
+        // Configuration des colonnes
         titreColumn.setCellValueFactory(new PropertyValueFactory<>("titre"));
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("type_cours"));
         niveauColumn.setCellValueFactory(new PropertyValueFactory<>("niveau"));
         dureeColumn.setCellValueFactory(new PropertyValueFactory<>("duree"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         imageColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
+
+        // Masquer la colonne ID
+        idColumn.setVisible(false);
 
         ajouterBoutonsActions();
     }
@@ -292,7 +282,8 @@ public class CoursAjout implements Initializable {
                                 "-fx-text-fill: #FFA500;" +
                                 "-fx-border-radius: 20;" +
                                 "-fx-background-radius: 20;" +
-                                "-fx-padding: 5 15;"
+                                "-fx-padding: 5 15;" +
+                                "-fx-cursor: hand;"
                 );
 
                 supprimerButton.setStyle(
@@ -301,7 +292,8 @@ public class CoursAjout implements Initializable {
                                 "-fx-text-fill: #FF4444;" +
                                 "-fx-border-radius: 20;" +
                                 "-fx-background-radius: 20;" +
-                                "-fx-padding: 5 15;"
+                                "-fx-padding: 5 15;" +
+                                "-fx-cursor: hand;"
                 );
 
                 pane.setAlignment(Pos.CENTER);
@@ -335,11 +327,18 @@ public class CoursAjout implements Initializable {
     }
 
     private void configureActions() {
-        ajouterButton.setOnAction(event -> ajouterCours());
+        ajouterButton.setOnAction(event -> {
+            if (coursEnModification != null) {
+                // Mode modification
+                modifierCoursExistant();
+            } else {
+                // Mode ajout
+                ajouterCours();
+            }
+        });
+
         annulerButton.setOnAction(event -> annuler());
 
-        // Ajouter l'action pour le bouton parcourir de l'image du cours
-        // Note: Il faut ajouter fx:id="parcourirImageButton" dans le FXML
         if (parcourirImageButton != null) {
             parcourirImageButton.setOnAction(event -> choisirImageCours());
         }
@@ -359,38 +358,7 @@ public class CoursAjout implements Initializable {
         }
 
         try {
-            // Construire la chaîne des images de mots à partir des lignes
-            StringBuilder imagesMotsBuilder = new StringBuilder();
-            List<String> motsList = new ArrayList<>();
-
-            // Récupérer les mots du champ motsField
-            String[] mots = motsField.getText().split(";");
-            for (String mot : mots) {
-                if (!mot.trim().isEmpty()) {
-                    motsList.add(mot.trim());
-                }
-            }
-
-            // Construire la chaîne d'images dans l'ordre des mots
-            for (String mot : motsList) {
-                boolean imageTrouvee = false;
-                for (ImageMotLigne ligne : imagesMotLignes) {
-                    if (ligne.getMot().equals(mot)) {
-                        if (imagesMotsBuilder.length() > 0) {
-                            imagesMotsBuilder.append(";");
-                        }
-                        imagesMotsBuilder.append(ligne.getImages());
-                        imageTrouvee = true;
-                        break;
-                    }
-                }
-                if (!imageTrouvee) {
-                    if (imagesMotsBuilder.length() > 0) {
-                        imagesMotsBuilder.append(";");
-                    }
-                    imagesMotsBuilder.append("");
-                }
-            }
+            String imagesMotsString = construireImagesMotsString();
 
             Cours nouveauCours = new Cours(
                     titreField.getText(),
@@ -400,7 +368,7 @@ public class CoursAjout implements Initializable {
                     Integer.parseInt(dureeField.getText()),
                     imageField.getText(),
                     motsField.getText(),
-                    imagesMotsBuilder.toString()
+                    imagesMotsString
             );
 
             boolean success = coursServices.ajouter(nouveauCours);
@@ -421,6 +389,83 @@ public class CoursAjout implements Initializable {
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de l'ajout: " + e.getMessage());
         }
+    }
+
+    // Nouvelle méthode pour la modification
+    private void modifierCoursExistant() {
+        if (!validateFields()) {
+            return;
+        }
+
+        try {
+            String imagesMotsString = construireImagesMotsString();
+
+            // Mettre à jour l'objet cours existant
+            coursEnModification.setTitre(titreField.getText());
+            coursEnModification.setDescription(descriptionArea.getText());
+            coursEnModification.setType_cours(typeCoursCombo.getValue());
+            coursEnModification.setNiveau(niveauCombo.getValue());
+            coursEnModification.setDuree(Integer.parseInt(dureeField.getText()));
+            coursEnModification.setImage(imageField.getText());
+            coursEnModification.setMots(motsField.getText());
+            coursEnModification.setImages_mots(imagesMotsString);
+
+            boolean success = coursServices.modifier(coursEnModification);
+
+            if (success) {
+                showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours modifié avec succès!");
+
+                // Réinitialiser le mode modification
+                coursEnModification = null;
+                ajouterButton.setText("Ajouter le cours");
+
+                // Recharger les données et vider le formulaire
+                clearFields();
+                loadCoursData();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la modification du cours.");
+            }
+
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur", "La durée doit être un nombre valide.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la modification: " + e.getMessage());
+        }
+    }
+
+    // Méthode utilitaire pour construire la chaîne des images de mots
+    private String construireImagesMotsString() {
+        StringBuilder imagesMotsBuilder = new StringBuilder();
+        List<String> motsList = new ArrayList<>();
+
+        String[] mots = motsField.getText().split(";");
+        for (String mot : mots) {
+            if (!mot.trim().isEmpty()) {
+                motsList.add(mot.trim());
+            }
+        }
+
+        for (String mot : motsList) {
+            boolean imageTrouvee = false;
+            for (ImageMotLigne ligne : imagesMotLignes) {
+                if (ligne.getMot().equals(mot)) {
+                    if (imagesMotsBuilder.length() > 0) {
+                        imagesMotsBuilder.append(";");
+                    }
+                    imagesMotsBuilder.append(ligne.getImages());
+                    imageTrouvee = true;
+                    break;
+                }
+            }
+            if (!imageTrouvee) {
+                if (imagesMotsBuilder.length() > 0) {
+                    imagesMotsBuilder.append(";");
+                }
+                imagesMotsBuilder.append("");
+            }
+        }
+
+        return imagesMotsBuilder.toString();
     }
 
     private boolean validateFields() {
@@ -444,13 +489,27 @@ public class CoursAjout implements Initializable {
             showAlert(Alert.AlertType.WARNING, "Validation", "Veuillez saisir une description.");
             return false;
         }
-        // Les mots ne sont plus obligatoires
         return true;
     }
 
     @FXML
     private void annuler() {
-        clearFields();
+        if (coursEnModification != null) {
+            // Demander confirmation avant d'annuler une modification en cours
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText("Annuler la modification");
+            alert.setContentText("Voulez-vous vraiment annuler la modification en cours ?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                clearFields();
+                coursEnModification = null;
+                ajouterButton.setText("Ajouter le cours");
+            }
+        } else {
+            clearFields();
+        }
     }
 
     private void clearFields() {
@@ -462,16 +521,22 @@ public class CoursAjout implements Initializable {
         imageField.clear();
         motsField.clear();
 
-        // Effacer les lignes d'images
         imagesMotLignes.clear();
         imagesMotsContainer.getChildren().clear();
     }
 
     private void modifierCours(Cours cours) {
+        // Remplir le formulaire avec les données du cours sélectionné
         remplirFormulairePourModification(cours);
-        ajouterButton.setText("Modifier");
-        showAlert(Alert.AlertType.INFORMATION, "Modification",
-                "Fonctionnalité de modification en cours de développement");
+
+        // Changer le texte du bouton
+        ajouterButton.setText("Modifier le cours");
+
+        // Stocker le cours en cours de modification
+        coursEnModification = cours;
+
+        // Faire défiler jusqu'au formulaire
+        // (Optionnel : vous pouvez ajouter ici du code pour faire défiler la vue)
     }
 
     private void supprimerCours(Cours cours) {
@@ -486,6 +551,13 @@ public class CoursAjout implements Initializable {
                 if (success) {
                     showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours supprimé avec succès!");
                     loadCoursData();
+
+                    // Si on était en train de modifier ce cours, réinitialiser
+                    if (coursEnModification != null && coursEnModification.getId_cours() == cours.getId_cours()) {
+                        clearFields();
+                        coursEnModification = null;
+                        ajouterButton.setText("Ajouter le cours");
+                    }
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la suppression du cours.");
                 }
@@ -502,7 +574,6 @@ public class CoursAjout implements Initializable {
         imageField.setText(cours.getImage());
         motsField.setText(cours.getMots());
 
-        // Reconstruire les lignes d'images
         imagesMotLignes.clear();
         imagesMotsContainer.getChildren().clear();
 
@@ -512,12 +583,15 @@ public class CoursAjout implements Initializable {
 
             for (int i = 0; i < mots.length; i++) {
                 if (i < mots.length) {
-                    ImageMotLigne ligne = new ImageMotLigne(mots[i].trim());
-                    if (i < images.length) {
-                        ligne.setImages(images[i].trim());
+                    String mot = mots[i].trim();
+                    if (!mot.isEmpty()) {
+                        ImageMotLigne ligne = new ImageMotLigne(mot);
+                        if (i < images.length) {
+                            ligne.setImages(images[i].trim());
+                        }
+                        imagesMotLignes.add(ligne);
+                        imagesMotsContainer.getChildren().add(ligne.getLigne());
                     }
-                    imagesMotLignes.add(ligne);
-                    imagesMotsContainer.getChildren().add(ligne.getLigne());
                 }
             }
         }
