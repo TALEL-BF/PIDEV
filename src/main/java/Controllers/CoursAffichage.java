@@ -105,7 +105,7 @@ public class CoursAffichage implements Initializable {
     private VBox createCourseCard(Cours cours) {
         VBox card = new VBox(10);
         card.setPrefWidth(280);
-        card.setPrefHeight(380);
+        card.setPrefHeight(320);
         card.setStyle("-fx-background-color: white; " +
                 "-fx-background-radius: 15; " +
                 "-fx-border-radius: 15; " +
@@ -117,18 +117,18 @@ public class CoursAffichage implements Initializable {
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-padding: 0 0 20 0; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 15, 0, 0, 5);"));
         card.setOnMouseExited(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #EEEEEE; -fx-border-width: 1; -fx-padding: 0 0 20 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);"));
 
-        // Image du cours
+
         StackPane imageContainer = new StackPane();
-        imageContainer.setPrefHeight(140);
+        imageContainer.setPrefHeight(200);
         imageContainer.setStyle("-fx-background-color: linear-gradient(to bottom, #F5F0FF, #FFFFFF); " +
                 "-fx-background-radius: 15 15 0 0;");
 
         ImageView courseImageView = new ImageView();
-        courseImageView.setFitHeight(100);
-        courseImageView.setFitWidth(200);
+        courseImageView.setFitHeight(150);
+        courseImageView.setFitWidth(230);
         courseImageView.setPreserveRatio(true);
 
-        // Charger l'image du cours si disponible
+
         if (cours.getImage() != null && !cours.getImage().isEmpty()) {
             try {
                 String imagePath = "/images/" + cours.getImage();
@@ -148,16 +148,16 @@ public class CoursAffichage implements Initializable {
 
         imageContainer.getChildren().add(courseImageView);
 
-        // Conteneur pour le contenu texte (avec padding)
+
         VBox contentContainer = new VBox(8);
         contentContainer.setStyle("-fx-padding: 0 20 0 20;");
 
-        // Titre du cours
+
         Label titleLabel = new Label(cours.getTitre());
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;");
         titleLabel.setWrapText(true);
 
-        // Description
+
         Label descriptionLabel = new Label(cours.getDescription());
         descriptionLabel.setWrapText(true);
         descriptionLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666666;");
@@ -173,7 +173,7 @@ public class CoursAffichage implements Initializable {
         typeBadge.setStyle(getTypeStyle(cours.getType_cours()));
         typeBadge.setPadding(new Insets(4, 12, 4, 12));
 
-        // Badge pour le niveau
+
         Label niveauBadge = new Label(cours.getNiveau());
         niveauBadge.setStyle(getNiveauStyle(cours.getNiveau()));
         niveauBadge.setPadding(new Insets(4, 12, 4, 12));
@@ -787,10 +787,10 @@ public class CoursAffichage implements Initializable {
     }
 
     private void updateFilterButtons(String activeCategory) {
-        // Réinitialiser tous les boutons au style inactif d'abord
+
         resetFilterButtons();
 
-        // Mettre en évidence le bouton actif
+
         switch (activeCategory) {
             case "Académique":
                 setButtonActive(academicButton);
