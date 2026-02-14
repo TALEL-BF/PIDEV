@@ -29,8 +29,11 @@ public class MainFX extends Application {
         );
 
         stage.setTitle("Gestion des Suivies");
-        stage.setMinWidth(1100);
-        stage.setMinHeight(700);
+        stage.setWidth(1365);
+        stage.setHeight(768);
+        stage.setResizable(true);
+        stage.centerOnScreen();
+
         stage.setScene(scene);
         stage.show();
 

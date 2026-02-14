@@ -1,90 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="Controller.AjouterSuivie"
-            stylesheets="@styles/app.css">
+<BorderPane stylesheets="@styles/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AjouterSuivie">
 
     <!-- SIDEBAR -->
     <left>
-        <VBox styleClass="sidebar" spacing="14">
-            <HBox styleClass="sidebar-header" spacing="10">
-                <ImageView fitWidth="36" fitHeight="36" preserveRatio="true">
+        <VBox spacing="14" styleClass="sidebar">
+            <HBox spacing="10" styleClass="sidebar-header">
+                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
                     <image>
-                        <Image url="@assets/logo.png"/>
+                        <Image url="@assets/logo.png" />
                     </image>
                 </ImageView>
                 <VBox>
-                    <Label text="AutiCare" styleClass="app-title"/>
-                    <Label text="Plateforme éducative" styleClass="app-subtitle"/>
+                    <Label styleClass="app-title" text="AutiCare" />
+                    <Label styleClass="app-subtitle" text="Plateforme éducative" />
                 </VBox>
             </HBox>
 
-            <Label text="Connecté en tant que" styleClass="muted"/>
-            <Label text="Etudiant" styleClass="badge"/>
+            <Label styleClass="muted" text="Connecté en tant que" />
+            <Label styleClass="badge" text="Admin" />
 
-            <VBox spacing="8">
-                <Button text="Gestion des suivies" styleClass="menu-item active"/>
-                <Button text="Gestion des consultations" styleClass="menu-item"/>
-                <Button text="Gestion des cours" styleClass="menu-item"/>
-                <Button text="Gestion des évaluations" styleClass="menu-item"/>
-                <Button text="Scores" styleClass="menu-item"/>
+            <VBox spacing="8" styleClass="menu">
+                <Button styleClass="menu-item" text="Gestion Utilisateur" />
+                <Button styleClass="menu-item" text="Gestion Cours &amp; Evaluations" />
+                <Button styleClass="menu-item" text="Gestion Emploi" />
+
+                <!-- ✅ Gestion Consultations avec flèche -->
+                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="menu-row">
+                    <Button fx:id="btnGestionConsultations" maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Consultations" HBox.hgrow="ALWAYS" />
+
+                    <!-- flèche -->
+                    <ToggleButton fx:id="tbConsultations" styleClass="chevron-btn" text="▾" />
+                </HBox>
+
+                <!-- ✅ sous-menu (caché par défaut) -->
+                <VBox fx:id="consultationsSubMenu"
+                      visible="false" managed="false"
+                      spacing="6"
+                      styleClass="submenu">
+
+                    <Button fx:id="btnMenuSuivie" text="Suivie" styleClass="submenu-item"/>
+                    <Button fx:id="btnMenuTherapie" text="Thérapie" styleClass="submenu-item"/>
+
+                </VBox>
+
+
+                <Button styleClass="menu-item" text="Gestion Evenements" />
+                <Button styleClass="menu-item" text="Gestion Jeux" />
             </VBox>
         </VBox>
     </left>
 
+
     <!-- CONTENT -->
     <center>
-        <ScrollPane fx:id="mainScroll"
-                    fitToWidth="true"
-                    pannable="true"
-                    vbarPolicy="ALWAYS"
-                    hbarPolicy="NEVER"
-                    styleClass="main-scroll">
+        <ScrollPane fx:id="mainScroll" fitToWidth="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="AS_NEEDED">
 
             <content>
-                <VBox styleClass="content" spacing="14">
+                <VBox spacing="16" style="-fx-padding: 26;">
 
                     <!-- Title -->
-                    <VBox spacing="3">
-                        <Label text="Gestion des Suivies" styleClass="page-title"/>
-                        <Label text="Gérez les suivies et les informations associées"
-                               styleClass="page-subtitle"/>
+                    <VBox spacing="4">
+                        <Label styleClass="page-title" text="Gestion des Suivies" />
+                        <Label styleClass="page-subtitle" text="Gérez les suivies et les informations associées" />
                     </VBox>
 
-                    <!-- Search + Filters + Add -->
-                    <HBox spacing="12" alignment="CENTER_LEFT">
-                        <TextField fx:id="searchField"
-                                   promptText="Rechercher un suivi..."
-                                   styleClass="search"/>
+                    <!-- Search + Add -->
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <TextField fx:id="searchField" promptText="Rechercher un suivi..." styleClass="search" HBox.hgrow="ALWAYS" />
 
-                        <HBox styleClass="filters" spacing="8">
-                            <ToggleButton fx:id="tbTous" text="Tous" selected="true"/>
-                            <ToggleButton fx:id="tbActif" text="Actif"/>
-                            <ToggleButton fx:id="tbTermine" text="Terminé"/>
-                            <ToggleButton fx:id="tbAnnule" text="Annulé"/>
-                        </HBox>
-
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnAjouter" text="+ Ajouter" styleClass="btn-add"/>
+                        <Button fx:id="btnAjouter" styleClass="btn-primary" text="+ Ajouter" />
                     </HBox>
 
-                    <!-- ✅ Remis (sinon NPE) -->
-                    <Label fx:id="countLabel" text="0 Suivies" styleClass="count"/>
+                    <!-- Count -->
+                    <Label fx:id="countLabel" styleClass="counter-label" text="0 Suivies" />
 
                     <!-- Empty state -->
-                    <VBox fx:id="emptyBox" visible="false" managed="false"
-                          styleClass="empty-box" spacing="6">
-                        <Label text="Aucun suivi trouvé" styleClass="empty-title"/>
-                        <Label text="Essayez un autre filtre ou ajoutez un suivi." styleClass="empty-sub"/>
+                    <VBox fx:id="emptyBox" managed="false" spacing="6" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 18; -fx-border-color: #E6E8F0; -fx-border-radius: 18;" visible="false">
+                        <Label style="-fx-font-size: 16; -fx-font-weight: 800; -fx-text-fill: #0F172A;" text="Aucun suivi trouvé" />
+                        <Label style="-fx-font-size: 13; -fx-text-fill: #64748B;" text="Essayez une autre recherche ou ajoutez un suivi." />
                     </VBox>
 
                     <!-- Cards -->
-                    <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980"/>
+                    <FlowPane fx:id="cardsPane" hgap="18" prefWrapLength="980" vgap="18" />
 
                 </VBox>
             </content>
