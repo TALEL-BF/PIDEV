@@ -2,114 +2,84 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefWidth="1300.0" prefHeight="800.0"
+<AnchorPane prefWidth="1300.0" prefHeight="800.0" style="-fx-background-color: #F0F8FF;"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controllers.EvaluationAffichage">
 
     <children>
-        <HBox prefWidth="1300.0" prefHeight="800.0">
-            <!-- ================= SIDEBAR ================= -->
-            <VBox prefWidth="220.0"
-                  minWidth="220.0"
-                  maxWidth="220.0"
-                  spacing="15"
-                  style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding:20;">
+        <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #F0F8FF;" AnchorPane.topAnchor="0"
+              AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
 
-                <HBox alignment="CENTER_LEFT" spacing="5">
-                    <VBox alignment="CENTER">
-                        <ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
-                            <image>
-                                <Image url="@images/logo.png"/>
-                            </image>
-                        </ImageView>
-                    </VBox>
-                    <Label text="AutiCare"
-                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;">
+            <!-- En-tête -->
+            <VBox spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="20">
+                    <Button fx:id="retourButton" text="← Retour"
+                            style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-font-size: 16px; -fx-cursor: hand;"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Label text="📋 Gestion des évaluations"
+                           style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;">
                         <font>
-                            <Font size="20.0"/>
+                            <Font size="36.0"/>
                         </font>
                     </Label>
+
+                    <Region HBox.hgrow="ALWAYS"/>
                 </HBox>
 
-                <Separator/>
-
-                <Button text="Gestion des utilisateurs"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
-
-                <Button text="Gestion des cours"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
-
-                <Button text="Gestion des plans"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
-
-                <Button text="Gestion des événements"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
-
-                <Button text="Gestion des suivie consultation"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand; -fx-wrap-text: true;"/>
-
-                <Button text="Gestion des jeux"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
-
-                <VBox VBox.vgrow="ALWAYS" />
-
-                <Button text="Déconnexion"
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill:white; -fx-cursor: hand; -fx-background-radius:10;"/>
-
+                <Label fx:id="coursTitreLabel" text="" visible="false"
+                       style="-fx-font-size: 20px; -fx-text-fill: #7B2FF7; -fx-padding: 0 0 0 50;"/>
             </VBox>
 
+            <!-- Filtres et stats -->
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label text="Filtrer par cours:"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <ComboBox fx:id="filterCoursCombo" prefWidth="300"
+                                  style="-fx-background-radius: 10;"/>
+                    </HBox>
+                </VBox>
 
-            <!-- Contenu principal -->
-            <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS" style="-fx-background: white;">
-                <content>
-                    <VBox spacing="25" style="-fx-padding: 30;">
+                <VBox alignment="CENTER_RIGHT" spacing="5">
+                    <Label fx:id="totalEvaluationsLabel" text="📊 Total: 0 question(s)"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;"/>
+                    <Label fx:id="totalScoreLabel" text="" visible="false"
+                           style="-fx-font-size: 16px; -fx-text-fill: #666666;"/>
+                    <Label fx:id="statsLabel" text=""
+                           style="-fx-font-size: 14px; -fx-text-fill: #999999;"/>
+                </VBox>
 
-                        <!-- Header -->
-                        <HBox alignment="CENTER_LEFT" spacing="20">
-                            <VBox spacing="10" HBox.hgrow="ALWAYS">
-                                <Label text="Gestion des Évaluations"
-                                       style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
-                                <Label text="Suivez et évaluez la progression des apprenants"
-                                       style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
-                            </VBox>
-                            <Button fx:id="ajouterEvaluationButton"
-                                    text="+ Nouvelle évaluation"
-                                    style="-fx-background-color: #7B2FF7; -fx-text-fill: white;
-                                           -fx-background-radius: 20; -fx-padding: 12 25;
-                                           -fx-font-weight: bold; -fx-cursor: hand;"/>
-                        </HBox>
+                <Button fx:id="ajouterEvaluationButton" text="➕ Ajouter des questions"
+                        style="-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12 25; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"/>
+            </HBox>
 
-                        <!-- Filtres -->
-                        <HBox spacing="15" alignment="CENTER_LEFT">
-                            <ComboBox fx:id="filterCoursCombo"
-                                      promptText="Filtrer par cours"
-                                      prefWidth="200"/>
-                            <Label fx:id="totalEvaluationsLabel"
-                                   text="Total: 0 évaluations"
-                                   style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
-                        </HBox>
+            <!-- Tableau des évaluations -->
+            <TableView fx:id="evaluationTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #EEEEEE;">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="questionColumn" text="Question" prefWidth="300"/>
+                    <TableColumn fx:id="choix1Column" text="Choix 1" prefWidth="150"/>
+                    <TableColumn fx:id="choix2Column" text="Choix 2" prefWidth="150"/>
+                    <TableColumn fx:id="choix3Column" text="Choix 3" prefWidth="150"/>
+                    <TableColumn fx:id="bonneReponseColumn" text="Bonne réponse" prefWidth="120"/>
+                    <TableColumn fx:id="scoreColumn" text="Score" prefWidth="70"/>
+                    <TableColumn fx:id="coursColumn" text="Cours" prefWidth="150"/>
+                    <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="150"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
 
-                        <!-- Tableau des évaluations -->
-                        <TableView fx:id="evaluationTable" prefHeight="600">
-                            <columns>
-                                <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
-                                <TableColumn fx:id="typeColumn" text="Type" prefWidth="120"/>
-                                <TableColumn fx:id="scoreColumn" text="Score" prefWidth="80"/>
-                                <TableColumn fx:id="niveauColumn" text="Niveau" prefWidth="120"/>
-                                <TableColumn fx:id="dateColumn" text="Date" prefWidth="100"/>
-                                <TableColumn fx:id="coursColumn" text="Cours" prefWidth="200"/>
-                                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="250"/>
-                            </columns>
-                        </TableView>
-                    </VBox>
-                </content>
-            </ScrollPane>
-        </HBox>
+        </VBox>
     </children>
+
 </AnchorPane>

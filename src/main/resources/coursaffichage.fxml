@@ -91,7 +91,6 @@
                                     <clip>
                                         <Circle radius="50" centerX="48" centerY="60" />
                                     </clip>
-
                                 </StackPane>
 
                                 <VBox spacing="8">
@@ -118,17 +117,30 @@
                                        style="-fx-font-size: 14px; -fx-text-fill: #666666;" />
                             </VBox>
 
-                            <!-- BOUTON POUR AJOUTER -->
-                            <Button text="+ Ajouter un cours"
-                                    fx:id="ajouterCoursButton"
-                                    style="-fx-background-color: #7B2FF7;
-                                           -fx-text-fill: white;
-                                           -fx-background-radius: 20;
-                                           -fx-padding: 12 25;
-                                           -fx-font-weight: bold;
-                                           -fx-cursor: hand;
-                                           -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
-                        </HBox>
+                            <HBox spacing="15" alignment="CENTER_RIGHT">
+                                <!-- BOUTON POUR AJOUTER UN COURS -->
+                                <Button text="+ Ajouter un cours"
+                                        fx:id="ajouterCoursButton"
+                                        style="-fx-background-color: #7B2FF7;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
+
+                                <!-- BOUTON POUR AJOUTER UNE ÉVALUATION -->
+                                <Button text="📝 Ajouter évaluation"
+                                        fx:id="ajouterEvaluationButton"
+                                        style="-fx-background-color: #28A745;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(40,167,69,0.3), 10, 0, 0, 5);"/>
+                            </HBox>
+                        </HBox> <!-- ← FERMETURE DU PREMIER HBOX AJOUTÉE -->
 
                         <!-- Barre de recherche -->
                         <HBox spacing="15" alignment="CENTER_LEFT">

@@ -2,6 +2,7 @@ package Controllers;
 
 import Entites.Cours;
 import Services.CoursServices;
+import Services.EvaluationServices;
 import Utils.Navigation;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -31,13 +32,17 @@ public class CoursAffichage implements Initializable {
     private Button academicButton, socialButton, autonomieButton, creativiteButton;
     @FXML
     private Button ajouterCoursButton;
+    @FXML
+    private Button ajouterEvaluationButton;
 
     private CoursServices coursServices;
+    private EvaluationServices evaluationServices;
     private List<Cours> allCours;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         coursServices = new CoursServices();
+        evaluationServices = new EvaluationServices();
         loadCours();
         setupSearch();
         setupFilters();
@@ -50,6 +55,35 @@ public class CoursAffichage implements Initializable {
                 System.out.println("➕ Navigation vers l'ajout de cours...");
                 Navigation.navigateTo("coursajout.fxml", "Ajouter un cours");
             });
+        }
+
+        // Navigation pour le bouton Ajouter évaluation
+        if (ajouterEvaluationButton != null) {
+            ajouterEvaluationButton.setOnAction(event -> {
+                System.out.println("📝 Navigation vers l'ajout d'évaluation...");
+                Navigation.navigateTo("evaluationajout.fxml", "Ajouter des questions");
+            });
+
+            // Effet hover pour le bouton vert
+            ajouterEvaluationButton.setOnMouseEntered(e ->
+                    ajouterEvaluationButton.setStyle("-fx-background-color: #218838; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(33,136,56,0.4), 10, 0, 0, 5);")
+            );
+
+            ajouterEvaluationButton.setOnMouseExited(e ->
+                    ajouterEvaluationButton.setStyle("-fx-background-color: #28A745; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(40,167,69,0.3), 10, 0, 0, 5);")
+            );
         }
     }
 
@@ -71,7 +105,7 @@ public class CoursAffichage implements Initializable {
     private VBox createCourseCard(Cours cours) {
         VBox card = new VBox(10);
         card.setPrefWidth(280);
-        card.setPrefHeight(380); // Augmenté pour accueillir les badges
+        card.setPrefHeight(380);
         card.setStyle("-fx-background-color: white; " +
                 "-fx-background-radius: 15; " +
                 "-fx-border-radius: 15; " +
@@ -130,7 +164,7 @@ public class CoursAffichage implements Initializable {
         descriptionLabel.setPrefHeight(40);
         descriptionLabel.setMaxHeight(40);
 
-        // === BADGES POUR TYPE ET NIVEAU ===
+        // BADGES POUR TYPE ET NIVEAU
         HBox badgesBox = new HBox(8);
         badgesBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -365,32 +399,93 @@ public class CoursAffichage implements Initializable {
         }
 
         if (motsPane.getChildren().isEmpty()) {
-            Label emptyLabel = new Label("Aucun mot disponible pour ce cours");
+            Label emptyLabel = new Label("Aucun contenu");
             emptyLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #999;");
             motsPane.getChildren().add(emptyLabel);
         }
 
         motsSection.getChildren().add(motsPane);
 
-        // Section Évaluations
-        VBox evaluationsSection = new VBox(15);
-        evaluationsSection.setMaxWidth(1200);
+        // SECTION ÉVALUATION - UNIQUEMENT LE BOUTON PASSER LE QUIZ
+        VBox evaluationSection = new VBox(15);
+        evaluationSection.setMaxWidth(1200);
+        evaluationSection.setAlignment(Pos.CENTER);
+        evaluationSection.setStyle("-fx-padding: 40 0 20 0;");
 
-        Label evaluationsTitle = new Label("📊 Évaluations du cours");
-        evaluationsTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7; -fx-padding: 10 0;");
+        Label evaluationTitle = new Label("📋 Évaluation du cours");
+        evaluationTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
 
-        Button voirEvaluationsBtn = new Button("Voir les évaluations");
-        voirEvaluationsBtn.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 25; -fx-font-weight: bold; -fx-cursor: hand;");
+        // Compter les questions disponibles
+        int questionCount = evaluationServices.compterParCours(cours.getId_cours());
 
-        voirEvaluationsBtn.setOnAction(e -> {
+        // Bouton Passer le quiz
+        Button passerQuizBtn = new Button("🎯 Passer le quiz");
+        passerQuizBtn.setStyle(
+                "-fx-background-color: #7B2FF7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 30;" +
+                        "-fx-padding: 20 50;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"
+        );
+
+        // Effet hover
+        passerQuizBtn.setOnMouseEntered(e ->
+                passerQuizBtn.setStyle(
+                        "-fx-background-color: #6A1FF7;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-background-radius: 30;" +
+                                "-fx-padding: 20 50;" +
+                                "-fx-font-size: 20px;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-cursor: hand;" +
+                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.5), 15, 0, 0, 8);"
+                )
+        );
+
+        passerQuizBtn.setOnMouseExited(e ->
+                passerQuizBtn.setStyle(
+                        "-fx-background-color: #7B2FF7;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-background-radius: 30;" +
+                                "-fx-padding: 20 50;" +
+                                "-fx-font-size: 20px;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-cursor: hand;" +
+                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"
+                )
+        );
+
+        // Action pour le quiz - CORRIGÉ
+        passerQuizBtn.setOnAction(e -> {
             contentStage.close();
-            Navigation.navigateTo("evaluationaffichage.fxml?coursId=" + cours.getId_cours(),
-                    "Évaluations - " + cours.getTitre());
+            System.out.println("🎯 Navigation vers le quiz pour le cours ID: " + cours.getId_cours());
+            Navigation.navigateTo("passerevaluation.fxml?coursId=" + cours.getId_cours(),
+                    "Quiz - " + cours.getTitre());
         });
 
-        evaluationsSection.getChildren().addAll(evaluationsTitle, voirEvaluationsBtn);
+        // Texte descriptif
+        String questionText = questionCount + " question(s) disponible(s)";
+        if (questionCount > 0) {
+            int totalScore = evaluationServices.getScoreTotalParCours(cours.getId_cours());
+            questionText += " - Score total: " + totalScore + " points";
+        }
 
-        mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationsSection);
+        Label evaluationHint = new Label(questionText);
+        evaluationHint.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666; -fx-padding: 10 0 0;");
+
+        if (questionCount == 0) {
+            Label noQuestionsLabel = new Label("Aucune question disponible pour ce cours pour le moment.");
+            noQuestionsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #999999; -fx-padding: 20;");
+            evaluationSection.getChildren().addAll(evaluationTitle, noQuestionsLabel);
+        } else {
+            evaluationSection.getChildren().addAll(evaluationTitle, passerQuizBtn, evaluationHint);
+        }
+
+        // Ajouter toutes les sections au conteneur principal
+        mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationSection);
         scrollPane.setContent(mainContainer);
 
         Scene scene = new Scene(scrollPane, 1300, 800);

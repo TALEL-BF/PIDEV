@@ -1,44 +1,66 @@
 package Entites;
 
-import java.time.LocalDate;
-import java.util.Date;
-
 public class Evaluation {
-    private int id_evaluation;
-    private String type_evaluation;
-    private float score;
-    private String niveau_comprehension;
-    private LocalDate date_evaluation;
-    private Cours cours;  // Relation avec la classe Cours
+    private int id_eval;
+    private int id_cours;
+    private String question;
+    private String choix1;
+    private String choix2;
+    private String choix3;
+    private String bonne_reponse;
+    private int score;
+    private Cours cours; // Pour la jointure
 
     // Constructeurs
     public Evaluation() {}
 
-    public Evaluation(int id_evaluation, String type_evaluation, float score,
-                      String niveau_comprehension, LocalDate date_evaluation, Cours cours) {
-        this.id_evaluation = id_evaluation;
-        this.type_evaluation = type_evaluation;
+    public Evaluation(int id_eval, int id_cours, String question, String choix1,
+                      String choix2, String choix3, String bonne_reponse, int score) {
+        this.id_eval = id_eval;
+        this.id_cours = id_cours;
+        this.question = question;
+        this.choix1 = choix1;
+        this.choix2 = choix2;
+        this.choix3 = choix3;
+        this.bonne_reponse = bonne_reponse;
         this.score = score;
-        this.niveau_comprehension = niveau_comprehension;
-        this.date_evaluation = date_evaluation;
-        this.cours = cours;
+    }
+
+    public Evaluation(int id_cours, String question, String choix1, String choix2,
+                      String choix3, String bonne_reponse, int score) {
+        this.id_cours = id_cours;
+        this.question = question;
+        this.choix1 = choix1;
+        this.choix2 = choix2;
+        this.choix3 = choix3;
+        this.bonne_reponse = bonne_reponse;
+        this.score = score;
     }
 
     // Getters et Setters
-    public int getId_evaluation() { return id_evaluation; }
-    public void setId_evaluation(int id_evaluation) { this.id_evaluation = id_evaluation; }
+    public int getId_eval() { return id_eval; }
+    public void setId_eval(int id_eval) { this.id_eval = id_eval; }
 
-    public String getType_evaluation() { return type_evaluation; }
-    public void setType_evaluation(String type_evaluation) { this.type_evaluation = type_evaluation; }
+    public int getId_cours() { return id_cours; }
+    public void setId_cours(int id_cours) { this.id_cours = id_cours; }
 
-    public float getScore() { return score; }
-    public void setScore(float score) { this.score = score; }
+    public String getQuestion() { return question; }
+    public void setQuestion(String question) { this.question = question; }
 
-    public String getNiveau_comprehension() { return niveau_comprehension; }
-    public void setNiveau_comprehension(String niveau_comprehension) { this.niveau_comprehension = niveau_comprehension; }
+    public String getChoix1() { return choix1; }
+    public void setChoix1(String choix1) { this.choix1 = choix1; }
 
-    public LocalDate getDate_evaluation() { return date_evaluation; }
-    public void setDate_evaluation(LocalDate date_evaluation) { this.date_evaluation = date_evaluation; }
+    public String getChoix2() { return choix2; }
+    public void setChoix2(String choix2) { this.choix2 = choix2; }
+
+    public String getChoix3() { return choix3; }
+    public void setChoix3(String choix3) { this.choix3 = choix3; }
+
+    public String getBonne_reponse() { return bonne_reponse; }
+    public void setBonne_reponse(String bonne_reponse) { this.bonne_reponse = bonne_reponse; }
+
+    public int getScore() { return score; }
+    public void setScore(int score) { this.score = score; }
 
     public Cours getCours() { return cours; }
     public void setCours(Cours cours) { this.cours = cours; }
@@ -46,11 +68,9 @@ public class Evaluation {
     @Override
     public String toString() {
         return "Evaluation{" +
-                "id_evaluation=" + id_evaluation +
-                ", type_evaluation='" + type_evaluation + '\'' +
+                "id_eval=" + id_eval +
+                ", question='" + question + '\'' +
                 ", score=" + score +
-                ", date=" + date_evaluation +
-                ", cours=" + (cours != null ? cours.getTitre() : "null") +
                 '}';
     }
 }
