@@ -1,0 +1,1138 @@
+.root{
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #f6f7fb;
+}
+
+/* Sidebar */
+.sidebar{
+    -fx-padding: 18;
+    -fx-pref-width: 250;
+    -fx-background-color: linear-gradient(to bottom, #8b5cf6, #a78bfa);
+}
+
+.sidebar-header{
+    -fx-padding: 10;
+    -fx-background-radius: 14;
+    -fx-background-color: rgba(255,255,255,0.15);
+}
+
+.app-title{ -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: 800; }
+.app-subtitle{ -fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11; }
+
+.muted{ -fx-text-fill: rgba(255,255,255,0.85); }
+.badge{
+    -fx-background-color: rgba(255,255,255,0.20);
+    -fx-text-fill: white;
+    -fx-padding: 6 10;
+    -fx-background-radius: 999;
+}
+
+.menu-item{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 12;
+    -fx-background-radius: 10;
+}
+.menu-item:hover{ -fx-background-color: rgba(255,255,255,0.16); }
+.menu-item.active{ -fx-background-color: rgba(255,255,255,0.22); }
+
+/* Content */
+.content{ -fx-padding: 22; }
+
+.page-title{ -fx-font-size: 26; -fx-font-weight: 900; }
+.page-subtitle{ -fx-text-fill: #7b7f8a; }
+
+.search{
+    -fx-pref-width: 340;
+    -fx-padding: 10 12;
+    -fx-background-radius: 12;
+    -fx-background-color: white;
+}
+
+/* Filter chips */
+.filters .toggle-button{
+    -fx-background-radius: 999;
+    -fx-padding: 8 14;
+    -fx-background-color: white;
+}
+.filters .toggle-button:selected{
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+}
+
+.count{ -fx-font-weight: 800; -fx-font-size: 16; }
+
+/* Card style like template */
+.suivie-card{
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-padding: 0;
+    -fx-pref-width: 360;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 14, 0, 0, 6);
+}
+
+/* Colored header band */
+.suivie-band{
+    -fx-background-radius: 18 18 0 0;
+    -fx-padding: 14;
+}
+
+/* Card body */
+.suivie-body{
+    -fx-padding: 14;
+}
+
+.suivie-title{ -fx-font-weight: 900; -fx-font-size: 14; }
+.suivie-info{ -fx-text-fill: #646b76; }
+
+/* Buttons like template */
+.btn-voir{
+    -fx-background-radius: 10;
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-padding: 8 18;
+}
+.btn-edit{
+    -fx-background-radius: 10;
+    -fx-background-color: #ff77aa;
+    -fx-text-fill: white;
+    -fx-padding: 8 18;
+}
+/* Sponsor card default style */
+.sponsor-card {
+    -fx-background-color: #ffe4e1;
+    -fx-background-radius: 20;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 10, 0, 0, 3);
+    -fx-border-color: #ffb6c1;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-cursor: hand;
+}
+
+/* Hover effect */
+.sponsor-card:hover {
+    -fx-background-color: #ffd6dc;   /* brighter pink */
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 15, 0, 0, 6);
+    -fx-border-width: 1.5;
+}
+/* event-table.css */
+
+/* Table styling */
+.event-table {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+}
+
+/* Header styling */
+.event-table .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #F9FAFB, #F3F4F6);
+    -fx-background-radius: 15 15 0 0;
+    -fx-padding: 10 0 10 0;
+}
+
+.event-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.event-table .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Row styling */
+.event-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #F3F4F6 transparent;
+    -fx-cell-size: 50px;
+}
+
+.event-table .table-row-cell:odd {
+    -fx-background-color: #F9FAFB;
+}
+
+.event-table .table-row-cell:hover {
+    -fx-background-color: #EDE9FE; /* Light purple */
+}
+
+.event-table .table-row-cell:selected {
+    -fx-background-color: #C4B5FD; /* Lavender */
+}
+
+.event-table .table-row-cell:selected .text {
+    -fx-fill: #1F2937;
+    -fx-font-weight: 600;
+}
+
+/* Cell styling */
+.event-table .table-cell {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8 10 8 10;
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 12px;
+}
+
+/* Specific column alignments */
+.table-column.dateDebutColumn .table-cell,
+.table-column.dateFinColumn .table-cell,
+.table-column.heureDebutColumn .table-cell,
+.table-column.heureFinColumn .table-cell,
+.table-column.maxParticipantColumn .table-cell {
+    -fx-alignment: CENTER;
+}
+
+/* Scrollbar styling */
+/* event-table.css */
+
+/* Table styling */
+.event-table {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+}
+
+/* Header styling */
+.event-table .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #F9FAFB, #F3F4F6);
+    -fx-background-radius: 15 15 0 0;
+    -fx-padding: 10 0 10 0;
+}
+
+.event-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.event-table .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Row styling */
+.event-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #F3F4F6 transparent;
+    -fx-cell-size: 60px;
+}
+
+.event-table .table-row-cell:odd {
+    -fx-background-color: #F9FAFB;
+}
+
+.event-table .table-row-cell:hover {
+    -fx-background-color: #EDE9FE; /* Light purple */
+    -fx-transition: all 0.3s ease;
+}
+
+.event-table .table-row-cell:selected {
+    -fx-background-color: #C4B5FD; /* Lavender */
+}
+
+.event-table .table-row-cell:selected .text {
+    -fx-fill: #1F2937;
+    -fx-font-weight: 600;
+}
+
+/* Cell styling */
+.event-table .table-cell {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8 10 8 10;
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 12px;
+    -fx-border-color: transparent;
+}
+
+/* Specific column alignments */
+.table-column.dateDebutColumn .table-cell,
+.table-column.dateFinColumn .table-cell,
+.table-column.heureDebutColumn .table-cell,
+.table-column.heureFinColumn .table-cell,
+.table-column.maxParticipantColumn .table-cell,
+.table-column.typeEventColumn .table-cell {
+    -fx-alignment: CENTER;
+}
+
+/* Image column */
+.table-column.imageColumn .table-cell {
+    -fx-alignment: CENTER;
+}
+
+/* Action icons styling */
+.action-icon {
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-padding: 5;
+    -fx-background-radius: 8;
+    -fx-transition: all 0.2s ease;
+}
+
+.action-icon:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Edit icon */
+.edit-icon {
+    -fx-background-color: #8B5CF6;
+    -fx-text-fill: white;
+}
+
+.edit-icon:hover {
+    -fx-background-color: #6D28D9;
+}
+
+/* Delete icon */
+.delete-icon {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+}
+
+.delete-icon:hover {
+    -fx-background-color: #B91C1C;
+}
+
+/* Scrollbar styling */
+.event-table .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+}
+
+.event-table .scroll-bar:vertical .thumb {
+    -fx-background-color: #C4B5FD;
+    -fx-background-radius: 10;
+}
+
+.event-table .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #A78BFA;
+}
+
+/* Empty table placeholder */
+.event-table .placeholder .label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #9CA3AF;
+}
+
+/* Tooltip styling */
+.tooltip {
+    -fx-background-color: #2D3748;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5 10 5 10;
+    -fx-background-radius: 6;
+}
+.main-content {
+    -fx-background-color: #F4F5F7;
+}
+
+/* Titre principal */
+.main-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff4b7d;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Carte formulaire */
+.form-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #ff4b7d;
+    -fx-border-width: 2;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(gaussian, rgba(255,75,125,0.15), 15, 0, 0, 5);
+    -fx-spacing: 20;
+}
+
+/* Sous-titre de la carte */
+.card-subtitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2d3748;
+}
+
+/* ================= LABELS ================= */
+.form-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4a5568;
+    -fx-font-size: 14px;
+}
+
+/* ================= CHAMPS DE SAISIE ================= */
+.text-field, .text-area, .com-box, .date-picker, .spinner {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 15;
+    -fx-font-size: 14px;
+    -fx-pref-width: 750;
+    -fx-transition: all 0.2s ease;
+}
+
+.text-field:focused, .text-area:focused, .com-box:focused, .date-picker:focused, .spinner:focused {
+    -fx-border-color: #ff4b7d;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(255,75,125,0.2), 8, 0, 0, 0);
+}
+
+.text-area {
+    -fx-pref-row-count: 4;
+}
+
+/* ================= DATE PICKER ================= */
+.date-picker {
+    -fx-pref-width: 360;
+}
+
+.date-picker .arrow-button {
+    -fx-background-radius: 0 12 12 0;
+}
+
+/* ================= COMBOBOX ================= */
+.combo-box {
+    -fx-pref-width: 750;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8 15;
+}
+
+/* ================= SPINNER ================= */
+.spinner {
+    -fx-pref-width: 750;
+}
+
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
+    -fx-background-radius: 0 12 12 0;
+}
+
+/* ================= BOUTON PARCOURIR ================= */
+.browse-button {
+    -fx-background-color: #ff4b7d;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 10 25;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,75,125,0.3), 8, 0, 0, 2);
+    -fx-transition: all 0.3s ease;
+}
+
+.browse-button:hover {
+    -fx-background-color: #e63e6b;
+    -fx-effect: dropshadow(gaussian, rgba(255,75,125,0.4), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ================= IMAGE VIEW ================= */
+.event-image-view {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+/* ================= SPONSOR CONTAINER ================= */
+.sponsor-container {
+    -fx-background-color: #f9fafb;
+    -fx-padding: 15;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-spacing: 8;
+}
+
+/* Checkbox sponsors */
+.check-box {
+    -fx-font-size: 14px;
+    -fx-padding: 5 0;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #ff4b7d;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #ff4b7d;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* Bouton ajouter sponsor */
+.add-sponsor-button {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 8 20;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 8, 0, 0, 2);
+    -fx-transition: all 0.3s ease;
+}
+
+.add-sponsor-button:hover {
+    -fx-background-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ================= BOUTONS PRINCIPAUX ================= */
+.button-annuler {
+    -fx-background-color: transparent;
+    -fx-border-color: #ff4b7d;
+    -fx-text-fill: #ff4b7d;
+    -fx-border-width: 2;
+    -fx-border-radius: 25;
+    -fx-background-radius: 25;
+    -fx-padding: 12 30;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
+}
+
+.button-annuler:hover {
+    -fx-background-color: rgba(255,75,125,0.1);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button-ajouter {
+    -fx-background-color: #ff4b7d;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-padding: 12 30;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,75,125,0.3), 10, 0, 0, 3);
+    -fx-transition: all 0.3s ease;
+}
+
+.button-ajouter:hover {
+    -fx-background-color: #e63e6b;
+    -fx-effect: dropshadow(gaussian, rgba(255,75,125,0.4), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ================= BOUTON RETOUR ================= */
+.back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff4b7d;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 10 0;
+    -fx-transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    -fx-text-fill: #e63e6b;
+    -fx-translate-x: -5;
+}
+
+/* ================= SEPARATOR ================= */
+.separator {
+    -fx-background-color: #e2e8f0;
+}
+
+/* ================= HBOX ET VBOX ================= */
+.hbox-spacing, .vbox-spacing {
+    -fx-spacing: 15;
+}
+
+/* ================= SCROLLPANE ================= */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.form-card {
+    -fx-animation: fadeIn 0.5s ease;
+}
+/* ================= MAIN CONTENT ================= */
+.main-scrollpane {
+    -fx-background-color: #F4F5F7;
+    -fx-border-color: transparent;
+}
+
+.main-scrollpane .viewport {
+    -fx-background-color: #F4F5F7;
+}
+
+.main-content {
+    -fx-background-color: #F4F5F7;
+    -fx-padding: 30;
+}
+
+/* Titre principal */
+.main-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8b5cf6;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Carte formulaire */
+.form-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #8b5cf6;
+    -fx-border-width: 2;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.15), 15, 0, 0, 5);
+    -fx-spacing: 15;
+}
+
+/* Sous-titre de la carte */
+.card-subtitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2d3748;
+    -fx-padding: 0 0 5 0;
+}
+
+/* ================= LABELS ================= */
+.form-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4a5568;
+    -fx-font-size: 14px;
+}
+
+/* ================= CHAMPS DE SAISIE ================= */
+.text-field, .text-area, .combo-box, .date-picker, .spinner {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 15;
+    -fx-font-size: 14px;
+    -fx-pref-width: 750;
+    -fx-transition: all 0.2s ease;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused, .date-picker:focused, .spinner:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 8, 0, 0, 0);
+}
+
+.text-area {
+    -fx-pref-row-count: 4;
+}
+
+/* ================= DATE PICKER ================= */
+.date-picker {
+    -fx-pref-width: 360;
+    -fx-background-radius: 12;
+}
+
+.date-picker .arrow-button {
+    -fx-background-radius: 0 12 12 0;
+}
+
+.date-picker .cell {
+    -fx-background-color: white;
+}
+
+.date-picker .cell:hover {
+    -fx-background-color: #ede9fe;
+}
+
+/* ================= COMBOBOX ================= */
+.combo-box {
+    -fx-pref-width: 750;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8 15;
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #ede9fe;
+}
+
+/* ================= SPINNER ================= */
+.spinner {
+    -fx-pref-width: 750;
+}
+
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
+    -fx-background-radius: 0 12 12 0;
+}
+
+/* ================= BOUTON PARCOURIR ================= */
+.browse-button {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 10 25;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0, 0, 2);
+    -fx-transition: all 0.3s ease;
+}
+
+.browse-button:hover {
+    -fx-background-color: #7c3aed;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ================= IMAGE VIEW ================= */
+.event-image-view {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+/* ================= SPONSOR CONTAINER ================= */
+.sponsor-container {
+    -fx-background-color: #f9fafb;
+    -fx-padding: 15;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-spacing: 8;
+    -fx-max-height: 200;
+}
+
+/* Checkbox sponsors */
+.check-box {
+    -fx-font-size: 14px;
+    -fx-padding: 5 0;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #8b5cf6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-border-width: 2;
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #8b5cf6;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+    -fx-shape: "M1.73,12.91 L5.51,16.7 L14.4,7.8 L12.99,6.4 L5.51,13.88 L3.12,11.5 L1.73,12.91 Z";
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+}
+
+/* Bouton ajouter sponsor */
+.add-sponsor-button {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 8 20;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0, 0, 2);
+    -fx-transition: all 0.3s ease;
+    -fx-max-width: 200;
+    -fx-alignment: CENTER;
+}
+
+.add-sponsor-button:hover {
+    -fx-background-color: #7c3aed;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ================= BOUTONS PRINCIPAUX ================= */
+.button-annuler {
+    -fx-background-color: transparent;
+    -fx-border-color: #8b5cf6;
+    -fx-text-fill: #8b5cf6;
+    -fx-border-width: 2;
+    -fx-border-radius: 25;
+    -fx-background-radius: 25;
+    -fx-padding: 12 30;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
+}
+
+.button-annuler:hover {
+    -fx-background-color: rgba(139,92,246,0.1);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button-ajouter {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-padding: 12 30;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 10, 0, 0, 3);
+    -fx-transition: all 0.3s ease;
+}
+
+.button-ajouter:hover {
+    -fx-background-color: #7c3aed;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ================= BOUTON RETOUR ================= */
+.back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b5cf6;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 10 0;
+    -fx-transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    -fx-text-fill: #7c3aed;
+    -fx-translate-x: -5;
+}
+
+/* ================= SEPARATOR ================= */
+.separator {
+    -fx-background-color: #e2e8f0;
+    -fx-padding: 5 0;
+}
+
+/* ================= SCROLLBAR ================= */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #c4b5fd;
+    -fx-background-radius: 10;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a78bfa;
+}
+
+/* ================= ANIMATION ================= */
+.form-card {
+    -fx-animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        -fx-translate-y: 20;
+    }
+    to {
+        opacity: 1;
+        -fx-translate-y: 0;
+    }
+}
+/* add-event-purple.css */
+
+.text-field, .text-area, .combo-box, .date-picker, .spinner {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 15;
+    -fx-font-size: 14px;
+    -fx-transition: all 0.2s ease;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused, .date-picker:focused, .spinner:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 8, 0, 0, 0);
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #8b5cf6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-border-width: 2;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #8b5cf6;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.button-annuler:hover {
+    -fx-background-color: rgba(139,92,246,0.1);
+}
+
+.button-ajouter:hover {
+    -fx-background-color: #7c3aed;
+}
+
+.back-button:hover {
+    -fx-text-fill: #7c3aed;
+    -fx-translate-x: -5;
+}
+/* sponsor-table.css */
+
+/* Style général de la table */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
+    -fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* En-tête de la table */
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+    -fx-background-radius: 20 20 0 0;
+    -fx-padding: 10 0 10 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8 10 8 10;
+}
+
+/* Lignes de la table */
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #f3f4f6 transparent;
+    -fx-cell-size: 70px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f9fafb;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #ede9fe; /* Light purple */
+    -fx-transition: all 0.3s ease;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #c4b5fd; /* Lavender */
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #1f2937;
+    -fx-font-weight: 600;
+}
+
+/* Cellules */
+.table-cell {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: #4b5563;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+}
+
+/* Alignements spécifiques */
+.table-column.colLogo .table-cell {
+    -fx-alignment: CENTER;
+}
+
+.table-column.colType .table-cell {
+    -fx-alignment: CENTER;
+}
+
+.table-column.colActions .table-cell {
+    -fx-alignment: CENTER;
+}
+
+/* Badge pour le type */
+.table-column.colType .table-cell:filled {
+    -fx-background-color: #f3e8ff;
+    -fx-text-fill: #8b5cf6;
+    -fx-font-weight: bold;
+    -fx-padding: 5 10;
+    -fx-background-radius: 15;
+}
+
+/* Icônes dans les cellules */
+.table-cell .image-view {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+/* Boutons d'action */
+.table-cell .button {
+    -fx-background-radius: 8;
+    -fx-font-size: 16px;
+    -fx-padding: 6 10 6 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);
+    -fx-transition: all 0.2s ease;
+}
+
+.table-cell .button:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Scrollbar */
+.table-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #c4b5fd;
+    -fx-background-radius: 10;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a78bfa;
+}
+
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+/* Placeholder quand la table est vide */
+.table-view .placeholder .label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #9ca3af;
+    -fx-padding: 20;
+}
+
+/* ================= STYLE POUR LA TOP BAR ================= */
+.hbox {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
+}
+
+/* Champ de recherche */
+.text-field {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-background-color: #f7fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1.5;
+    -fx-padding: 12 18;
+    -fx-font-size: 14px;
+    -fx-transition: all 0.2s ease;
+}
+
+.text-field:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 8, 0, 0, 0);
+}
+
+/* Bouton Ajouter */
+.button-add {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30;
+    -fx-padding: 12 25;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(139,92,246,0.3), 8, 0, 0, 2);
+    -fx-transition: all 0.3s ease;
+}
+
+.button-add:hover {
+    -fx-background-color: #7c3aed;
+    -fx-effect: dropshadow(three-pass-box, rgba(139,92,246,0.4), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* Label count */
+.count-label {
+    -fx-font-weight: 700;
+    -fx-font-size: 15px;
+    -fx-text-fill: #8b5cf6;
+    -fx-padding: 5 0 0 10;
+}
+
+/* Titre de la page */
+.page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #8b5cf6;
+}
+
+.page-subtitle {
+    -fx-text-fill: #4a5568;
+    -fx-font-size: 16px;
+}
+
+/* Animation de la fleur */
+.floating-flower {
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 10, 0, 0, 2);
+}
+
+/* Tooltip styling */
+.tooltip {
+    -fx-background-color: #2d3748;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 6;
+}
