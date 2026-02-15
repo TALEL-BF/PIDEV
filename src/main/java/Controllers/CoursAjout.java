@@ -250,7 +250,11 @@ public class CoursAjout implements Initializable {
                 supprimerImageButton.setVisible(false);
             }
             // Forcer le rafraîchissement immédiat
-            ligneContainer.requestLayout();
+            javafx.application.Platform.runLater(() -> {
+                ligneContainer.requestLayout();
+                ligneContainer.applyCss();
+                ligneContainer.layout();
+            });
         }
 
         public void setImagePath(String path) {
@@ -261,12 +265,20 @@ public class CoursAjout implements Initializable {
         public void showError(String message) {
             errorLabel.setText("❌ " + message);
             errorLabel.setVisible(true);
-            ligneContainer.requestLayout();
+            javafx.application.Platform.runLater(() -> {
+                ligneContainer.requestLayout();
+                ligneContainer.applyCss();
+                ligneContainer.layout();
+            });
         }
 
         public void hideError() {
             errorLabel.setVisible(false);
-            ligneContainer.requestLayout();
+            javafx.application.Platform.runLater(() -> {
+                ligneContainer.requestLayout();
+                ligneContainer.applyCss();
+                ligneContainer.layout();
+            });
         }
 
         public boolean hasImage() {
@@ -288,8 +300,12 @@ public class CoursAjout implements Initializable {
 
         if (selectedFile != null) {
             ligne.setImagePath(selectedFile.getName());
-            // Forcer le rafraîchissement du conteneur parent
-            imagesMotsContainer.requestLayout();
+            // Forcer le rafraîchissement immédiat
+            javafx.application.Platform.runLater(() -> {
+                imagesMotsContainer.requestLayout();
+                imagesMotsContainer.applyCss();
+                imagesMotsContainer.layout();
+            });
             System.out.println("✅ Image '" + selectedFile.getName() + "' associée au mot: " + ligne.getMot());
         }
     }
@@ -299,7 +315,11 @@ public class CoursAjout implements Initializable {
      */
     private void supprimerImage(ImageMotLigne ligne) {
         ligne.setImagePath("");
-        imagesMotsContainer.requestLayout();
+        javafx.application.Platform.runLater(() -> {
+            imagesMotsContainer.requestLayout();
+            imagesMotsContainer.applyCss();
+            imagesMotsContainer.layout();
+        });
         System.out.println("🗑️ Image supprimée pour le mot: " + ligne.getMot());
     }
 
@@ -350,7 +370,11 @@ public class CoursAjout implements Initializable {
         }
 
         // Forcer le rafraîchissement
-        imagesMotsContainer.requestLayout();
+        javafx.application.Platform.runLater(() -> {
+            imagesMotsContainer.requestLayout();
+            imagesMotsContainer.applyCss();
+            imagesMotsContainer.layout();
+        });
     }
 
     /**
@@ -378,11 +402,48 @@ public class CoursAjout implements Initializable {
                     motsField.setText(motsField.getText() + ";" + mot);
                 }
 
-                // Forcer le rafraîchissement
-                imagesMotsContainer.requestLayout();
-                nouvelleLigne.getLigneContainer().requestLayout();
+                // Forcer le rafraîchissement immédiat
+                javafx.application.Platform.runLater(() -> {
+                    imagesMotsContainer.requestLayout();
+                    imagesMotsContainer.applyCss();
+                    imagesMotsContainer.layout();
+                    nouvelleLigne.getLigneContainer().requestLayout();
+                    nouvelleLigne.getLigneContainer().applyCss();
+                    nouvelleLigne.getLigneContainer().layout();
+                });
 
                 System.out.println("✚ Nouveau mot ajouté: " + mot);
+            }
+        } else {
+            // Si des mots existent déjà, on ajoute juste une ligne pour un nouveau mot
+            String[] mots = motsText.split(";");
+            for (String mot : mots) {
+                if (!mot.trim().isEmpty()) {
+                    boolean motExiste = false;
+                    for (ImageMotLigne ligne : imagesMotLignes) {
+                        if (ligne.getMot().equals(mot.trim())) {
+                            motExiste = true;
+                            break;
+                        }
+                    }
+
+                    if (!motExiste) {
+                        int nouvelIndex = imagesMotLignes.size();
+                        ImageMotLigne nouvelleLigne = new ImageMotLigne(mot.trim(), nouvelIndex);
+                        imagesMotLignes.add(nouvelleLigne);
+                        imagesMotsContainer.getChildren().add(nouvelleLigne.getLigneContainer());
+
+                        // Forcer le rafraîchissement
+                        javafx.application.Platform.runLater(() -> {
+                            imagesMotsContainer.requestLayout();
+                            imagesMotsContainer.applyCss();
+                            imagesMotsContainer.layout();
+                        });
+
+                        System.out.println("✚ Nouveau mot ajouté: " + mot);
+                        break; // Ajouter un seul mot à la fois
+                    }
+                }
             }
         }
     }
@@ -404,7 +465,13 @@ public class CoursAjout implements Initializable {
         }
         motsField.setText(newMots.toString());
 
-        imagesMotsContainer.requestLayout();
+        // Forcer le rafraîchissement
+        javafx.application.Platform.runLater(() -> {
+            imagesMotsContainer.requestLayout();
+            imagesMotsContainer.applyCss();
+            imagesMotsContainer.layout();
+        });
+
         System.out.println("✖ Ligne supprimée pour le mot: " + ligne.getMot());
     }
 
@@ -917,8 +984,12 @@ public class CoursAjout implements Initializable {
         // Forcer le rafraîchissement après le chargement
         javafx.application.Platform.runLater(() -> {
             imagesMotsContainer.requestLayout();
+            imagesMotsContainer.applyCss();
+            imagesMotsContainer.layout();
             for (ImageMotLigne ligne : imagesMotLignes) {
                 ligne.getLigneContainer().requestLayout();
+                ligne.getLigneContainer().applyCss();
+                ligne.getLigneContainer().layout();
             }
         });
     }
