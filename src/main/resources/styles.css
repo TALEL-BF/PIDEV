@@ -1,0 +1,153 @@
+/* AutiCare Modern Theme - Revamped to Match Screenshot */
+.root {
+    -fx-primary-purple: #7b2ff7;
+    -fx-accent-pink: #ff4d94;
+    -fx-sidebar-gradient: linear-gradient(to bottom, #7209b7, #f72585);
+    -fx-card-gradient: linear-gradient(to right, #7b2ff7, #f72585);
+    -fx-bg-light: #f8f9fe;
+    -fx-text-dark: #1b263b;
+    -fx-text-gray: #778da9;
+    -fx-card-shadow: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 20, 0, 0, 10);
+}
+
+.main-bg {
+    -fx-background-color: var(-fx-bg-light);
+}
+
+/* Sidebar Styling */
+.sidebar {
+    -fx-background-color: var(-fx-sidebar-gradient);
+}
+
+.sidebar-logo-text {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.sidebar-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.8);
+    -fx-font-size: 11px;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 25;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-sub-btn {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-background-radius: 20;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.sidebar-sub-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+}
+
+.sidebar-btn-active {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Header */
+.page-title {
+    -fx-font-size: 42px;
+    -fx-font-weight: 900;
+    -fx-text-fill: var(-fx-text-dark);
+}
+
+/* Card Styling */
+.modern-card {
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-effect: var(-fx-card-shadow);
+}
+
+.card-header-gradient {
+    -fx-background-color: var(-fx-card-gradient);
+    -fx-background-radius: 25 25 0 0;
+    -fx-padding: 25;
+}
+
+.card-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.card-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+    -fx-font-size: 12px;
+}
+
+.card-body {
+    -fx-padding: 25;
+}
+
+.card-info-label {
+    -fx-text-fill: var(-fx-text-gray);
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.card-info-value {
+    -fx-text-fill: var(-fx-text-dark);
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+/* Buttons */
+.btn-voir {
+    -fx-background-color: #7b2ff7;
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 10 25;
+    -fx-font-weight: bold;
+}
+
+.btn-editer {
+    -fx-background-color: #f72585;
+    /* Vibrant pink */
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 10 25;
+    -fx-font-weight: bold;
+}
+
+.btn-supprimer {
+    -fx-background-color: #f1f2f6;
+    -fx-text-fill: #1b263b;
+    -fx-background-radius: 12;
+    -fx-padding: 10 25;
+    -fx-font-weight: bold;
+}
+
+.btn-ajouter {
+    -fx-background-color: #0b132b;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 12 30;
+    -fx-font-weight: bold;
+}
+
+/* Search Bar */
+.modern-search {
+    -fx-background-color: white;
+    -fx-background-radius: 30;
+    -fx-padding: 15 30;
+    -fx-effect: var(-fx-card-shadow);
+}

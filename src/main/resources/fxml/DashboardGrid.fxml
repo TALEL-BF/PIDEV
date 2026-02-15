@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="30.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.auticare.controller.DashboardGridController">
+    <children>
+        <VBox spacing="5.0">
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #2d3436;"
+                    text="Bienvenue sur AutiCare">
+                    <font>
+                        <Font size="28.0" />
+                    </font>
+                </Label>
+                <Label style="-fx-text-fill: #636e72;"
+                    text="Sélectionnez un module pour commencer la gestion." />
+            </children>
+        </VBox>
+        <GridPane hgap="25.0" vgap="25.0" VBox.vgrow="ALWAYS">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <VBox fx:id="tileUsers" alignment="CENTER" onMouseClicked="#handleUsersClick"
+                    spacing="15.0" styleClass="module-tile">
+                    <children>
+                        <Label style="-fx-font-size: 40px;" text="👥" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;"
+                            text="Utilisateurs" />
+                        <Label style="-fx-text-fill: #636e72; -fx-text-alignment: center;"
+                            text="Gérer les profiles et rôles" wrapText="true" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+                <VBox fx:id="tileCourses" alignment="CENTER" onMouseClicked="#handleCoursesClick"
+                    spacing="15.0" styleClass="module-tile" GridPane.columnIndex="1">
+                    <children>
+                        <Label style="-fx-font-size: 40px;" text="📚" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;" text="Cours" />
+                        <Label style="-fx-text-fill: #636e72; -fx-text-alignment: center;"
+                            text="Programmes pédagogiques" wrapText="true" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+                <VBox fx:id="tileEvals" alignment="CENTER" onMouseClicked="#handleEvalsClick"
+                    spacing="15.0" styleClass="module-tile" GridPane.columnIndex="2">
+                    <children>
+                        <Label style="-fx-font-size: 40px;" text="📊" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;"
+                            text="Évaluations" />
+                        <Label style="-fx-text-fill: #636e72; -fx-text-alignment: center;"
+                            text="Suivi des progrès" wrapText="true" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+                <VBox fx:id="tileConsults" alignment="CENTER" onMouseClicked="#handleConsultsClick"
+                    spacing="15.0" styleClass="module-tile" GridPane.rowIndex="1">
+                    <children>
+                        <Label style="-fx-font-size: 40px;" text="👨‍⚕️" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;"
+                            text="Consultations" />
+                        <Label style="-fx-text-fill: #636e72; -fx-text-alignment: center;"
+                            text="Séances spécialistes" wrapText="true" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+                <VBox fx:id="tileEvents" alignment="CENTER" onMouseClicked="#handleEventsClick"
+                    spacing="15.0" styleClass="module-tile" GridPane.columnIndex="1"
+                    GridPane.rowIndex="1">
+                    <children>
+                        <Label style="-fx-font-size: 40px;" text="📅" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;" text="Événements" />
+                        <Label style="-fx-text-fill: #636e72; -fx-text-alignment: center;"
+                            text="Calendrier des activités" wrapText="true" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+                <VBox fx:id="tileClaims" alignment="CENTER" onMouseClicked="#handleClaimsClick"
+                    spacing="15.0" styleClass="module-tile" GridPane.columnIndex="2"
+                    GridPane.rowIndex="1">
+                    <children>
+                        <Label style="-fx-font-size: 40px;" text="📩" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;"
+                            text="Réclamations" />
+                        <Label style="-fx-text-fill: #636e72; -fx-text-alignment: center;"
+                            text="Retours communauté" wrapText="true" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </GridPane>
+    </children>
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+</VBox>

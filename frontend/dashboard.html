@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AutiCare</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <h3>AutiCare</h3>
+            <p>Plateforme éducative</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="users-list.html"><i class="fas fa-users"></i> Gestion des utilisateurs</a></li>
+
+            <li><a href="#"><i class="fas fa-clipboard-check"></i> Gestion des évaluations</a></li>
+            <li><a href="#"><i class="fas fa-calendar-alt"></i> Gestion des consultations</a></li>
+            <li><a href="#"><i class="fas fa-calendar-day"></i> Gestion des événements</a></li>
+            <li><a href="#"><i class="fas fa-exclamation-circle"></i> Gestion des réclamations</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Paramètres</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <p>Connecté en tant que</p>
+            <strong>Administrateur</strong>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar-custom">
+            <div>
+                <button class="btn btn-link d-md-none" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="d-inline-block mb-0">Dashboard</h4>
+            </div>
+
+            <div class="navbar-right">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+
+                <div class="dropdown">
+                    <div class="profile-dropdown" data-bs-toggle="dropdown">
+                        <div class="profile-avatar">AD</div>
+                        <span class="d-none d-md-inline">Admin</span>
+                        <i class="fas fa-chevron-down ms-2"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mon profil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Paramètres</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="login.html"><i
+                                    class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="row g-4 mb-4">
+                <!-- Stats Cards -->
+                <div class="col-md-3">
+                    <div class="card-modern p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Total Utilisateurs</p>
+                                <h3 class="mb-0">1,234</h3>
+                            </div>
+                            <div class="text-gradient" style="font-size: 32px;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <small class="text-success"><i class="fas fa-arrow-up"></i> +12% ce mois</small>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card-modern p-4 text-center">
+                        <div class="photo-upload-small" onclick="document.getElementById('dashPhotoInput').click()">
+                            <img id="dashPhotoPreview" src="https://via.placeholder.com/60" class="rounded-circle mb-2"
+                                style="width: 60px; height: 60px; object-fit: cover; display: none;">
+                            <div id="dashPhotoPlaceholder">
+                                <i class="fas fa-camera fa-2x text-muted mb-1"></i>
+                            </div>
+                            <p class="mb-0" style="font-size: 12px;">Photo de Profil</p>
+                            <input type="file" id="dashPhotoInput" accept="image/*" style="display: none;"
+                                onchange="handleDashPhotoUpload(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card-modern p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Évaluations</p>
+                                <h3 class="mb-0">892</h3>
+                            </div>
+                            <div class="text-gradient" style="font-size: 32px;">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <small class="text-success"><i class="fas fa-arrow-up"></i> +8% ce mois</small>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card-modern p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Consultations</p>
+                                <h3 class="mb-0">156</h3>
+                            </div>
+                            <div class="text-gradient" style="font-size: 32px;">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                        <small class="text-warning"><i class="fas fa-arrow-down"></i> -3% ce mois</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="card-modern p-4">
+                        <h5 class="mb-4">Activité Récente</h5>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item border-0 px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">JD</div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0"><strong>Jean Dupont</strong> s'est inscrit</p>
+                                        <small class="text-muted">Il y a 5 minutes</small>
+                                    </div>
+                                    <span class="badge-role badge-apprenant">Apprenant</span>
+                                </div>
+                            </div>
+
+                            <div class="list-group-item border-0 px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">PB</div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0"><strong>Pierre Bernard</strong> a créé une évaluation</p>
+                                        <small class="text-muted">Il y a 2 heures</small>
+                                    </div>
+                                    <span class="badge-role badge-therapeute">Thérapeute</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-modern p-4">
+                        <h5 class="mb-4">Utilisateurs en Attente</h5>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar me-3">SB</div>
+                                <div>
+                                    <p class="mb-0"><strong>Sophie Bernard</strong></p>
+                                    <small class="text-muted">Parent</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">Valider</button>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar me-3">TM</div>
+                                <div>
+                                    <p class="mb-0"><strong>Thomas Martin</strong></p>
+                                    <small class="text-muted">Éducateur</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">Valider</button>
+                        </div>
+                        <a href="users-list.html" class="btn btn-link text-decoration-none p-0">Voir tous →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
