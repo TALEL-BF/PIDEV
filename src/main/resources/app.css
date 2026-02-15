@@ -1,0 +1,222 @@
+/* =========================
+   THEME (palette pro)
+   ========================= */
+.root {
+    -bg: #F7F8FC;
+    -surface: #FFFFFF;
+    -text: #0F172A;
+    -muted: #64748B;
+    -border: #E6E8F0;
+
+    -primary: #7C3AED;
+    -primary2: #EC4899;
+
+    -shadow: rgba(15, 23, 42, 0.10);
+
+    -fx-font-family: "Segoe UI", "Inter", Arial;
+    -fx-background-color: -bg;
+}
+
+/* =========================
+   SIDEBAR
+   ========================= */
+.sidebar {
+    -fx-background-color: linear-gradient(to bottom, #7C3AED, #EC4899);
+    -fx-padding: 22;
+    -fx-pref-width: 280;
+}
+
+.sidebar-header { -fx-padding: 8 0 14 0; }
+
+.brand, .app-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+}
+
+.brand-sub, .app-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 12px;
+}
+
+.sidebar .separator {
+    -fx-opacity: 0.35;
+}
+
+/* =========================
+   MENU BUTTONS
+   ========================= */
+/* ton ami */
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.92);
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 10 12;
+    -fx-background-radius: 14;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+.menu-item:hover {
+    -fx-background-color: rgba(255,255,255,0.14);
+}
+.menu-item.active {
+    -fx-background-color: rgba(255,255,255,0.22);
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+}
+
+/* compat ancien code */
+.side-btn { -fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.92); }
+.side-btn:hover { -fx-background-color: rgba(255,255,255,0.14); }
+.side-btn-active {
+    -fx-background-color: rgba(255,255,255,0.22);
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+}
+
+/* =========================
+   PAGE TITLES
+   ========================= */
+.page {
+    -fx-padding: 26;
+    -fx-background-color: -bg;
+}
+
+.page-top { -fx-padding: 6 0 2 0; }
+
+.page-title {
+    -fx-font-size: 40px;
+    -fx-font-weight: 900;
+    -fx-text-fill: -text;
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -muted;
+}
+
+.counter-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+.btn-primary {
+    -fx-background-color: linear-gradient(to right, #7C3AED, #EC4899);
+    -fx-text-fill: white;
+    -fx-background-radius: 16;
+    -fx-padding: 10 18;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-opacity: 0.94;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 16, 0.2, 0, 4);
+    -fx-translate-y: -1;
+}
+
+.btn-soft {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #0F172A;
+    -fx-background-radius: 14;
+    -fx-padding: 9 14;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+.btn-soft:hover {
+    -fx-background-color: #E8EEF7;
+    -fx-translate-y: -1;
+}
+
+.btn-danger {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-background-radius: 14;
+    -fx-padding: 9 14;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+.btn-danger:hover {
+    -fx-background-color: #DC2626;
+    -fx-translate-y: -1;
+}
+
+/* =========================
+   INPUTS
+   ========================= */
+.input, .search {
+    -fx-background-color: -surface;
+    -fx-background-radius: 16;
+    -fx-border-color: -border;
+    -fx-border-radius: 16;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+}
+
+.search:focused, .input:focused {
+    -fx-border-color: rgba(124, 58, 237, 0.65);
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.18), 14, 0.2, 0, 0);
+}
+
+/* validation */
+.field-ok { -fx-border-color: #22c55e; -fx-border-width: 2; }
+.field-bad { -fx-border-color: #ef4444; -fx-border-width: 2; }
+
+/* =========================
+   CARD
+   ========================= */
+.card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-border-color: rgba(230,232,240,0.8);
+    -fx-border-radius: 22;
+    -fx-effect: dropshadow(gaussian, -shadow, 22, 0.18, 0, 10);
+}
+
+/* =========================
+   TABPANE
+   ========================= */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+.tab-pane .tab {
+    -fx-background-radius: 14 14 0 0;
+    -fx-padding: 8 14;
+}
+.tab-pane .tab:selected {
+    -fx-background-color: white;
+}
+.tab-pane .tab-label {
+    -fx-font-weight: 900;
+}
+
+/* =========================
+   TABLEVIEW
+   ========================= */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 14 14 0 0;
+}
+
+.table-row-cell:filled:selected,
+.table-row-cell:filled:selected:hover {
+    -fx-background-color: rgba(124,58,237,0.18);
+}
+
+/* =========================
+   STATIC PAGES (old)
+   ========================= */
+.h1 { -fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: -text; }
+.sub { -fx-font-size: 13px; -fx-text-fill: -muted; }
+.content { -fx-padding: 18; }
