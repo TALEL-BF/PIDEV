@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -349,11 +350,12 @@ public class AjouterSuivie {
     }
 
     // ==========================================================
-    // Fenêtre Ajouter / Modifier (bordures + message des erreurs)
+    // Fenêtre Ajouter / Modifier (PRO: rouge/vert + erreurs + date future)
+    // Niveau séance + scores: 0 rouge, >=1 vert, retour à 0 rouge
     // ==========================================================
     private Optional<Suivie> showSuivieWindow(Suivie s, String title) {
 
-        Stage stage = createCustomStage(title, 1000, 680);
+        Stage stage = createCustomStage(title, 1000, 700);
 
         VBox content = new VBox(12);
         content.getStyleClass().add("custom-content");
@@ -361,7 +363,7 @@ public class AjouterSuivie {
         // Message erreurs global
         Label lblErrors = new Label("");
         lblErrors.setWrapText(true);
-        lblErrors.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: 700;");
+        lblErrors.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: 800;");
 
         TextField tfNom = new TextField(s == null ? "" : safe(s.getNomEnfant()));
         TextField tfEmail = new TextField(s == null ? "" : safe(s.getEmailParent()));
@@ -376,42 +378,74 @@ public class AjouterSuivie {
                         : s.getDateSuivie().toLocalDateTime().toLocalDate()
         );
 
+        // ✅ BLOQUER dates passées
+        dpDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) return;
+                if (item.isBefore(LocalDate.now())) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #fecaca;");
+                }
+            }
+        });
+
         TextField tfHeure = new TextField(
                 (s == null || s.getDateSuivie() == null)
-                        ? "10:00"
+                        ? ""
                         : s.getDateSuivie().toLocalDateTime().toLocalTime().withSecond(0).withNano(0).toString()
         );
+        tfHeure.setPromptText("HH:mm (ex: 11:00)");
 
-        Spinner<Integer> spH = new Spinner<>(0, 10, s == null ? 5 : s.getScoreHumeur());
-        Spinner<Integer> spS = new Spinner<>(0, 10, s == null ? 5 : s.getScoreStress());
-        Spinner<Integer> spA = new Spinner<>(0, 10, s == null ? 5 : s.getScoreAttention());
-        Spinner<Integer> spNiveau = new Spinner<>(1, 10, (s == null || s.getNiveauSeance() == null) ? 1 : s.getNiveauSeance());
+        // ✅ Spinners : 0 au départ => ROUGE ; >=1 => VERT ; retour à 0 => ROUGE
+        Spinner<Integer> spH = new Spinner<>();
+        Spinner<Integer> spS = new Spinner<>();
+        Spinner<Integer> spA = new Spinner<>();
+        Spinner<Integer> spNiveau = new Spinner<>();
+
+        spH.setValueFactory(new IntegerSpinnerValueFactory(0, 10, 0));
+        spS.setValueFactory(new IntegerSpinnerValueFactory(0, 10, 0));
+        spA.setValueFactory(new IntegerSpinnerValueFactory(0, 10, 0));
+        spNiveau.setValueFactory(new IntegerSpinnerValueFactory(0, 10, 0));
 
         spH.setEditable(true);
         spS.setEditable(true);
         spA.setEditable(true);
         spNiveau.setEditable(true);
 
-        // État (+ Normal)
+        if (s == null) {
+            spNiveau.getValueFactory().setValue(0);
+            spH.getValueFactory().setValue(0);
+            spS.getValueFactory().setValue(0);
+            spA.getValueFactory().setValue(0);
+        } else {
+            spNiveau.getValueFactory().setValue(s.getNiveauSeance() == null ? 0 : s.getNiveauSeance());
+            spH.getValueFactory().setValue(s.getScoreHumeur());
+            spS.getValueFactory().setValue(s.getScoreStress());
+            spA.getValueFactory().setValue(s.getScoreAttention());
+        }
+
+        // ✅ État (+ Normal)
         ComboBox<String> cbEtat = new ComboBox<>();
         cbEtat.getItems().addAll("Normal", "Immobile", "Il ne bouge pas", "Il n'entend pas", "Il ne voit pas");
-        String etatInit = (s == null) ? "Normal" : safe(s.getStatut());
-        cbEtat.setValue(etatInit.isBlank() ? "Normal" : etatInit);
+        String etatInit = (s == null) ? "" : safe(s.getStatut());
+        cbEtat.setValue(etatInit.isBlank() ? null : etatInit);
 
         ComboBox<String> cbComportement = new ComboBox<>();
         cbComportement.getItems().addAll("Calme", "Agité");
-        String compInit = (s == null) ? "Calme" : safe(s.getComportement());
-        cbComportement.setValue(compInit.isBlank() ? "Calme" : compInit);
+        String compInit = (s == null) ? "" : safe(s.getComportement());
+        cbComportement.setValue(compInit.isBlank() ? null : compInit);
 
         ComboBox<String> cbInteraction = new ComboBox<>();
         cbInteraction.getItems().addAll("Interaction totale", "Moyenne", "Faible");
-        String interInit = (s == null) ? "Moyenne" : safe(s.getInteractionSociale());
-        cbInteraction.setValue(interInit.isBlank() ? "Moyenne" : interInit);
+        String interInit = (s == null) ? "" : safe(s.getInteractionSociale());
+        cbInteraction.setValue(interInit.isBlank() ? null : interInit);
 
         TextArea taObs = new TextArea(s == null ? "" : safe(s.getObservation()));
         taObs.setPrefRowCount(5);
 
-        // -------- Filtrage strict (optionnel)
+        // -------- Filtrage strict
         tfNom.textProperty().addListener((obs, oldV, newV) -> {
             if (newV == null) return;
             String cleaned = newV.replaceAll("[^a-zA-ZÀ-ÿ\\s]", "");
@@ -506,17 +540,23 @@ public class AjouterSuivie {
         Runnable validateAll = () -> {
             List<String> errors = new ArrayList<>();
 
-            boolean okNom = validateNom(tfNom, errors);
-            boolean okAge = validateAge(tfAge, errors);
+            boolean okNom   = validateNom(tfNom, errors);
+            boolean okAge   = validateAge(tfAge, errors);
             boolean okEmail = validateEmail(tfEmail, errors);
-            boolean okPsy = validatePsy(tfPsy, errors);
-            boolean okDate = validateDate(dpDate, errors);
+            boolean okPsy   = validatePsy(tfPsy, errors);
+            boolean okDate  = validateDateNotPast(dpDate, errors);
             boolean okHeure = validateHeure(tfHeure, errors);
-            boolean okEtat = validateCombo(cbEtat, "État", errors);
-            boolean okComp = validateCombo(cbComportement, "Comportement", errors);
+
+            boolean okEtat  = validateCombo(cbEtat, "État", errors);
+            boolean okComp  = validateCombo(cbComportement, "Comportement", errors);
             boolean okInter = validateCombo(cbInteraction, "Interaction sociale", errors);
 
-            // Indicateur global
+            // ✅ Niveau + Scores : 0 = ROUGE, >=1 = VERT, retour 0 = ROUGE
+            boolean okNiv = validateSpinnerMin1(spNiveau, "Niveau séance", errors);
+            boolean okSH  = validateSpinnerMin1(spH, "Score humeur", errors);
+            boolean okSS  = validateSpinnerMin1(spS, "Score stress", errors);
+            boolean okSA  = validateSpinnerMin1(spA, "Score attention", errors);
+
             if (errors.isEmpty()) {
                 lblErrors.setText("");
                 save.setDisable(false);
@@ -525,11 +565,7 @@ public class AjouterSuivie {
                 save.setDisable(true);
             }
 
-            // Si tu veux : remettre style neutre sur obs (pas obligatoire)
             taObs.setStyle(STYLE_NONE);
-
-            // option : si tout ok, on garde bordure verte; sinon rouge est déjà mis champ par champ
-            // (déjà fait dans validateX)
         };
 
         // listeners
@@ -542,36 +578,49 @@ public class AjouterSuivie {
         cbEtat.valueProperty().addListener((o, a, b) -> validateAll.run());
         cbComportement.valueProperty().addListener((o, a, b) -> validateAll.run());
         cbInteraction.valueProperty().addListener((o, a, b) -> validateAll.run());
-        spNiveau.valueProperty().addListener((o, a, b) -> validateAll.run());
 
+        // ✅ important: écouter les flèches + saisie dans les spinners
+        spNiveau.valueProperty().addListener((o,a,b) -> validateAll.run());
+        spH.valueProperty().addListener((o,a,b) -> validateAll.run());
+        spS.valueProperty().addListener((o,a,b) -> validateAll.run());
+        spA.valueProperty().addListener((o,a,b) -> validateAll.run());
+
+        spNiveau.getEditor().textProperty().addListener((o,a,b) -> validateAll.run());
+        spH.getEditor().textProperty().addListener((o,a,b) -> validateAll.run());
+        spS.getEditor().textProperty().addListener((o,a,b) -> validateAll.run());
+        spA.getEditor().textProperty().addListener((o,a,b) -> validateAll.run());
+
+        // ✅ Au démarrage : 0 => rouges
         validateAll.run();
 
         // -------- Save
         save.setOnAction(e -> {
             validateAll.run();
-            if (save.isDisable()) {
-                // message déjà affiché dans lblErrors
-                return;
-            }
+            if (save.isDisable()) return;
 
             try {
                 int age = Integer.parseInt(tfAge.getText().trim());
                 Timestamp ts = buildTimestamp(dpDate.getValue(), tfHeure.getText().trim());
+
+                int niveau = Integer.parseInt(spNiveau.getEditor().getText().trim());
+                int scoreH = Integer.parseInt(spH.getEditor().getText().trim());
+                int scoreS = Integer.parseInt(spS.getEditor().getText().trim());
+                int scoreA = Integer.parseInt(spA.getEditor().getText().trim());
 
                 Suivie created = new Suivie(
                         tfNom.getText().trim(),
                         age,
                         tfPsy.getText().trim(),
                         ts,
-                        spH.getValue(),
-                        spS.getValue(),
-                        spA.getValue(),
+                        scoreH,
+                        scoreS,
+                        scoreA,
                         cbComportement.getValue(),
                         cbInteraction.getValue(),
                         taObs.getText().trim(),
-                        cbEtat.getValue(),     // état stocké dans statut
+                        cbEtat.getValue(),
                         tfEmail.getText().trim(),
-                        spNiveau.getValue(),
+                        niveau,
                         null,
                         null,
                         null
@@ -579,7 +628,7 @@ public class AjouterSuivie {
 
                 // sécurité setters
                 created.setEmailParent(tfEmail.getText().trim());
-                created.setNiveauSeance(spNiveau.getValue());
+                created.setNiveauSeance(niveau);
                 created.setStatut(cbEtat.getValue());
                 created.setComportement(cbComportement.getValue());
                 created.setInteractionSociale(cbInteraction.getValue());
@@ -651,10 +700,11 @@ public class AjouterSuivie {
         return ok;
     }
 
-    private boolean validateDate(DatePicker dp, List<String> errors) {
-        boolean ok = dp.getValue() != null;
+    private boolean validateDateNotPast(DatePicker dp, List<String> errors) {
+        LocalDate d = dp.getValue();
+        boolean ok = d != null && !d.isBefore(LocalDate.now());
         dp.setStyle(ok ? STYLE_OK : STYLE_BAD);
-        if (!ok) errors.add("Date (obligatoire)");
+        if (!ok) errors.add("Date (obligatoire, pas de date passée)");
         return ok;
     }
 
@@ -662,6 +712,32 @@ public class AjouterSuivie {
         boolean ok = cb.getValue() != null && !cb.getValue().trim().isEmpty();
         cb.setStyle(ok ? STYLE_OK : STYLE_BAD);
         if (!ok) errors.add(label + " (obligatoire)");
+        return ok;
+    }
+
+    // ✅ appliquer style sur le spinner (éditeur)
+    private void applySpinnerBorder(Spinner<Integer> sp, boolean ok) {
+        if (sp == null) return;
+        sp.getEditor().setStyle(ok ? STYLE_OK : STYLE_BAD);
+    }
+
+    // ✅ 0 => ROUGE ; 1..10 => VERT ; retour 0 => ROUGE ; texte => ROUGE
+    private boolean validateSpinnerMin1(Spinner<Integer> sp, String label, List<String> errors) {
+        String txt = sp.getEditor().getText() == null ? "" : sp.getEditor().getText().trim();
+        boolean ok = false;
+
+        try {
+            int v = Integer.parseInt(txt);
+            ok = (v >= 1 && v <= 10);
+            if (ok && sp.getValueFactory() instanceof IntegerSpinnerValueFactory) {
+                ((IntegerSpinnerValueFactory) sp.getValueFactory()).setValue(v);
+            }
+        } catch (Exception e) {
+            ok = false;
+        }
+
+        applySpinnerBorder(sp, ok);
+        if (!ok) errors.add(label + " (obligatoire, min 1)");
         return ok;
     }
 
@@ -720,14 +796,42 @@ public class AjouterSuivie {
 
     private void switchTo(String fxmlPath) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
+            var url = getClass().getResource(fxmlPath);
+            if (url == null) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Navigation");
+                a.setHeaderText("FXML introuvable");
+                a.setContentText("Chemin : " + fxmlPath);
+                a.showAndWait();
+                return;
+            }
+
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(url);
             javafx.scene.Parent root = loader.load();
-            Stage stage = (Stage) cardsPane.getScene().getWindow();
+
+            // Prend n'importe quel node sûr (btnMenuTherapie ici)
+            Stage stage = (Stage) btnMenuTherapie.getScene().getWindow();
             stage.getScene().setRoot(root);
+
         } catch (Exception ex) {
             ex.printStackTrace();
+
+            // Remonter la cause réelle
+            Throwable cause = ex;
+            while (cause.getCause() != null) cause = cause.getCause();
+
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Navigation");
+            a.setHeaderText("Erreur lors du chargement");
+            a.setContentText(
+                    "FXML: " + fxmlPath + "\n\n" +
+                            "Erreur: " + ex.getClass().getSimpleName() + " - " + String.valueOf(ex.getMessage()) + "\n\n" +
+                            "Cause: " + cause.getClass().getSimpleName() + " - " + String.valueOf(cause.getMessage())
+            );
+            a.showAndWait();
         }
     }
+
 
     // -----------------------------
     // Stats
@@ -841,7 +945,6 @@ public class AjouterSuivie {
 
     private void initStatsToggle() {
         if (statsBox == null) return;
-
         setStatsVisible(false);
         if (lblToggleStats != null) {
             lblToggleStats.setOnMouseClicked(e -> setStatsVisible(!statsBox.isVisible()));

@@ -1,4 +1,3 @@
-
 package Controller;
 
 import Entites.Therapie;
@@ -135,15 +134,15 @@ public class AjouterTherapie {
     }
 
     // =========================
-    // CARD (same design as suivie)
+    // CARD
     // =========================
     private Node buildCard(Therapie t) {
 
         VBox card = new VBox();
-        card.getStyleClass().add("suivie-card"); // نفس style card
+        card.getStyleClass().add("suivie-card");
 
         HBox band = new HBox(10);
-        band.getStyleClass().add("suivie-band"); // نفس gradient header
+        band.getStyleClass().add("suivie-band");
 
         Label title = new Label(safe(t.getNomExercice()));
         title.getStyleClass().add("card-title");
@@ -168,7 +167,7 @@ public class AjouterTherapie {
         Label info = new Label(
                 "OBJECTIF\n" + safe(t.getObjectif()) +
                         "\n\nDURÉE (min)\n" + t.getDureeMin() +
-                        "\n\nNIVEAU\n" + t.getNiveau() +
+                        "\n\nNIVEAU\n" + (t.getNiveau() == null ? "" : t.getNiveau()) +
                         "\n\nMATÉRIEL\n" + safe(t.getMateriel())
         );
         info.getStyleClass().add("suivie-info");
@@ -209,8 +208,16 @@ public class AjouterTherapie {
     private void onAjouter() {
         Optional<Therapie> res = showTherapieWindow(null, "Ajouter une thérapie");
         res.ifPresent(t -> {
-            therapieService.ajouterTherapie(t);
-            reloadFromDb();
+            try {
+                therapieService.ajouterTherapie(t);
+                reloadFromDb();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText("Erreur INSERT");
+                a.setContentText(ex.getMessage());
+                a.showAndWait();
+            }
         });
     }
 
@@ -218,18 +225,32 @@ public class AjouterTherapie {
         Optional<Therapie> res = showTherapieWindow(exist, "Modifier la thérapie");
         res.ifPresent(updated -> {
             updated.setIdTherapie(exist.getIdTherapie());
-            therapieService.modifierTherapie(updated);
-            reloadFromDb();
+            try {
+                therapieService.modifierTherapie(updated);
+                reloadFromDb();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText("Erreur UPDATE");
+                a.setContentText(ex.getMessage());
+                a.showAndWait();
+            }
         });
     }
 
     private void onVoir(Therapie t) {
-        Stage stage = createCustomStage("Détails de la thérapie", 760, 560);
+        Stage stage = createCustomStage("Détails de la thérapie", 820, 620);
 
         VBox content = new VBox(14);
         content.getStyleClass().add("custom-content");
 
         GridPane grid = new GridPane();
+        ScrollPane sp = new ScrollPane(grid);
+        sp.setFitToWidth(true);
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        sp.setPrefViewportHeight(320);
+
         grid.setHgap(16);
         grid.setVgap(10);
         grid.getStyleClass().add("details-grid");
@@ -242,12 +263,13 @@ public class AjouterTherapie {
         addRow(grid, r++, "Niveau", String.valueOf(t.getNiveau()));
         addRow(grid, r++, "Matériel", safe(t.getMateriel()));
 
-        Label adapLabel = new Label("Adaptation TSA");
-        adapLabel.getStyleClass().add("details-label");
-
-        Label adap = new Label(safe(t.getAdaptationTsa()));
-        adap.setWrapText(true);
-        adap.getStyleClass().add("details-box");
+        // ✅ champs ajoutés
+        addRow(grid, r++, "Cible", safe(t.getCible()));
+        addRow(grid, r++, "Niveaux Humeur", safe(t.getNiveauxHumeur()));
+        addRow(grid, r++, "Niveaux Attention", safe(t.getNiveauxAttention()));
+        addRow(grid, r++, "Niveaux Stress", safe(t.getNiveauxStresse()));
+        addRow(grid, r++, "Comportement", safe(t.getComportement()));
+        addRow(grid, r++, "Interaction sociale", safe(t.getInteraction()));
 
         Label descLabel = new Label("Description");
         descLabel.getStyleClass().add("details-label");
@@ -255,6 +277,13 @@ public class AjouterTherapie {
         Label desc = new Label(safe(t.getDescription()));
         desc.setWrapText(true);
         desc.getStyleClass().add("details-box");
+
+        Label adapLabel = new Label("Adaptation TSA");
+        adapLabel.getStyleClass().add("details-label");
+
+        Label adap = new Label(safe(t.getAdaptationTsa()));
+        adap.setWrapText(true);
+        adap.getStyleClass().add("details-box");
 
         HBox actions = new HBox(12);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -265,9 +294,8 @@ public class AjouterTherapie {
 
         actions.getChildren().add(close);
 
-        content.getChildren().addAll(grid, descLabel, desc, adapLabel, adap, actions);
+        content.getChildren().addAll(sp, descLabel, desc, adapLabel, adap, actions);
         setCenter(stage, content);
-
         stage.showAndWait();
     }
 
@@ -299,9 +327,17 @@ public class AjouterTherapie {
         Button del = new Button("Supprimer");
         del.getStyleClass().addAll("btn-danger", "btn-hover");
         del.setOnAction(e -> {
-            therapieService.supprimerTherapie(t.getIdTherapie());
-            stage.close();
-            reloadFromDb();
+            try {
+                therapieService.supprimerTherapie(t.getIdTherapie());
+                stage.close();
+                reloadFromDb();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText("Erreur DELETE");
+                a.setContentText(ex.getMessage());
+                a.showAndWait();
+            }
         });
 
         actions.getChildren().addAll(cancel, del);
@@ -313,23 +349,69 @@ public class AjouterTherapie {
     }
 
     // =========================
-    // ADD / EDIT WINDOW (custom)
+    // ADD / EDIT WINDOW ✅ ComboBox + contrôle de saisie + vert/rouge
     // =========================
     private Optional<Therapie> showTherapieWindow(Therapie t, String title) {
 
-        Stage stage = createCustomStage(title, 980, 660);
+        Stage stage = createCustomStage(title, 980, 820);
 
         VBox content = new VBox(14);
         content.getStyleClass().add("custom-content");
+
+        // ✅ Zone erreurs (comme ton exemple)
+        Label errors = new Label();
+        errors.setWrapText(true);
+        errors.getStyleClass().add("form-errors");
+        errors.setVisible(false);
+        errors.setManaged(false);
 
         TextField tfNom = new TextField(t == null ? "" : safe(t.getNomExercice()));
         TextField tfType = new TextField(t == null ? "" : safe(t.getTypeExercice()));
         TextField tfObj = new TextField(t == null ? "" : safe(t.getObjectif()));
 
-        Spinner<Integer> spDuree = new Spinner<>(1, 300, t == null ? 15 : t.getDureeMin());
-        Spinner<Integer> spNiveau = new Spinner<>(1, 10, t == null ? 1 : t.getNiveau());
+        Spinner<Integer> spDuree = new Spinner<>(0, 300, t == null ? 0 : t.getDureeMin());
+        Spinner<Integer> spNiveau = new Spinner<>(0, 10, t == null ? 0 : (t.getNiveau() == null ? 0 : t.getNiveau()));
+        spDuree.setEditable(true);
+        spNiveau.setEditable(true);
+
+        spDuree.setEditable(true);
+        spNiveau.setEditable(true);
 
         TextField tfMateriel = new TextField(t == null ? "" : safe(t.getMateriel()));
+
+        // ✅ COMBOBOX (choix imposés)
+        ComboBox<String> cbCible = new ComboBox<>();
+        cbCible.setItems(FXCollections.observableArrayList(
+                "Handicap motrice", "Handicap sonore", "Handicap visuelle", "Handicap verbale"
+        ));
+        cbCible.setValue(t == null ? null : emptyToNull(safe(t.getCible())));
+
+        ComboBox<String> cbHumeur = new ComboBox<>();
+        cbHumeur.setItems(FXCollections.observableArrayList("Faible", "Moyenne", "Élevée"));
+        cbHumeur.setValue(t == null ? null : emptyToNull(safe(t.getNiveauxHumeur())));
+
+        ComboBox<String> cbAttention = new ComboBox<>();
+        cbAttention.setItems(FXCollections.observableArrayList("Faible", "Moyenne", "Élevée"));
+        cbAttention.setValue(t == null ? null : emptyToNull(safe(t.getNiveauxAttention())));
+
+        ComboBox<String> cbStress = new ComboBox<>();
+        cbStress.setItems(FXCollections.observableArrayList("Faible", "Moyenne", "Élevée"));
+        cbStress.setValue(t == null ? null : emptyToNull(safe(t.getNiveauxStresse())));
+
+        ComboBox<String> cbComportement = new ComboBox<>();
+        cbComportement.setItems(FXCollections.observableArrayList("Agité", "Calme"));
+        cbComportement.setValue(t == null ? null : emptyToNull(safe(t.getComportement())));
+
+        ComboBox<String> cbInteraction = new ComboBox<>();
+        cbInteraction.setItems(FXCollections.observableArrayList("Faible", "Moyenne", "Totale"));
+        cbInteraction.setValue(t == null ? null : emptyToNull(safe(t.getInteraction())));
+
+        cbCible.setMaxWidth(Double.MAX_VALUE);
+        cbHumeur.setMaxWidth(Double.MAX_VALUE);
+        cbAttention.setMaxWidth(Double.MAX_VALUE);
+        cbStress.setMaxWidth(Double.MAX_VALUE);
+        cbComportement.setMaxWidth(Double.MAX_VALUE);
+        cbInteraction.setMaxWidth(Double.MAX_VALUE);
 
         TextArea taDesc = new TextArea(t == null ? "" : safe(t.getDescription()));
         taDesc.setPrefRowCount(4);
@@ -343,15 +425,24 @@ public class AjouterTherapie {
         gp.getStyleClass().add("form-grid");
 
         int r = 0;
-        gp.add(label("Nom exercice"), 0, r); gp.add(tfNom, 1, r);
-        gp.add(label("Type exercice"), 2, r); gp.add(tfType, 3, r); r++;
+        gp.add(label("Nom exercice *"), 0, r); gp.add(tfNom, 1, r);
+        gp.add(label("Type exercice *"), 2, r); gp.add(tfType, 3, r); r++;
 
-        gp.add(label("Objectif"), 0, r); gp.add(tfObj, 1, r, 3, 1); r++;
+        gp.add(label("Objectif *"), 0, r); gp.add(tfObj, 1, r, 3, 1); r++;
 
-        gp.add(label("Durée (min)"), 0, r); gp.add(spDuree, 1, r);
-        gp.add(label("Niveau"), 2, r); gp.add(spNiveau, 3, r); r++;
+        gp.add(label("Durée (min) *"), 0, r); gp.add(spDuree, 1, r);
+        gp.add(label("Niveau *"), 2, r); gp.add(spNiveau, 3, r); r++;
 
-        gp.add(label("Matériel"), 0, r); gp.add(tfMateriel, 1, r, 3, 1); r++;
+        gp.add(label("Matériel"), 0, r); gp.add(tfMateriel, 1, r);
+        gp.add(label("Cible *"), 2, r); gp.add(cbCible, 3, r); r++;
+
+        gp.add(label("Niveaux Humeur *"), 0, r); gp.add(cbHumeur, 1, r);
+        gp.add(label("Niveaux Attention *"), 2, r); gp.add(cbAttention, 3, r); r++;
+
+        gp.add(label("Niveaux Stress *"), 0, r); gp.add(cbStress, 1, r);
+        gp.add(label("Comportement *"), 2, r); gp.add(cbComportement, 3, r); r++;
+
+        gp.add(label("Interaction sociale *"), 0, r); gp.add(cbInteraction, 1, r, 3, 1); r++;
 
         Label descLabel = new Label("Description");
         descLabel.getStyleClass().add("details-label");
@@ -373,22 +464,67 @@ public class AjouterTherapie {
 
         actions.getChildren().addAll(cancel, save);
 
-        content.getChildren().addAll(gp, descLabel, taDesc, adapLabel, taAdap, actions);
+        content.getChildren().addAll(errors, gp, descLabel, taDesc, adapLabel, taAdap, actions);
         setCenter(stage, content);
 
         final Therapie[] result = {null};
 
-        // Validation
-        save.setDisable(true);
+        // ✅ VALIDATION : rouge si mauvais / vert si bon (comme suivi)
         Runnable validate = () -> {
-            boolean valid = !tfNom.getText().trim().isEmpty()
-                    && !tfType.getText().trim().isEmpty()
-                    && !tfObj.getText().trim().isEmpty();
-            save.setDisable(!valid);
+            StringBuilder sb = new StringBuilder("Champs à corriger :\n");
+            boolean ok = true;
+
+            ok &= validateMin3(tfNom, "Nom exercice (min 3 lettres)", sb);
+            ok &= validateMin3(tfType, "Type exercice (min 3 lettres)", sb);
+            ok &= validateRequiredNonEmpty(tfObj, "Objectif (obligatoire)", sb);
+
+            // ✅ durée / niveau doivent être > 0
+            ok &= validateSpinnerMin(spDuree, 1, "Durée (min) (doit être > 0)", sb);
+            ok &= validateSpinnerMin(spNiveau, 1, "Niveau (doit être > 0)", sb);
+
+            // ✅ Combos obligatoires
+            ok &= validateRequiredCombo(cbCible, "Cible (obligatoire)", sb);
+            ok &= validateRequiredCombo(cbHumeur, "Niveaux humeur (Faible/Moyenne/Élevée)", sb);
+            ok &= validateRequiredCombo(cbAttention, "Niveaux attention (Faible/Moyenne/Élevée)", sb);
+            ok &= validateRequiredCombo(cbStress, "Niveaux stress (Faible/Moyenne/Élevée)", sb);
+            ok &= validateRequiredCombo(cbComportement, "Comportement (Agité/Calme)", sb);
+            ok &= validateRequiredCombo(cbInteraction, "Interaction sociale (Faible/Moyenne/Totale)", sb);
+
+            // ✅ Matériel / Description / Adaptation obligatoires
+            ok &= validateRequiredNonEmpty(tfMateriel, "Matériel (obligatoire)", sb);
+            ok &= validateRequiredTextArea(taDesc, "Description (obligatoire)", sb);
+            ok &= validateRequiredTextArea(taAdap, "Adaptation TSA (obligatoire)", sb);
+
+            save.setDisable(!ok);
+            errors.setText(sb.toString().trim());
+            errors.setVisible(!ok);
+            errors.setManaged(!ok);
         };
-        tfNom.textProperty().addListener((o,a,b)->validate.run());
-        tfType.textProperty().addListener((o,a,b)->validate.run());
-        tfObj.textProperty().addListener((o,a,b)->validate.run());
+
+
+        tfNom.textProperty().addListener((o,a,b)-> validate.run());
+        tfType.textProperty().addListener((o,a,b)-> validate.run());
+        tfObj.textProperty().addListener((o,a,b)-> validate.run());
+
+        cbCible.valueProperty().addListener((o,a,b)-> validate.run());
+        cbHumeur.valueProperty().addListener((o,a,b)-> validate.run());
+        cbAttention.valueProperty().addListener((o,a,b)-> validate.run());
+        cbStress.valueProperty().addListener((o,a,b)-> validate.run());
+        cbComportement.valueProperty().addListener((o,a,b)-> validate.run());
+        cbInteraction.valueProperty().addListener((o,a,b)-> validate.run());
+
+        // ✅ Spinners : revalider à chaque changement
+        spDuree.valueProperty().addListener((o,a,b)-> validate.run());
+        spNiveau.valueProperty().addListener((o,a,b)-> validate.run());
+
+// ✅ TextAreas : revalider à chaque saisie
+        taDesc.textProperty().addListener((o,a,b)-> validate.run());
+        taAdap.textProperty().addListener((o,a,b)-> validate.run());
+
+// ✅ Matériel obligatoire
+        tfMateriel.textProperty().addListener((o,a,b)-> validate.run());
+
+
         validate.run();
 
         save.setOnAction(e -> {
@@ -398,9 +534,17 @@ public class AjouterTherapie {
                     tfObj.getText().trim(),
                     taDesc.getText().trim(),
                     spDuree.getValue(),
-                    spNiveau.getValue(),
                     tfMateriel.getText().trim(),
-                    taAdap.getText().trim()
+                    taAdap.getText().trim(),
+
+                    cbCible.getValue(),
+                    cbHumeur.getValue(),
+                    cbAttention.getValue(),
+                    cbStress.getValue(),
+                    cbComportement.getValue(),
+                    cbInteraction.getValue(),
+
+                    spNiveau.getValue()
             );
             stage.close();
         });
@@ -410,7 +554,7 @@ public class AjouterTherapie {
     }
 
     // =========================
-    // CUSTOM WINDOW (same as suivie)
+    // CUSTOM WINDOW
     // =========================
     private Stage createCustomStage(String title, double w, double h) {
 
@@ -418,7 +562,7 @@ public class AjouterTherapie {
         stage.initModality(Modality.APPLICATION_MODAL);
 
         StackPane root = new StackPane();
-        root.setPadding(new Insets(18)); // marge externe
+        root.setPadding(new Insets(18));
         root.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
 
         root.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
@@ -447,7 +591,6 @@ public class AjouterTherapie {
 
         root.getChildren().add(shell);
 
-        // Drag window
         final double[] dx = {0};
         final double[] dy = {0};
         header.setOnMousePressed(e -> {
@@ -493,4 +636,65 @@ public class AjouterTherapie {
     }
 
     private String safe(String s) { return s == null ? "" : s; }
+
+    // ✅ Validation + style rouge/vert
+    private boolean validateMin3(TextField tf, String msg, StringBuilder sb) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok = v.length() >= 3;
+        setFieldState(tf, ok);
+        if (!ok) sb.append("- ").append(msg).append("\n");
+        return ok;
+    }
+
+    private boolean validateRequiredNonEmpty(TextField tf, String msg, StringBuilder sb) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok = !v.isEmpty();
+        setFieldState(tf, ok);
+        if (!ok) sb.append("- ").append(msg).append("\n");
+        return ok;
+    }
+
+    private boolean validateRequiredCombo(ComboBox<String> cb, String msg, StringBuilder sb) {
+        boolean ok = cb.getValue() != null && !cb.getValue().trim().isEmpty();
+        setFieldState(cb, ok);
+        if (!ok) sb.append("- ").append(msg).append("\n");
+        return ok;
+    }
+
+    private boolean validateSpinnerMin(Spinner<Integer> sp, int min, String msg, StringBuilder sb) {
+        Integer v = sp.getValue();
+        boolean ok = v != null && v >= min;
+
+        // le Spinner n'est pas un Control direct : on colore son editor
+        TextField editor = sp.getEditor();
+        setFieldState(editor, ok);
+
+        if (!ok) sb.append("- ").append(msg).append("\n");
+        return ok;
+    }
+
+    private boolean validateRequiredTextArea(TextArea ta, String msg, StringBuilder sb) {
+        String v = ta.getText() == null ? "" : ta.getText().trim();
+        boolean ok = !v.isEmpty();
+        setFieldState(ta, ok);
+        if (!ok) sb.append("- ").append(msg).append("\n");
+        return ok;
+    }
+
+
+    private void setFieldState(Control c, boolean ok) {
+        final String ERROR_CLASS = "field-error";
+        final String OK_CLASS = "field-ok";
+
+        c.getStyleClass().removeAll(ERROR_CLASS, OK_CLASS);
+
+        if (ok) c.getStyleClass().add(OK_CLASS);
+        else c.getStyleClass().add(ERROR_CLASS);
+    }
+
+    private String emptyToNull(String s) {
+        if (s == null) return null;
+        String v = s.trim();
+        return v.isEmpty() ? null : v;
+    }
 }

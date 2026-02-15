@@ -47,7 +47,10 @@ public class TherapieServicesTest {
 
         Therapie t = new Therapie(
                 uniqueName, "EMOTION", "OBJ_TEST", "DESC_TEST",
-                10, 1, "MAT_TEST", "ADAPT_TEST"
+                10,
+                "MAT_TEST", "ADAPT_TEST",
+                null, null, null, null, null, null,
+                1
         );
 
         service.ajouterTherapie(t);
@@ -75,8 +78,12 @@ public class TherapieServicesTest {
         // insert
         Therapie t = new Therapie(
                 uniqueName, "EMOTION", "OBJ_TEST", "DESC_TEST",
-                10, 1, "MAT_TEST", "ADAPT_TEST"
+                10,
+                "MAT_TEST", "ADAPT_TEST",
+                null, null, null, null, null, null,
+                1
         );
+
         service.ajouterTherapie(t);
 
         // get id
@@ -92,8 +99,14 @@ public class TherapieServicesTest {
 
         // update
         Therapie modif = new Therapie(
-                id, uniqueName, "SOCIAL", "OBJ_MODIF", "DESC_MODIF",
-                20, 3, "MAT_MODIF", "ADAPT_MODIF"
+                Therapie t = new Therapie(
+                uniqueName, "EMOTION", "OBJ_TEST", "DESC_TEST",
+                10,
+                "MAT_TEST", "ADAPT_TEST",
+                null, null, null, null, null, null,
+                1
+        );
+
         );
         service.modifierTherapie(modif);
 

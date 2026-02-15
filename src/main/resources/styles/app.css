@@ -731,3 +731,85 @@
 
 .field-bad { -fx-border-color: #ef4444; -fx-border-width: 2; }
 
+/* Champs invalides (bord rouge comme ton exemple) */
+.field-error {
+    -fx-border-color: #e53935;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+/* Optionnel : focus rouge aussi */
+.field-error:focused {
+    -fx-border-color: #e53935;
+    -fx-border-width: 2.5;
+}
+.form-errors {
+    -fx-text-fill: #e53935;
+    -fx-font-weight: 700;
+}
+.field-error {
+    -fx-border-color: #ff4d4d;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.field-ok {
+    -fx-border-color: #22c55e;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}.field-error {
+     -fx-border-color: #ff4d4d;
+     -fx-border-width: 2;
+     -fx-border-radius: 10;
+     -fx-background-radius: 10;
+ }
+
+.field-ok {
+    -fx-border-color: #22c55e;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+/* erreurs (rouge) */
+.field-error {
+    -fx-border-color: #ff4d4d;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+/* ok (vert) */
+.field-ok {
+    -fx-border-color: #22c55e;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+/* zone erreurs en haut (comme AjouterSuivie) */
+.form-errors {
+    -fx-text-fill: #e53935;
+    -fx-font-weight: 700;
+}
+.field-error {
+    -fx-border-color: #ff4d4d;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.field-ok {
+    -fx-border-color: #22c55e;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.form-errors {
+    -fx-text-fill: #e53935;
+    -fx-font-weight: 700;
+}
+
