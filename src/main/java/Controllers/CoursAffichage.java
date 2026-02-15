@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
 
 import java.net.URL;
 import java.util.List;
@@ -104,33 +105,61 @@ public class CoursAffichage implements Initializable {
             coursFlowPane.getChildren().add(courseCard);
         }
     }
-
     private VBox createCourseCard(Cours cours) {
-        VBox card = new VBox(10);
+        // Carte principale avec design moderne
+        VBox card = new VBox(0);
         card.setPrefWidth(280);
-        card.setPrefHeight(320);
-        card.setStyle("-fx-background-color: white; " +
-                "-fx-background-radius: 15; " +
-                "-fx-border-radius: 15; " +
-                "-fx-border-color: #EEEEEE; " +
-                "-fx-border-width: 1; " +
-                "-fx-padding: 0 0 20 0; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);");
+        card.setPrefHeight(380);
+        card.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 24;" +
+                        "-fx-border-radius: 24;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" +
+                        "-fx-transition: all 0.3s ease;"
+        );
 
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-padding: 0 0 20 0; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 15, 0, 0, 5);"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #EEEEEE; -fx-border-width: 1; -fx-padding: 0 0 20 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);"));
+        // Effet de survol amélioré
+        card.setOnMouseEntered(e -> {
+            card.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-background-radius: 24;" +
+                            "-fx-border-radius: 24;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(123,47,247,0.3), 25, 0, 0, 10);" +
+                            "-fx-translate-y: -5;" +
+                            "-fx-transition: all 0.3s ease;"
+            );
+        });
 
+        card.setOnMouseExited(e -> {
+            card.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-background-radius: 24;" +
+                            "-fx-border-radius: 24;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" +
+                            "-fx-translate-y: 0;" +
+                            "-fx-transition: all 0.3s ease;"
+            );
+        });
 
+        // ===== CONTENEUR D'IMAGE AVEC OVERLAY GRADIENT =====
         StackPane imageContainer = new StackPane();
-        imageContainer.setPrefHeight(200);
-        imageContainer.setStyle("-fx-background-color: linear-gradient(to bottom, #F5F0FF, #FFFFFF); " +
-                "-fx-background-radius: 15 15 0 0;");
+        imageContainer.setPrefHeight(160);
+        imageContainer.setStyle(
+                "-fx-background-radius: 24 24 0 0;" +
+                        "-fx-background-color: linear-gradient(to bottom, #7B2FF7, #9F5FF7);"
+        );
 
+        // Image du cours avec masque d'arrondi
         ImageView courseImageView = new ImageView();
-        courseImageView.setFitHeight(150);
-        courseImageView.setFitWidth(230);
-        courseImageView.setPreserveRatio(true);
+        courseImageView.setFitHeight(160);
+        courseImageView.setFitWidth(280);
+        courseImageView.setPreserveRatio(false);
 
+        // Rectangle pour clip l'image aux coins arrondis
+        Rectangle clip = new Rectangle(300, 180);
+        clip.setArcWidth(24);
+        clip.setArcHeight(24);
+        courseImageView.setClip(clip);
 
         if (cours.getImage() != null && !cours.getImage().isEmpty()) {
             try {
@@ -149,91 +178,237 @@ public class CoursAffichage implements Initializable {
             setDefaultCourseImage(courseImageView, cours);
         }
 
-        imageContainer.getChildren().add(courseImageView);
+        // Overlay gradient pour meilleure lisibilité des badges
+        Region gradientOverlay = new Region();
+        gradientOverlay.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);" +
+                        "-fx-background-radius: 24 24 0 0;"
+        );
+        gradientOverlay.setPrefHeight(70);
+        gradientOverlay.setMaxHeight(70);
+        StackPane.setAlignment(gradientOverlay, Pos.TOP_CENTER);
 
+        // Badge de type de cours (plus élégant)
+        Label typeBadge = new Label(cours.getType_cours());
+        String typeColor = getTypeColor(cours.getType_cours());
+        typeBadge.setStyle(
+                "-fx-background-color: " + typeColor + ";" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 30;" +
+                        "-fx-padding: 6 16;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);" +
+                        "-fx-border-color: rgba(255,255,255,0.3);" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 30;"
+        );
+        StackPane.setAlignment(typeBadge, Pos.TOP_RIGHT);
+        StackPane.setMargin(typeBadge, new Insets(15, 15, 0, 0));
 
-        VBox contentContainer = new VBox(8);
-        contentContainer.setStyle("-fx-padding: 0 20 0 20;");
+        imageContainer.getChildren().addAll(courseImageView, gradientOverlay, typeBadge);
 
+        // ===== CONTENEUR DE CONTENU =====
+        VBox contentContainer = new VBox(15);
+        contentContainer.setStyle("-fx-padding: 20 20 15 20;");
+
+        // Titre avec icône
+        HBox titleBox = new HBox(10);
+        titleBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label titleIcon = new Label(getEmojiForCours(cours));
+        titleIcon.setStyle("-fx-font-size: 24px;");
 
         Label titleLabel = new Label(cours.getTitre());
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;");
+        titleLabel.setStyle(
+                "-fx-font-size: 20px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-text-fill: #2C3E50;" +
+                        "-fx-wrap-text: true;"
+        );
         titleLabel.setWrapText(true);
+        titleLabel.setMaxWidth(200);
 
+        titleBox.getChildren().addAll(titleIcon, titleLabel);
 
-        Label descriptionLabel = new Label(cours.getDescription());
+        // Description avec limite de caractères
+        String description = cours.getDescription();
+        if (description.length() > 80) {
+            description = description.substring(0, 77) + "...";
+        }
+
+        Label descriptionLabel = new Label(description);
         descriptionLabel.setWrapText(true);
-        descriptionLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666666;");
-        descriptionLabel.setPrefHeight(40);
-        descriptionLabel.setMaxHeight(40);
-
-        // BADGES POUR TYPE ET NIVEAU
-        HBox badgesBox = new HBox(8);
-        badgesBox.setAlignment(Pos.CENTER_LEFT);
-
-        // Badge pour le type de cours
-        Label typeBadge = new Label(cours.getType_cours());
-        typeBadge.setStyle(getTypeStyle(cours.getType_cours()));
-        typeBadge.setPadding(new Insets(4, 12, 4, 12));
-
-
-        Label niveauBadge = new Label(cours.getNiveau());
-        niveauBadge.setStyle(getNiveauStyle(cours.getNiveau()));
-        niveauBadge.setPadding(new Insets(4, 12, 4, 12));
-
-        badgesBox.getChildren().addAll(typeBadge, niveauBadge);
-
-        // Footer avec évaluations
-        HBox footer = new HBox(15);
-        footer.setAlignment(Pos.CENTER_LEFT);
-
-        HBox ratingBox = new HBox(5);
-        ratingBox.setAlignment(Pos.CENTER_LEFT);
-        Label starLabel = new Label("⭐");
-        Label ratingLabel = new Label("4.8");
-        ratingLabel.setStyle("-fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
-        ratingBox.getChildren().addAll(starLabel, ratingLabel);
-
-        HBox participantsBox = new HBox(5);
-        participantsBox.setAlignment(Pos.CENTER_LEFT);
-        Label usersLabel = new Label("👥");
-        Label participantsLabel = new Label("124");
-        participantsLabel.setStyle("-fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
-        participantsBox.getChildren().addAll(usersLabel, participantsLabel);
-
-        footer.getChildren().addAll(ratingBox, participantsBox);
-
-        // Bouton Commencer
-        Button commencerBtn = new Button("Commencer");
-        commencerBtn.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; " +
-                "-fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; " +
-                "-fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 5, 0, 0, 2);");
-
-        commencerBtn.setOnMouseEntered(e ->
-                commencerBtn.setStyle("-fx-background-color: #6A1FF7; -fx-text-fill: white; " +
-                        "-fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; " +
-                        "-fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.5), 8, 0, 0, 3);")
+        descriptionLabel.setStyle(
+                "-fx-font-size: 13px;" +
+                        "-fx-text-fill: #7F8C8D;" +
+                        "-fx-line-spacing: 2;"
         );
 
-        commencerBtn.setOnMouseExited(e ->
-                commencerBtn.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; " +
-                        "-fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; " +
-                        "-fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 5, 0, 0, 2);")
+        // ===== GRILLE D'INFORMATIONS =====
+        GridPane infoGrid = new GridPane();
+        infoGrid.setHgap(20);
+        infoGrid.setVgap(10);
+        infoGrid.setStyle("-fx-padding: 5 0;");
+
+        // Niveau avec couleur
+        String niveauColor = getNiveauColor(cours.getNiveau());
+        Label niveauIcon = new Label(getNiveauIcon(cours.getNiveau()));
+        niveauIcon.setStyle("-fx-font-size: 16px;");
+        Label niveauLabel = new Label(cours.getNiveau());
+        niveauLabel.setStyle(
+                "-fx-font-size: 13px;" +
+                        "-fx-font-weight: 600;" +
+                        "-fx-text-fill: " + niveauColor + ";"
         );
+        HBox niveauBox = new HBox(5, niveauIcon, niveauLabel);
+        niveauBox.setAlignment(Pos.CENTER_LEFT);
+
+        // Durée
+        Label dureeIcon = new Label("⏱️");
+        dureeIcon.setStyle("-fx-font-size: 16px;");
+        Label dureeLabel = new Label(cours.getDuree() + " min");
+        dureeLabel.setStyle(
+                "-fx-font-size: 13px;" +
+                        "-fx-font-weight: 600;" +
+                        "-fx-text-fill: #7B2FF7;"
+        );
+        HBox dureeBox = new HBox(5, dureeIcon, dureeLabel);
+        dureeBox.setAlignment(Pos.CENTER_LEFT);
+
+        infoGrid.add(niveauBox, 0, 0);
+        infoGrid.add(dureeBox, 1, 0);
+
+        // Statistiques
+        int motCount = cours.getMots() != null ? cours.getMots().split(";").length : 0;
+        Label motsIcon = new Label("📝");
+        motsIcon.setStyle("-fx-font-size: 14px;");
+        Label motsCountLabel = new Label(motCount + " mot" + (motCount > 1 ? "s" : ""));
+        motsCountLabel.setStyle(
+                "-fx-font-size: 12px;" +
+                        "-fx-text-fill: #95A5A6;"
+        );
+        HBox motsBox = new HBox(5, motsIcon, motsCountLabel);
+        motsBox.setAlignment(Pos.CENTER_LEFT);
+
+        int evalCount = evaluationServices.compterParCours(cours.getId_cours());
+        Label evalIcon = new Label("📋");
+        evalIcon.setStyle("-fx-font-size: 14px;");
+        Label evalCountLabel = new Label(evalCount + " éval" + (evalCount > 1 ? "s" : ""));
+        evalCountLabel.setStyle(
+                "-fx-font-size: 12px;" +
+                        "-fx-text-fill: #95A5A6;"
+        );
+        HBox evalBox = new HBox(5, evalIcon, evalCountLabel);
+        evalBox.setAlignment(Pos.CENTER_LEFT);
+
+        HBox statsBox = new HBox(20);
+        statsBox.getChildren().addAll(motsBox, evalBox);
+
+        // ===== BOUTON COMMENCER MODERNE =====
+        Button commencerBtn = new Button("Commencer l'apprentissage");
+        commencerBtn.setMaxWidth(Double.MAX_VALUE);
+        commencerBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #7B2FF7, #9F5FF7);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 30;" +
+                        "-fx-padding: 12 20;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(123,47,247,0.3), 10, 0, 0, 3);" +
+                        "-fx-border-color: rgba(255,255,255,0.2);" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 30;"
+        );
+
+        // Effet de survol pour le bouton
+        commencerBtn.setOnMouseEntered(e -> {
+            commencerBtn.setStyle(
+                    "-fx-background-color: linear-gradient(to right, #6A1FF7, #8A4FF7);" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 30;" +
+                            "-fx-padding: 12 20;" +
+                            "-fx-font-size: 14px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-cursor: hand;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(123,47,247,0.5), 15, 0, 0, 5);" +
+                            "-fx-border-color: rgba(255,255,255,0.3);" +
+                            "-fx-border-width: 1;" +
+                            "-fx-border-radius: 30;" +
+                            "-fx-scale-x: 1.02;" +
+                            "-fx-scale-y: 1.02;"
+            );
+        });
+
+        commencerBtn.setOnMouseExited(e -> {
+            commencerBtn.setStyle(
+                    "-fx-background-color: linear-gradient(to right, #7B2FF7, #9F5FF7);" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 30;" +
+                            "-fx-padding: 12 20;" +
+                            "-fx-font-size: 14px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-cursor: hand;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(123,47,247,0.3), 10, 0, 0, 3);" +
+                            "-fx-border-color: rgba(255,255,255,0.2);" +
+                            "-fx-border-width: 1;" +
+                            "-fx-border-radius: 30;"
+            );
+        });
 
         commencerBtn.setOnAction(e -> {
             System.out.println("🎓 Début du cours: " + cours.getTitre());
             afficherContenuSimplifie(cours);
         });
 
-        // Ajouter tous les éléments au contentContainer
-        contentContainer.getChildren().addAll(titleLabel, descriptionLabel, badgesBox, footer);
-        card.getChildren().addAll(imageContainer, contentContainer, commencerBtn);
+        // Assemblage final
+        contentContainer.getChildren().addAll(
+                titleBox,
+                descriptionLabel,
+                infoGrid,
+                statsBox
+        );
 
-        // Aligner le bouton au centre
-        VBox.setMargin(commencerBtn, new Insets(0, 20, 10, 20));
+        card.getChildren().addAll(imageContainer, contentContainer, commencerBtn);
+        VBox.setMargin(commencerBtn, new Insets(0, 20, 20, 20));
 
         return card;
+    }
+
+    // Méthodes d'aide pour les couleurs et icônes
+    private String getTypeColor(String type) {
+        if (type == null) return "#7B2FF7";
+
+        switch (type) {
+            case "Académique": return "#3498DB";
+            case "Social": return "#E91E63";
+            case "Autonomie": return "#2ECC71";
+            case "Créativité": return "#F39C12";
+            default: return "#7B2FF7";
+        }
+    }
+
+    private String getNiveauColor(String niveau) {
+        if (niveau == null) return "#7B2FF7";
+
+        switch (niveau) {
+            case "Débutant": return "#2ECC71";
+            case "Intermédiaire": return "#F39C12";
+            case "Avancé": return "#E74C3C";
+            default: return "#7B2FF7";
+        }
+    }
+
+    private String getNiveauIcon(String niveau) {
+        if (niveau == null) return "📊";
+
+        switch (niveau) {
+            case "Débutant": return "🌱";
+            case "Intermédiaire": return "📈";
+            case "Avancé": return "🚀";
+            default: return "📊";
+        }
     }
 
     // Styles pour les badges de type
