@@ -78,20 +78,48 @@ public class UserFormController {
             roleCombo.setValue(user.getRole());
             statusCombo.setValue(user.getStatus());
             this.photoUrl = user.getPhotoUrl();
+
+            // Afficher la photo si elle existe
             if (photoUrl != null && !photoUrl.isEmpty()) {
-                File photoFile = new File(photoUrl.replaceFirst("/", ""));
-                if (photoFile.exists()) {
-                    photoPreview.setImage(new Image(photoFile.toURI().toString()));
-                }
+                loadPhotoPreview(photoUrl);
             }
         } else {
             this.user = new User();
         }
     }
 
+    // Ajoute cette méthode pour charger la photo
+    private void loadPhotoPreview(String photoPath) {
+        try {
+            String cleanPath = photoPath.replaceFirst("^/", "");
+            File photoFile = new File(cleanPath);
+            if (photoFile.exists()) {
+                Image image = new Image(photoFile.toURI().toString());
+                photoPreview.setImage(image);
+                System.out.println("✅ Photo chargée: " + cleanPath);
+            } else {
+                System.out.println("⚠️ Fichier photo non trouvé: " + cleanPath);
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Erreur chargement photo: " + e.getMessage());
+        }
+    }
     @FXML
     private void save() {
         if (isValid()) {
+            // Vérifier si l'email existe déjà (sauf pour l'utilisateur en cours d'édition)
+            if (!editMode && userService.existsByEmail(emailField.getText())) {
+                errorLabel.setText("Cet email est déjà utilisé");
+                return;
+            }
+
+            // Pour l'édition, vérifier si l'email a changé et existe déjà
+            if (editMode && user != null && !user.getEmail().equals(emailField.getText())
+                    && userService.existsByEmail(emailField.getText())) {
+                errorLabel.setText("Cet email est déjà utilisé par un autre utilisateur");
+                return;
+            }
+
             user.setName(nameField.getText());
             user.setEmail(emailField.getText());
             user.setPhoneNumber(phoneField.getText());
@@ -99,6 +127,7 @@ public class UserFormController {
             user.setStatus(statusCombo.getValue());
             user.setPhotoUrl(photoUrl);
 
+            // Gestion du mot de passe
             if (passwordField.getText() != null && !passwordField.getText().isEmpty()) {
                 user.setPassword(passwordField.getText());
             } else if (!editMode && user.getId() == null) {
@@ -107,10 +136,22 @@ public class UserFormController {
             }
 
             try {
-                userService.saveUser(user);
-                close();
+                User savedUser = userService.saveUser(user);
+                if (savedUser != null) {
+                    // Message de succès
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Succès");
+                    alert.setHeaderText(null);
+                    alert.setContentText(editMode ? "Utilisateur modifié avec succès!" : "Utilisateur ajouté avec succès!");
+                    alert.showAndWait();
+
+                    close();
+                } else {
+                    errorLabel.setText("Erreur lors de la sauvegarde");
+                }
             } catch (Exception e) {
                 errorLabel.setText("Erreur lors de la sauvegarde: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -142,6 +183,10 @@ public class UserFormController {
 
     @FXML
     private void close() {
+        // Important: Rafraîchir la liste des utilisateurs avant de recharger la vue
+        dashboardController.refreshUserList();
+
+        // Recharger la vue UserManagement
         dashboardController.loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs",
                 "Gérez les membres de la plateforme");
     }
@@ -180,4 +225,5 @@ public class UserFormController {
 
         return true;
     }
+
 }

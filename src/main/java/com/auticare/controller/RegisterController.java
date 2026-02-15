@@ -6,31 +6,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Component
-@Scope("prototype")
 public class RegisterController {
 
-    @FXML
-    private TextField nameField;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private TextField phoneField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private PasswordField confirmPasswordField;
+    @FXML private TextField nameField;
+    @FXML private TextField emailField;
+    @FXML private TextField phoneField;
+    @FXML private PasswordField passwordField;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private Button btnRegister;
+    @FXML private Label errorLabel;
 
     @Autowired
     private UserService userService;
@@ -40,68 +33,75 @@ public class RegisterController {
 
     @FXML
     private void handleRegister() {
-        String name = nameField.getText();
-        String email = emailField.getText();
-        String phone = phoneField.getText();
-        String password = passwordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
+        if (validateInput()) {
+            // Vérifier si l'email existe déjà
+            if (userService.existsByEmail(emailField.getText())) {
+                showError("Cet email est déjà utilisé");
+                return;
+            }
 
-        if (name == null || name.trim().isEmpty() ||
-                email == null || email.trim().isEmpty() ||
-                phone == null || phone.trim().isEmpty() ||
-                password == null || password.trim().isEmpty()) {
+            // Créer nouvel utilisateur
+            User user = new User();
+            user.setName(nameField.getText());
+            user.setEmail(emailField.getText());
+            user.setPhoneNumber(phoneField.getText());
+            user.setPassword(passwordField.getText());
+            user.setRole("Parent"); // Rôle par défaut
+            user.setStatus("En attente"); // Statut par défaut
+            user.setRegistrationDate(LocalDate.now());
 
-            showAlert(Alert.AlertType.WARNING, "Champs manquants", "Veuillez remplir tous les champs obligatoires.");
-            return;
-        }
-
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            showAlert(Alert.AlertType.WARNING, "Format Email invalide", "Veuillez saisir un email valide.");
-            return;
-        }
-
-        if (password.length() < 6) {
-            showAlert(Alert.AlertType.WARNING, "Mot de passe trop court",
-                    "Le mot de passe doit contenir au moins 6 caractères.");
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            showAlert(Alert.AlertType.WARNING, "Mots de passe non identiques",
-                    "Les deux mots de passe ne correspondent pas.");
-            return;
-        }
-
-        if (userService.existsByEmail(email)) {
-            showAlert(Alert.AlertType.WARNING, "Email déjà utilisé", "Cet email est déjà associé à un compte.");
-            return;
-        }
-
-        try {
-            User newUser = new User();
-            newUser.setName(name);
-            newUser.setEmail(email);
-            newUser.setPhoneNumber(phone);
-            newUser.setPassword(password); // Note: Should hash password in production
-            newUser.setRole("USER");
-            newUser.setStatus("Actif");
-
-            userService.saveUser(newUser);
-
-            showAlert(Alert.AlertType.INFORMATION, "Succès",
-                    "Compte créé avec succès ! Vous pouvez maintenant vous connecter.");
-            handleBackToLogin();
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Erreur",
-                    "Une erreur est survenue lors de la création du compte : " + e.getMessage());
+            try {
+                userService.saveUser(user);
+                showSuccess("Compte créé avec succès! Veuillez vous connecter.");
+                handleBackToLogin();
+            } catch (Exception e) {
+                showError("Erreur lors de la création du compte: " + e.getMessage());
+            }
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
+    private boolean validateInput() {
+        if (nameField.getText().isEmpty()) {
+            showError("Le nom est requis");
+            return false;
+        }
+        if (emailField.getText().isEmpty()) {
+            showError("L'email est requis");
+            return false;
+        }
+        if (passwordField.getText().isEmpty()) {
+            showError("Le mot de passe est requis");
+            return false;
+        }
+        if (!passwordField.getText().equals(confirmPasswordField.getText())) {
+            showError("Les mots de passe ne correspondent pas");
+            return false;
+        }
+        if (passwordField.getText().length() < 6) {
+            showError("Le mot de passe doit contenir au moins 6 caractères");
+            return false;
+        }
+        return true;
+    }
+
+    private void showError(String message) {
+        if (errorLabel != null) {
+            errorLabel.setText(message);
+            errorLabel.setVisible(true);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        }
+    }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès");
         alert.setHeaderText(null);
-        alert.setContentText(content);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 
@@ -112,10 +112,9 @@ public class RegisterController {
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
 
-            Stage stage = (Stage) nameField.getScene().getWindow();
+            Stage stage = (Stage) btnRegister.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("AutiCare - Login");
-            stage.show();
+            stage.setTitle("AutiCare - Connexion");
         } catch (IOException e) {
             e.printStackTrace();
         }

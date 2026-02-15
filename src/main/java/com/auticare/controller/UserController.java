@@ -50,7 +50,7 @@ public class UserController {
             model.addAttribute("users", userService.getAllUsers());
             return "users";
         }
-        userService.saveUser(user);
+        userService.updateUser(user);
         return "redirect:/users";
     }
 

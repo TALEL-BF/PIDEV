@@ -40,7 +40,7 @@ public class UserRestController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         user.setId(id);
-        User updatedUser = userService.saveUser(user);
+        User updatedUser = userService.updateUser(user);
         return ResponseEntity.ok(updatedUser);
     }
 

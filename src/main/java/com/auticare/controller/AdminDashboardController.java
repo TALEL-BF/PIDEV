@@ -14,13 +14,12 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URL;
 
 @Component
-@Scope("prototype")
 public class AdminDashboardController {
 
     @FXML
@@ -59,21 +58,61 @@ public class AdminDashboardController {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
+    // Référence au contrôleur UserFxController pour rafraîchir la liste
+    private UserFxController currentUserFxController;
+
     @FXML
     public void initialize() {
-        // Load User Management as default for Admin
-        loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
-        updateSidebarStyle(btnUsers);
-        setupAdminProfile();
+        System.out.println("=== AdminDashboardController.initialize() ===");
+
+        try {
+            // Vérifier si UserManagement.fxml existe
+            URL fxmlUrl = getClass().getResource("/fxml/UserManagement.fxml");
+            System.out.println("URL de UserManagement.fxml: " + fxmlUrl);
+
+            if (fxmlUrl == null) {
+                System.err.println("ERREUR: UserManagement.fxml n'est pas trouvé!");
+                pageTitle.setText("ERREUR");
+                pageSubtitle.setText("Fichier UserManagement.fxml manquant");
+                Label errorLabel = new Label("Le fichier /fxml/UserManagement.fxml est introuvable.\n" +
+                        "Vérifiez qu'il existe dans src/main/resources/fxml/");
+                errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+                contentArea.getChildren().add(errorLabel);
+                return;
+            }
+
+            // Essayer de charger UserManagement
+            loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
+            updateSidebarStyle(btnUsers);
+            setupAdminProfile();
+
+            System.out.println("Initialisation terminée avec succès!");
+
+        } catch (Exception e) {
+            System.err.println("Exception dans initialize(): " + e.getMessage());
+            e.printStackTrace();
+
+            // Afficher l'erreur dans l'interface
+            pageTitle.setText("Erreur");
+            pageSubtitle.setText(e.getMessage());
+            Label errorLabel = new Label("Erreur: " + e.toString());
+            errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px; -fx-wrap-text: true;");
+            contentArea.getChildren().add(errorLabel);
+        }
     }
 
     private void setupAdminProfile() {
-        com.auticare.entity.User user = SessionManager.getInstance().getCurrentUser();
-        if (user != null) {
-            String roleStr = user.getRole() != null ? user.getRole() : "ADMINISTRATEUR";
-            adminNameLabel.setText(user.getName());
-            adminRoleLabel.setText(roleStr);
-            userRoleSidebar.setText(roleStr);
+        try {
+            com.auticare.entity.User user = SessionManager.getInstance().getCurrentUser();
+            if (user != null) {
+                String roleStr = user.getRole() != null ? user.getRole() : "ADMINISTRATEUR";
+                adminNameLabel.setText(user.getName());
+                adminRoleLabel.setText(roleStr);
+                userRoleSidebar.setText(roleStr);
+                System.out.println("Profil admin chargé: " + user.getName());
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur dans setupAdminProfile: " + e.getMessage());
         }
     }
 
@@ -81,8 +120,8 @@ public class AdminDashboardController {
     private void switchView(ActionEvent event) {
         Button btn = (Button) event.getSource();
         String text = btn.getText();
+        System.out.println("switchView: " + text);
 
-        // Update active class
         updateSidebarStyle(btn);
 
         if (text.equals("Gestion Utilisateur")) {
@@ -102,9 +141,6 @@ public class AdminDashboardController {
         for (Button b : buttons) {
             if (b != null) {
                 b.getStyleClass().removeAll("sidebar-btn-active", "sidebar-sub-btn-active");
-                // Reset to base class based on ID or current state if needed
-                // But for now, just clearing the active ones is enough if we rely on FXML base
-                // classes
             }
         }
         if (activeBtn != null) {
@@ -133,13 +169,43 @@ public class AdminDashboardController {
 
     public void loadView(String fxmlPath, String title, String subtitle) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            System.out.println("Tentative de chargement: " + fxmlPath);
+
+            URL fxmlUrl = getClass().getResource(fxmlPath);
+            System.out.println("URL complète: " + fxmlUrl);
+
+            if (fxmlUrl == null) {
+                throw new IOException("Fichier non trouvé: " + fxmlPath);
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             loader.setControllerFactory(applicationContext::getBean);
             Node view = loader.load();
+
+            // Si c'est UserManagement.fxml, garder une référence au contrôleur
+            if (fxmlPath.contains("UserManagement")) {
+                currentUserFxController = loader.getController();
+                System.out.println("✅ Référence à UserFxController sauvegardée");
+            }
+
             setContent(view, title, subtitle);
-        } catch (IOException e) {
+            System.out.println("✅ Chargé avec succès: " + fxmlPath);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur chargement " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
             loadPlaceholder(title + " (Error loading FXML)");
+        }
+    }
+
+    // Méthode pour rafraîchir la liste des utilisateurs
+    public void refreshUserList() {
+        System.out.println("🔄 Rafraîchissement de la liste des utilisateurs...");
+        if (currentUserFxController != null) {
+            currentUserFxController.refreshList();
+        } else {
+            System.out.println("⚠️ currentUserFxController est null - rechargement de la vue");
+            loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
         }
     }
 

@@ -94,24 +94,6 @@
                 <Insets bottom="30.0" left="40.0" right="40.0" top="40.0" />
             </padding>
             <children>
-
-                <!-- Header -->
-                <HBox alignment="CENTER_LEFT">
-                    <children>
-                        <VBox>
-                            <children>
-                                <Label styleClass="page-title" text="Gestion des Utilisateurs" />
-                                <Label styleClass="page-subtitle"
-                                    text="Gérez les apprenants, parents et professionnels AutiCare" />
-                            </children>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button fx:id="btnAddUser" mnemonicParsing="false"
-                            onAction="#showAddUserParams" styleClass="btn-add-user"
-                            text="+  Nouvel utilisateur" />
-                    </children>
-                </HBox>
-
                 <!-- Filters Bar -->
                 <HBox alignment="CENTER_LEFT" spacing="15.0"
                     style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;">
