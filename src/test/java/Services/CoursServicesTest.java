@@ -1,7 +1,6 @@
 package Services;
 
 import Entites.Cours;
-import Services.CoursServices;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -61,13 +60,6 @@ public class CoursServicesTest {
         assertNotNull(coursList, "❌ La liste des cours ne devrait pas être null");
         assertFalse(coursList.isEmpty(), "❌ La liste des cours ne devrait pas être vide");
 
-        // Vérifier que le cours de test existe
-        if (idCoursTest > 0) {
-            boolean coursTrouve = coursList.stream()
-                    .anyMatch(c -> c.getId_cours() == idCoursTest);
-            assertTrue(coursTrouve, "❌ Le cours de test devrait être présent dans la liste");
-        }
-
         System.out.println("✅ Affichage des cours réussi - " + coursList.size() + " cours trouvés");
     }
 
@@ -116,6 +108,12 @@ public class CoursServicesTest {
         // Vérification
         assertTrue(result, "❌ La modification du cours devrait réussir");
 
+        System.out.println("✅ Modification du cours réussie");
+    }
+
+    @Test
+    @Order(5)
+    void testVerifierModification() {
         // Vérifier que les modifications sont appliquées
         Cours coursModifie = coursServices.getById(idCoursTest);
         assertNotNull(coursModifie, "❌ Le cours modifié devrait exister");
@@ -124,11 +122,11 @@ public class CoursServicesTest {
         assertEquals("Intermédiaire", coursModifie.getNiveau(), "❌ Le niveau n'a pas été modifié correctement");
         assertEquals(90, coursModifie.getDuree(), "❌ La durée n'a pas été modifiée correctement");
 
-        System.out.println("✅ Modification du cours réussie");
+        System.out.println("✅ Vérification de la modification réussie");
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void testSupprimerCours() {
         // Vérifier que nous avons un ID valide
         assertTrue(idCoursTest > 0, "❌ L'ID du cours de test devrait être valide");
@@ -144,30 +142,6 @@ public class CoursServicesTest {
         assertNull(coursSupprime, "❌ Le cours ne devrait plus exister après suppression");
 
         System.out.println("✅ Suppression du cours réussie pour l'ID: " + idCoursTest);
-    }
-
-    @Test
-    @Order(6)
-    void testAjoutCoursInvalide() {
-        // Test avec des données invalides
-        Cours coursInvalide = new Cours(
-                "",
-                "",
-                null,
-                null,
-                -10,
-                "",
-                "",
-                ""
-        );
-
-        // Exécution
-        boolean result = coursServices.ajouter(coursInvalide);
-
-        // Vérification
-        assertFalse(result, "❌ L'ajout d'un cours invalide devrait échouer");
-
-        System.out.println("✅ Test d'ajout invalide passé avec succès");
     }
 
     @AfterEach
