@@ -83,8 +83,8 @@ public class EmploiFormController {
                 return false;
             }
 
-            // Years should be reasonable (e.g., between 2000 and 2100)
-            if (firstYear < 2000 || firstYear > 2100) {
+            // Years should be reasonable (e.g., between 2025 and 2100)
+            if (firstYear < 2025 || firstYear > 2100) {
                 return false;
             }
 
@@ -105,10 +105,10 @@ public class EmploiFormController {
 
 
         if (txtAnneeScolaire.getText().trim().isEmpty()) {
-            showError(errorAnneeScolaire, "L'année scolaire est requise (format: 2024-2025)", txtAnneeScolaire);
+            showError(errorAnneeScolaire, "L'année scolaire est requise (format: 2025-2026)", txtAnneeScolaire);
             isValid = false;
         } else if (!isValidAnneeScolaire(txtAnneeScolaire.getText().trim())) {
-            showError(errorAnneeScolaire, "Format invalide. Utilisez: ANNÉE-ANNÉE+1 (ex: 2024-2025)", txtAnneeScolaire);
+            showError(errorAnneeScolaire, "Format invalide. Utilisez: ANNÉE-ANNÉE+1 (ex: 2025-2026)", txtAnneeScolaire);
             isValid = false;
         }
 
