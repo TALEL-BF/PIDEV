@@ -19,11 +19,8 @@ import javafx.geometry.Pos;
 import javafx.util.StringConverter;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class EvaluationAjout implements Initializable {
 
@@ -44,7 +41,7 @@ public class EvaluationAjout implements Initializable {
 
     @FXML private TableView<Evaluation> questionsTable;
     @FXML private TableColumn<Evaluation, String> questionColumn;
-    @FXML private TableColumn<Evaluation, String> coursColumn;  // Nouvelle colonne pour le cours
+    @FXML private TableColumn<Evaluation, String> coursColumn;
     @FXML private TableColumn<Evaluation, String> choix1Column;
     @FXML private TableColumn<Evaluation, String> choix2Column;
     @FXML private TableColumn<Evaluation, String> choix3Column;
@@ -59,14 +56,16 @@ public class EvaluationAjout implements Initializable {
     private static final String STYLE_VALIDE = "-fx-border-color: #00C853; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
     private static final String STYLE_INVALIDE = "-fx-border-color: #D32F2F; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
 
+    // Patterns de validation
+    private static final Pattern CARACTERES_AUTORISES = Pattern.compile("^[a-zA-Z0-9\\s\\-',.!?()]+$");
+    private static final Pattern PONCTUATION_EXCESSIVE = Pattern.compile(".*[!?.,]{2,}.*");
+
     private EvaluationServices evaluationServices;
     private CoursServices coursServices;
     private ObservableList<Evaluation> questionsList;
     private ObservableList<Cours> coursList;
     private Integer coursFiltreId = null;
     private Evaluation questionEnModification = null;
-
-    // Map pour stocker tous les cours et les retrouver facilement
     private Map<Integer, Cours> coursMap = new HashMap<>();
 
     @Override
@@ -74,7 +73,6 @@ public class EvaluationAjout implements Initializable {
         evaluationServices = new EvaluationServices();
         coursServices = new CoursServices();
 
-        // Récupérer l'ID du cours depuis les paramètres
         Map<String, String> params = Navigation.getParameters();
         if (params.containsKey("coursId")) {
             try {
@@ -91,13 +89,9 @@ public class EvaluationAjout implements Initializable {
         setupValidation();
         setupListeners();
 
-        // Ajouter les labels d'erreur après l'initialisation
         javafx.application.Platform.runLater(this::addErrorLabels);
     }
 
-    /**
-     * Ajoute les labels d'erreur après chaque champ
-     */
     private void addErrorLabels() {
         addErrorLabelAfter(questionArea, "Question");
         addErrorLabelAfter(choix1Field, "Choix 1");
@@ -108,17 +102,12 @@ public class EvaluationAjout implements Initializable {
         addErrorLabelAfter(coursCombo, "Cours");
     }
 
-    /**
-     * Ajoute un label d'erreur après un champ spécifique
-     */
     private void addErrorLabelAfter(Control field, String fieldName) {
-        // Créer le label d'erreur
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: #D32F2F; -fx-font-size: 11px; -fx-wrap-text: true;");
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
 
-        // Trouver le parent du champ
         Node parent = field.getParent();
         if (parent instanceof VBox) {
             VBox vbox = (VBox) parent;
@@ -129,7 +118,6 @@ public class EvaluationAjout implements Initializable {
                 vbox.getChildren().add(errorLabel);
             }
         } else if (parent instanceof HBox) {
-            // Si le champ est dans un HBox, remonter au VBox parent
             Node grandParent = parent.getParent();
             if (grandParent instanceof VBox) {
                 VBox vbox = (VBox) grandParent;
@@ -142,13 +130,9 @@ public class EvaluationAjout implements Initializable {
             }
         }
 
-        // Stocker le label dans la map
         errorLabels.put(field, errorLabel);
     }
 
-    /**
-     * Affiche un message d'erreur pour un champ
-     */
     private void showError(Control field, String message) {
         Label errorLabel = errorLabels.get(field);
         if (errorLabel != null) {
@@ -158,9 +142,6 @@ public class EvaluationAjout implements Initializable {
         }
     }
 
-    /**
-     * Cache le message d'erreur pour un champ
-     */
     private void hideError(Control field) {
         Label errorLabel = errorLabels.get(field);
         if (errorLabel != null) {
@@ -169,9 +150,6 @@ public class EvaluationAjout implements Initializable {
         }
     }
 
-    /**
-     * Configure la validation en temps réel
-     */
     private void setupValidation() {
         // Validation de la question
         questionArea.textProperty().addListener((obs, old, newValue) -> {
@@ -183,38 +161,10 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-        // Validation du choix 1
-        choix1Field.textProperty().addListener((obs, old, newValue) -> {
-            validerChoix1();
-            updateBonneReponseCombo();
-        });
-        choix1Field.focusedProperty().addListener((obs, old, newValue) -> {
-            if (!newValue) {
-                validerChoix1();
-            }
-        });
-
-        // Validation du choix 2
-        choix2Field.textProperty().addListener((obs, old, newValue) -> {
-            validerChoix2();
-            updateBonneReponseCombo();
-        });
-        choix2Field.focusedProperty().addListener((obs, old, newValue) -> {
-            if (!newValue) {
-                validerChoix2();
-            }
-        });
-
-        // Validation du choix 3
-        choix3Field.textProperty().addListener((obs, old, newValue) -> {
-            validerChoix3();
-            updateBonneReponseCombo();
-        });
-        choix3Field.focusedProperty().addListener((obs, old, newValue) -> {
-            if (!newValue) {
-                validerChoix3();
-            }
-        });
+        // Validation des choix
+        setupChoixValidation(choix1Field, "Choix 1");
+        setupChoixValidation(choix2Field, "Choix 2");
+        setupChoixValidation(choix3Field, "Choix 3");
 
         // Validation de la bonne réponse
         bonneReponseCombo.valueProperty().addListener((obs, old, newValue) -> {
@@ -238,99 +188,186 @@ public class EvaluationAjout implements Initializable {
     }
 
     /**
+     * Configure la validation pour un champ de choix
+     */
+    private void setupChoixValidation(TextField field, String nomChamp) {
+        // Validation à chaque frappe
+        field.textProperty().addListener((obs, old, newValue) -> {
+            if (field.isFocused()) {
+                // Validation en temps réel avec délai pour éviter trop de calculs
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(300));
+                pause.setOnFinished(e -> {
+                    validerChoix(field, nomChamp);
+                    updateBonneReponseCombo();
+                });
+                pause.play();
+            }
+        });
+
+        // Validation à la perte de focus
+        field.focusedProperty().addListener((obs, old, newValue) -> {
+            if (!newValue) {
+                validerChoix(field, nomChamp);
+                updateBonneReponseCombo();
+            }
+        });
+    }
+
+    /**
      * Valide la question
      */
     private boolean validerQuestion() {
         String question = questionArea.getText();
+
         if (question == null || question.trim().isEmpty()) {
             questionArea.setStyle(STYLE_INVALIDE);
             showError(questionArea, "La question est obligatoire");
             return false;
-        } else if (question.length() < 5) {
+        }
+
+        String trimmed = question.trim();
+
+        // Vérifier le nombre de mots
+        String[] mots = trimmed.split("\\s+");
+        if (mots.length < 3) {
+            questionArea.setStyle(STYLE_INVALIDE);
+            showError(questionArea, "La question doit contenir au moins 3 mots (actuellement: " + mots.length + " mot(s))");
+            return false;
+        }
+
+        if (trimmed.length() < 5) {
             questionArea.setStyle(STYLE_INVALIDE);
             showError(questionArea, "La question doit contenir au moins 5 caractères");
             return false;
-        } else if (question.length() > 500) {
-            questionArea.setStyle(STYLE_INVALIDE);
-            showError(questionArea, "La question ne doit pas dépasser 500 caractères");
-            return false;
-        } else {
-            questionArea.setStyle(STYLE_VALIDE);
-            hideError(questionArea);
-            return true;
         }
+
+        // Vérifier que la question se termine par un point d'interrogation
+        if (!trimmed.endsWith("?")) {
+            questionArea.setStyle(STYLE_INVALIDE);
+            showError(questionArea, "La question doit se terminer par un point d'interrogation (?)");
+            return false;
+        }
+
+        questionArea.setStyle(STYLE_VALIDE);
+        hideError(questionArea);
+        return true;
     }
 
     /**
      * Valide le choix 1
      */
     private boolean validerChoix1() {
-        String choix = choix1Field.getText();
-        if (choix == null || choix.trim().isEmpty()) {
-            choix1Field.setStyle(STYLE_INVALIDE);
-            showError(choix1Field, "Le choix 1 est obligatoire");
-            return false;
-        } else if (choix.length() < 1) {
-            choix1Field.setStyle(STYLE_INVALIDE);
-            showError(choix1Field, "Le choix doit contenir au moins 1 caractère");
-            return false;
-        } else if (choix.length() > 200) {
-            choix1Field.setStyle(STYLE_INVALIDE);
-            showError(choix1Field, "Le choix ne doit pas dépasser 200 caractères");
-            return false;
-        } else {
-            choix1Field.setStyle(STYLE_VALIDE);
-            hideError(choix1Field);
-            return true;
-        }
+        return validerChoix(choix1Field, "Choix 1");
     }
 
     /**
      * Valide le choix 2
      */
     private boolean validerChoix2() {
-        String choix = choix2Field.getText();
-        if (choix == null || choix.trim().isEmpty()) {
-            choix2Field.setStyle(STYLE_INVALIDE);
-            showError(choix2Field, "Le choix 2 est obligatoire");
-            return false;
-        } else if (choix.length() < 1) {
-            choix2Field.setStyle(STYLE_INVALIDE);
-            showError(choix2Field, "Le choix doit contenir au moins 1 caractère");
-            return false;
-        } else if (choix.length() > 200) {
-            choix2Field.setStyle(STYLE_INVALIDE);
-            showError(choix2Field, "Le choix ne doit pas dépasser 200 caractères");
-            return false;
-        } else {
-            choix2Field.setStyle(STYLE_VALIDE);
-            hideError(choix2Field);
-            return true;
-        }
+        return validerChoix(choix2Field, "Choix 2");
     }
 
     /**
      * Valide le choix 3
      */
     private boolean validerChoix3() {
-        String choix = choix3Field.getText();
+        return validerChoix(choix3Field, "Choix 3");
+    }
+
+    /**
+     * Méthode générique de validation d'un choix
+     */
+    private boolean validerChoix(TextField field, String nomChamp) {
+        String choix = field.getText();
+        List<String> erreurs = new ArrayList<>();
+
+        // 1. Champ obligatoire
         if (choix == null || choix.trim().isEmpty()) {
-            choix3Field.setStyle(STYLE_INVALIDE);
-            showError(choix3Field, "Le choix 3 est obligatoire");
+            field.setStyle(STYLE_INVALIDE);
+            showError(field, nomChamp + " est obligatoire");
             return false;
-        } else if (choix.length() < 1) {
-            choix3Field.setStyle(STYLE_INVALIDE);
-            showError(choix3Field, "Le choix doit contenir au moins 1 caractère");
-            return false;
-        } else if (choix.length() > 200) {
-            choix3Field.setStyle(STYLE_INVALIDE);
-            showError(choix3Field, "Le choix ne doit pas dépasser 200 caractères");
-            return false;
-        } else {
-            choix3Field.setStyle(STYLE_VALIDE);
-            hideError(choix3Field);
-            return true;
         }
+
+        String trimmed = choix.trim();
+
+        // 2. Longueur minimale (2 caractères)
+        if (trimmed.length() < 2) {
+            erreurs.add(nomChamp + " doit contenir au moins 2 caractères (actuellement: " + trimmed.length() + ")");
+        }
+
+        // 3. Longueur maximale (100 caractères)
+        if (trimmed.length() > 100) {
+            erreurs.add(nomChamp + " ne doit pas dépasser 100 caractères (actuellement: " + trimmed.length() + ")");
+        }
+
+        // 4. Caractères autorisés uniquement (lettres, chiffres, ponctuation de base)
+        if (!CARACTERES_AUTORISES.matcher(trimmed).matches()) {
+            erreurs.add(nomChamp + " ne doit contenir que des lettres, chiffres et ponctuation de base (.,!?()'-)");
+        }
+
+        // 5. Pas de ponctuation excessive ("!!", "..", "??", etc.)
+        if (PONCTUATION_EXCESSIVE.matcher(trimmed).matches()) {
+            erreurs.add(nomChamp + " ne doit pas contenir de ponctuation répétée (ex: '!!', '..', '??')");
+        }
+
+        // 6. Vérification que les choix ne sont pas identiques entre eux
+        List<String> erreursDoublons = verifierDoublonsChoix(trimmed, field);
+        erreurs.addAll(erreursDoublons);
+
+        if (!erreurs.isEmpty()) {
+            field.setStyle(STYLE_INVALIDE);
+            showError(field, erreurs.get(0)); // Afficher la première erreur
+            return false;
+        }
+
+        field.setStyle(STYLE_VALIDE);
+        hideError(field);
+        return true;
+    }
+
+    /**
+     * Vérifie que les choix ne sont pas identiques entre eux
+     */
+    private List<String> verifierDoublonsChoix(String valeur, TextField fieldActuel) {
+        List<String> erreurs = new ArrayList<>();
+
+        String choix1 = choix1Field.getText() != null ? choix1Field.getText().trim() : "";
+        String choix2 = choix2Field.getText() != null ? choix2Field.getText().trim() : "";
+        String choix3 = choix3Field.getText() != null ? choix3Field.getText().trim() : "";
+
+        // Compter combien de fois la valeur apparaît (ignorer les champs vides)
+        int occurrences = 0;
+
+        if (!choix1.isEmpty() && valeur.equalsIgnoreCase(choix1)) occurrences++;
+        if (!choix2.isEmpty() && valeur.equalsIgnoreCase(choix2)) occurrences++;
+        if (!choix3.isEmpty() && valeur.equalsIgnoreCase(choix3)) occurrences++;
+
+        // Si plus d'une occurrence, il y a un doublon
+        if (occurrences > 1) {
+            // Déterminer quels choix sont en conflit
+            List<String> conflits = new ArrayList<>();
+            if (!choix1.isEmpty() && valeur.equalsIgnoreCase(choix1) && fieldActuel != choix1Field) {
+                conflits.add("Choix 1");
+            }
+            if (!choix2.isEmpty() && valeur.equalsIgnoreCase(choix2) && fieldActuel != choix2Field) {
+                conflits.add("Choix 2");
+            }
+            if (!choix3.isEmpty() && valeur.equalsIgnoreCase(choix3) && fieldActuel != choix3Field) {
+                conflits.add("Choix 3");
+            }
+
+            if (!conflits.isEmpty()) {
+                String message = "Ce choix ne peut pas être identique à ";
+                if (conflits.size() == 1) {
+                    message += conflits.get(0);
+                } else {
+                    message += String.join(" et ", conflits);
+                }
+                erreurs.add(message);
+            }
+        }
+
+        return erreurs;
     }
 
     /**
@@ -338,15 +375,27 @@ public class EvaluationAjout implements Initializable {
      */
     private boolean validerBonneReponse() {
         String bonneReponse = bonneReponseCombo.getValue();
+
         if (bonneReponse == null || bonneReponse.isEmpty()) {
             bonneReponseCombo.setStyle(STYLE_INVALIDE);
             showError(bonneReponseCombo, "Veuillez sélectionner la bonne réponse");
             return false;
-        } else {
-            bonneReponseCombo.setStyle(STYLE_VALIDE);
-            hideError(bonneReponseCombo);
-            return true;
         }
+
+        // Vérifier que la bonne réponse correspond à l'un des choix
+        String choix1 = choix1Field.getText().trim();
+        String choix2 = choix2Field.getText().trim();
+        String choix3 = choix3Field.getText().trim();
+
+        if (!bonneReponse.equals(choix1) && !bonneReponse.equals(choix2) && !bonneReponse.equals(choix3)) {
+            bonneReponseCombo.setStyle(STYLE_INVALIDE);
+            showError(bonneReponseCombo, "La bonne réponse doit correspondre à l'un des choix proposés");
+            return false;
+        }
+
+        bonneReponseCombo.setStyle(STYLE_VALIDE);
+        hideError(bonneReponseCombo);
+        return true;
     }
 
     /**
@@ -354,6 +403,7 @@ public class EvaluationAjout implements Initializable {
      */
     private boolean validerScore() {
         String scoreText = scoreField.getText();
+
         if (scoreText == null || scoreText.trim().isEmpty()) {
             scoreField.setStyle(STYLE_INVALIDE);
             showError(scoreField, "Le score est obligatoire");
@@ -415,7 +465,6 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void initializeComboBoxes() {
-        // Configuration du ComboBox de cours pour le formulaire
         coursCombo.setConverter(new StringConverter<Cours>() {
             @Override
             public String toString(Cours cours) {
@@ -436,7 +485,6 @@ public class EvaluationAjout implements Initializable {
         if (!choix3Field.getText().trim().isEmpty()) choix.add(choix3Field.getText().trim());
         bonneReponseCombo.setItems(choix);
 
-        // Si la valeur sélectionnée n'est plus dans la liste, la réinitialiser
         if (bonneReponseCombo.getValue() != null && !choix.contains(bonneReponseCombo.getValue())) {
             bonneReponseCombo.setValue(null);
             validerBonneReponse();
@@ -444,28 +492,17 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void initializeTable() {
-        // Configuration des colonnes
         questionColumn.setCellValueFactory(new PropertyValueFactory<>("question"));
 
-        // Configuration spéciale pour la colonne Cours - utilise coursMap pour trouver le cours
         coursColumn.setCellValueFactory(cellData -> {
             Evaluation evaluation = cellData.getValue();
             Cours cours = evaluation.getCours();
-
-            // Si le cours n'est pas directement associé, utiliser la map
             if (cours == null && evaluation.getId_cours() > 0) {
                 cours = coursMap.get(evaluation.getId_cours());
                 evaluation.setCours(cours);
             }
 
-            // Vérifier si cours n'est pas null avant d'accéder à ses méthodes
-            String coursInfo;
-            if (cours != null) {
-                coursInfo = cours.getTitre() + " (" + cours.getNiveau() + ")";
-            } else {
-                coursInfo = "Non assigné";
-            }
-
+            String coursInfo = (cours != null) ? cours.getTitre() + " (" + cours.getNiveau() + ")" : "Non assigné";
             return new SimpleStringProperty(coursInfo);
         });
 
@@ -513,13 +550,11 @@ public class EvaluationAjout implements Initializable {
         coursList = FXCollections.observableArrayList(cours);
         coursCombo.setItems(coursList);
 
-        // Remplir la map des cours pour un accès facile
         coursMap.clear();
         for (Cours c : cours) {
             coursMap.put(c.getId_cours(), c);
         }
 
-        // Configuration du filtre
         ObservableList<String> coursNoms = FXCollections.observableArrayList();
         coursNoms.add("📚 Tous les cours");
         for (Cours c : cours) {
@@ -528,7 +563,6 @@ public class EvaluationAjout implements Initializable {
         filterCoursCombo.setItems(coursNoms);
 
         if (coursFiltreId != null) {
-            // Sélectionner le cours dans le filtre
             for (String item : coursNoms) {
                 if (item.startsWith(coursFiltreId + " - ")) {
                     filterCoursCombo.setValue(item);
@@ -536,7 +570,6 @@ public class EvaluationAjout implements Initializable {
                 }
             }
 
-            // Sélectionner le cours dans le formulaire
             for (Cours c : cours) {
                 if (c.getId_cours() == coursFiltreId) {
                     coursCombo.setValue(c);
@@ -557,7 +590,6 @@ public class EvaluationAjout implements Initializable {
             questions = evaluationServices.getAll();
         }
 
-        // Charger les cours pour chaque question en utilisant la map
         for (Evaluation question : questions) {
             if (question.getCours() == null && question.getId_cours() > 0) {
                 Cours cours = coursMap.get(question.getId_cours());
@@ -571,7 +603,6 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void setupListeners() {
-        // Filtre par cours
         filterCoursCombo.setOnAction(e -> {
             String selected = filterCoursCombo.getValue();
             if (selected != null && !selected.equals("📚 Tous les cours")) {
@@ -586,16 +617,10 @@ public class EvaluationAjout implements Initializable {
             loadQuestions();
         });
 
-        // Bouton ajouter
         ajouterQuestionBtn.setOnAction(e -> ajouterQuestion());
-
-        // Bouton modifier
         modifierQuestionBtn.setOnAction(e -> modifierQuestion());
-
-        // Bouton annuler modification
         annulerModificationBtn.setOnAction(e -> annulerModification());
 
-        // Bouton retour
         retourButton.setOnAction(e -> {
             Navigation.navigateTo("coursaffichage.fxml", "Liste des cours");
         });
@@ -611,7 +636,7 @@ public class EvaluationAjout implements Initializable {
         try {
             Evaluation question = new Evaluation();
             question.setId_cours(coursCombo.getValue().getId_cours());
-            question.setCours(coursCombo.getValue()); // Associer le cours directement
+            question.setCours(coursCombo.getValue());
             question.setQuestion(questionArea.getText().trim());
             question.setChoix1(choix1Field.getText().trim());
             question.setChoix2(choix2Field.getText().trim());
@@ -626,7 +651,6 @@ public class EvaluationAjout implements Initializable {
                 clearForm();
                 loadQuestions();
 
-                // Mettre à jour le filtre si nécessaire
                 if (coursCombo.getValue() != null) {
                     String coursItem = coursCombo.getValue().getId_cours() + " - " + coursCombo.getValue().getTitre();
                     if (!filterCoursCombo.getItems().contains(coursItem)) {
@@ -645,7 +669,6 @@ public class EvaluationAjout implements Initializable {
     private void modifierEvaluation(Evaluation evaluation) {
         questionEnModification = evaluation;
 
-        // Remplir le formulaire
         coursCombo.setValue(evaluation.getCours());
         questionArea.setText(evaluation.getQuestion());
         choix1Field.setText(evaluation.getChoix1());
@@ -653,7 +676,6 @@ public class EvaluationAjout implements Initializable {
         choix3Field.setText(evaluation.getChoix3());
         scoreField.setText(String.valueOf(evaluation.getScore()));
 
-        // Valider tous les champs remplis
         validerQuestion();
         validerChoix1();
         validerChoix2();
@@ -661,12 +683,10 @@ public class EvaluationAjout implements Initializable {
         validerScore();
         validerCours();
 
-        // Mettre à jour la combo des bonnes réponses
         updateBonneReponseCombo();
         bonneReponseCombo.setValue(evaluation.getBonne_reponse());
         validerBonneReponse();
 
-        // Changer l'interface
         formTitleLabel.setText("✏️ Modifier la question");
         ajouterQuestionBtn.setVisible(false);
         ajouterQuestionBtn.setManaged(false);
@@ -687,7 +707,7 @@ public class EvaluationAjout implements Initializable {
             if (questionEnModification == null) return;
 
             questionEnModification.setId_cours(coursCombo.getValue().getId_cours());
-            questionEnModification.setCours(coursCombo.getValue()); // Mettre à jour le cours
+            questionEnModification.setCours(coursCombo.getValue());
             questionEnModification.setQuestion(questionArea.getText().trim());
             questionEnModification.setChoix1(choix1Field.getText().trim());
             questionEnModification.setChoix2(choix2Field.getText().trim());
@@ -714,7 +734,8 @@ public class EvaluationAjout implements Initializable {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
         alert.setHeaderText("Supprimer la question");
-        alert.setContentText("Voulez-vous vraiment supprimer cette question ?");
+        alert.setContentText("Voulez-vous vraiment supprimer cette question ?\n\n" +
+                "Question: " + evaluation.getQuestion());
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -723,7 +744,6 @@ public class EvaluationAjout implements Initializable {
                     showAlert(Alert.AlertType.INFORMATION, "Succès", "Question supprimée !");
                     loadQuestions();
 
-                    // Si on était en train de modifier cette question, annuler
                     if (questionEnModification != null && questionEnModification.getId_eval() == evaluation.getId_eval()) {
                         annulerModification();
                     }

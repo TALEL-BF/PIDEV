@@ -19,10 +19,10 @@ public class MainFX extends Application {
             System.out.println("Resource coursajout.fxml : " + getClass().getResource("/coursajout.fxml"));
             System.out.println("================================");
 
-            // Initialiser la navigation
+
             Navigation.setPrimaryStage(stage);
 
-            // Charger le fichier FXML
+
             Parent root = FXMLLoader.load(getClass().getResource("/coursaffichage.fxml"));
             Scene scene = new Scene(root);
             stage.setScene(scene);
@@ -33,7 +33,7 @@ public class MainFX extends Application {
             System.err.println("❌ Erreur au démarrage : " + e.getMessage());
             e.printStackTrace();
 
-            // Afficher une alerte
+
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                     javafx.scene.control.Alert.AlertType.ERROR
             );

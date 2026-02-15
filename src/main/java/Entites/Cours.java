@@ -9,16 +9,13 @@ public class Cours {
     private String niveau;
     private int duree;
     private String image;
+    private String mots;
+    private String images_mots;
 
-    // NOUVEAUX ATTRIBUTS (sans audio)
-    private String mots;           // Liste de mots séparés par ;
-    private String images_mots;    // Liste des images séparées par ;
 
-    // ================== Constructeur vide ==================
     public Cours() {
     }
 
-    // ================== Constructeur complet ==================
     public Cours(int id_cours, String titre, String description,
                  String type_cours, String niveau,
                  int duree, String image, String mots, String images_mots) {
@@ -33,7 +30,7 @@ public class Cours {
         this.images_mots = images_mots;
     }
 
-    // ================== Constructeur sans id (pour ajout) ==================
+
     public Cours(String titre, String description,
                  String type_cours, String niveau,
                  int duree, String image, String mots, String images_mots) {
@@ -47,7 +44,7 @@ public class Cours {
         this.images_mots = images_mots;
     }
 
-    // ================== Getters & Setters ==================
+
     public int getId_cours() { return id_cours; }
     public void setId_cours(int id_cours) { this.id_cours = id_cours; }
 
@@ -76,7 +73,7 @@ public class Cours {
     public String getImages_mots() { return images_mots; }
     public void setImages_mots(String images_mots) { this.images_mots = images_mots; }
 
-    // ================== toString ==================
+
     @Override
     public String toString() {
         return "Cours{" +
