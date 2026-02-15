@@ -13,9 +13,9 @@
 <?import javafx.scene.shape.Circle?>
 
 <BorderPane fx:id="mainContainer" prefHeight="800.0" prefWidth="1200.0" styleClass="main-bg"
-    stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/17"
-    xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.auticare.controller.AdminDashboardController">
+            stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.auticare.controller.AdminDashboardController">
     <left>
         <VBox prefWidth="260.0" styleClass="sidebar" BorderPane.alignment="CENTER">
             <children>
@@ -27,7 +27,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="12.0">
                             <children>
                                 <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true"
-                                    preserveRatio="true">
+                                           preserveRatio="true">
                                     <image>
                                         <Image url="@../images/logo.png" />
                                     </image>
@@ -36,7 +36,7 @@
                                     <children>
                                         <Label styleClass="sidebar-logo-text" text="AutiCare" />
                                         <Label styleClass="sidebar-label"
-                                            text="Plateforme éducative" />
+                                               text="Plateforme éducative" />
                                     </children>
                                 </VBox>
                             </children>
@@ -50,34 +50,34 @@
                     </padding>
                     <children>
                         <Label
-                            style="-fx-text-fill: rgba(255, 255, 255, 0.4); -fx-font-size: 10px; -fx-font-weight: bold;"
-                            text="MENU PRINCIPAL" />
+                                style="-fx-text-fill: rgba(255, 255, 255, 0.4); -fx-font-size: 10px; -fx-font-weight: bold;"
+                                text="MENU PRINCIPAL" />
                     </children>
                 </VBox>
 
                 <VBox spacing="2.0" VBox.vgrow="ALWAYS">
                     <children>
                         <Button fx:id="btnUsers" mnemonicParsing="false"
-                            onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
-                            text="Gestion Utilisateur" />
+                                onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
+                                text="Gestion Utilisateur" />
                         <Button fx:id="btnCourses" mnemonicParsing="false"
-                            onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
-                            text="Gestion Cours &amp; Évaluations" />
+                                onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
+                                text="Gestion Cours &amp; Évaluations" />
                         <Button fx:id="btnEmploi" mnemonicParsing="false"
-                            onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
-                            text="Gestion Emploi" />
+                                onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
+                                text="Gestion Emploi" />
 
                         <VBox spacing="2.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
                                         <Button fx:id="btnConsults" mnemonicParsing="false"
-                                            onAction="#switchView" prefWidth="210.0"
-                                            styleClass="sidebar-btn"
-                                            text="Gestion Consultations" />
+                                                onAction="#switchView" prefWidth="210.0"
+                                                styleClass="sidebar-btn"
+                                                text="Gestion Consultations" />
                                         <Label
-                                            style="-fx-text-fill: rgba(255, 255, 255, 0.5); -fx-font-size: 10px;"
-                                            text="▼" />
+                                                style="-fx-text-fill: rgba(255, 255, 255, 0.5); -fx-font-size: 10px;"
+                                                text="▼" />
                                     </children>
                                 </HBox>
                                 <VBox spacing="2.0">
@@ -86,37 +86,37 @@
                                     </padding>
                                     <children>
                                         <Button fx:id="btnSuivie" mnemonicParsing="false"
-                                            onAction="#switchView" prefWidth="200.0"
-                                            styleClass="sidebar-sub-btn"
-                                            text="Suivie" />
+                                                onAction="#switchView" prefWidth="200.0"
+                                                styleClass="sidebar-sub-btn"
+                                                text="Suivie" />
                                         <Button fx:id="btnTherapie" mnemonicParsing="false"
-                                            onAction="#switchView" prefWidth="200.0"
-                                            styleClass="sidebar-sub-btn"
-                                            text="Théraphie" />
+                                                onAction="#switchView" prefWidth="200.0"
+                                                styleClass="sidebar-sub-btn"
+                                                text="Théraphie" />
                                     </children>
                                 </VBox>
                             </children>
                         </VBox>
 
                         <Button fx:id="btnEvents" mnemonicParsing="false"
-                            onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
-                            text="Gestion Evenements" />
+                                onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
+                                text="Gestion Evenements" />
                         <Button fx:id="btnJeux" mnemonicParsing="false"
-                            onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
-                            text="Gestion Jeux" />
+                                onAction="#switchView" prefWidth="260.0" styleClass="sidebar-btn"
+                                text="Gestion Jeux" />
                     </children>
                 </VBox>
 
                 <VBox spacing="10.0">
                     <children>
                         <Label
-                            style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-style: italic; -fx-font-size: 11px;"
-                            text="💡 Un espace pensé pour chaque autiste" wrapText="true" />
+                                style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-style: italic; -fx-font-size: 11px;"
+                                text="💡 Un espace pensé pour chaque autiste" wrapText="true" />
                         <Label style="-fx-text-fill: rgba(255,255,255,0.4); -fx-font-size: 10px;"
-                            text="✨ v1.0.0" />
+                               text="✨ v1.0.0" />
                         <Button fx:id="btnLogout" graphicTextGap="15.0" mnemonicParsing="false"
-                            onAction="#handleLogout" prefWidth="250.0" styleClass="sidebar-btn"
-                            text="🚪 Déconnexion" />
+                                onAction="#handleLogout" prefWidth="250.0" styleClass="sidebar-btn"
+                                text="🚪 Déconnexion" />
                     </children>
                     <padding>
                         <Insets bottom="30.0" left="25.0" right="25.0" />
@@ -129,7 +129,7 @@
     <center>
         <VBox BorderPane.alignment="CENTER">
             <children>
-                <!-- Top Header Bar matching user's screenshot -->
+                <!-- Top Header Bar -->
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="20.0">
                     <padding>
                         <Insets left="40.0" right="40.0" top="40.0" />
@@ -138,10 +138,10 @@
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                             <children>
                                 <Label fx:id="pageTitle" styleClass="page-title"
-                                    text="Gestion des Suivies" />
+                                       text="Gestion des Suivies" />
                                 <Label fx:id="pageSubtitle"
-                                    style="-fx-text-fill: #778da9; -fx-font-size: 16px;"
-                                    text="Gérez les suivies et les informations associées" />
+                                       style="-fx-text-fill: #778da9; -fx-font-size: 16px;"
+                                       text="Gérez les suivies et les informations associées" />
                             </children>
                         </VBox>
                         <HBox alignment="CENTER" spacing="15.0" styleClass="btn-icon">
@@ -152,17 +152,17 @@
                                 <VBox alignment="CENTER_RIGHT">
                                     <children>
                                         <Label fx:id="adminNameLabel"
-                                            style="-fx-font-weight: bold; -fx-text-fill: -fx-text-dark; -fx-font-size: 14px;"
-                                            text="Admin AutiCare" />
+                                               style="-fx-font-weight: bold; -fx-text-fill: -fx-text-dark; -fx-font-size: 14px;"
+                                               text="Admin AutiCare" />
                                         <Label fx:id="adminRoleLabel"
-                                            style="-fx-font-size: 12px; -fx-text-fill: -fx-text-gray;"
-                                            text="Administrateur" />
+                                               style="-fx-font-size: 12px; -fx-text-fill: -fx-text-gray;"
+                                               text="Administrateur" />
                                     </children>
                                 </VBox>
                                 <Circle fx:id="adminAvatar" fill="#eceaff" radius="22.0"
-                                    stroke="#6c5ce7" strokeType="INSIDE" strokeWidth="2.0" />
+                                        stroke="#6c5ce7" strokeType="INSIDE" strokeWidth="2.0" />
                                 <Label style="-fx-text-fill: -fx-text-gray; -fx-font-size: 10px;"
-                                    text="▼" />
+                                       text="▼" />
                             </children>
                         </HBox>
                     </children>
@@ -177,3 +177,4 @@
         </VBox>
     </center>
 </BorderPane>
+        <!-- FIN DU FICHIER - RIEN APRÈS -->

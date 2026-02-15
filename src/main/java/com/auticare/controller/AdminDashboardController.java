@@ -18,6 +18,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
 
 @Component
 public class AdminDashboardController {
@@ -211,17 +215,41 @@ public class AdminDashboardController {
 
     @FXML
     private void handleLogout() {
-        SessionManager.getInstance().clearSession();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            loader.setControllerFactory(applicationContext::getBean);
-            Parent root = loader.load();
+            // Afficher une confirmation
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Déconnexion");
+            alert.setHeaderText("Êtes-vous sûr de vouloir vous déconnecter?");
+            alert.setContentText("Vous serez redirigé vers la page de connexion.");
 
-            Stage stage = (Stage) mainContainer.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("AutiCare - Login");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // Vider la session
+                SessionManager.getInstance().clearSession();
+
+                // Charger la page de login
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+                loader.setControllerFactory(applicationContext::getBean);
+                Parent root = loader.load();
+
+                Stage stage = (Stage) mainContainer.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("AutiCare - Connexion");
+                stage.show();
+
+                System.out.println("✅ Déconnexion réussie");
+            }
         } catch (IOException e) {
             e.printStackTrace();
+            showError("Erreur lors de la déconnexion");
         }
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
