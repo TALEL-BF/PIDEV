@@ -40,10 +40,10 @@ public class Main {
 
         System.out.println("\n===== CRUD THERAPIE =====");
 
-        Therapie t = new Therapie(3,
-                "GTA", "EMOTION", "Identifier joie/tristesse/colère",
-                "Montrer des cartes d’émotions, demander à l’enfant de pointer et imiter.",
-                15, 2, "Cartes illustrées", "Utiliser supports visuels si non verbal");
+        //Therapie t = new Therapie(3,
+            //    "GTA", "EMOTION", "Identifier joie/tristesse/colère",
+             //   "Montrer des cartes d’émotions, demander à l’enfant de pointer et imiter.",
+             //   15, 2, "Cartes illustrées", "Utiliser supports visuels si non verbal");
      //   ts.ajouterTherapie(t);
         System.out.println("✅ Thérapie ajoutée.");
        // ts.modifierTherapie(t);

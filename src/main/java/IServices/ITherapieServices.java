@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface ITherapieServices {
 
-        void ajouterTherapie(Therapie t) throws SQLException;
-        void supprimerTherapie(int idTherapie) throws SQLException;
-        void modifierTherapie(Therapie t) throws SQLException;
-        List<Therapie> afficherTherapie() throws SQLException;
+    void ajouterTherapie(Therapie t) throws SQLException;
+    void supprimerTherapie(int idTherapie) throws SQLException;
+    void modifierTherapie(Therapie t) throws SQLException;
+    List<Therapie> afficherTherapie() throws SQLException;
 
 }

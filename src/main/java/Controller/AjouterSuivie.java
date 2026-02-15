@@ -20,8 +20,7 @@ import javafx.stage.StageStyle;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AjouterSuivie {
@@ -32,90 +31,124 @@ public class AjouterSuivie {
     @FXML private Button btnAjouter;
     @FXML private VBox emptyBox;
 
-    // Sidebar dropdown
     @FXML private ToggleButton tbConsultations;
     @FXML private VBox consultationsSubMenu;
     @FXML private Button btnGestionConsultations;
 
-    // ✅ Sous-menu buttons (il manquaient chez toi)
     @FXML private Button btnMenuSuivie;
     @FXML private Button btnMenuTherapie;
 
-    private final SuivieServices suivieService = new SuivieServices();
+    // Stats UI
+    @FXML private ComboBox<String> cbEnfantStats;
+    @FXML private Button btnRefreshStats;
+    @FXML private Label lblDeltaHumeur, lblDeltaStress, lblDeltaAttention;
+    @FXML private javafx.scene.chart.LineChart<String, Number> monthlyChart;
+    @FXML private VBox statsBox;
+    @FXML private Label lblToggleStats;
+
+    private SuivieServices suivieService;
+    private Services.StatsServices statsService;
+
     private final ObservableList<Suivie> master = FXCollections.observableArrayList();
 
-    // =========================
-    // INIT
-    // =========================
+    // Styles bordures
+    private static final String STYLE_OK   = "-fx-border-color: #22c55e; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private static final String STYLE_BAD  = "-fx-border-color: #ef4444; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private static final String STYLE_NONE = "-fx-border-color: transparent; -fx-border-width: 0;";
+
     @FXML
     public void initialize() {
+        initSidebarDropdown();
+        initNavigation();
+        initUiListeners();
+        initStatsToggle();
 
-        reloadFromDb();
-
-        ChangeListener<Object> refreshListener = (obs, o, n) -> refreshCards();
-        searchField.textProperty().addListener(refreshListener);
-
-        btnAjouter.setOnAction(e -> onAjouter());
-
-        cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
-            double w = newV.doubleValue();
-            cardsPane.setPrefWrapLength(Math.max(360, w - 40));
-        });
-
-        // ✅ Dropdown (Consultations -> Suivie / Thérapie)
-        if (tbConsultations != null && consultationsSubMenu != null) {
-
-            tbConsultations.setSelected(false);
-            tbConsultations.setText("▸"); // fermé au début
-
-            consultationsSubMenu.setVisible(false);
-            consultationsSubMenu.setManaged(false);
-
-            tbConsultations.setOnAction(e -> {
-                boolean open = tbConsultations.isSelected();
-                consultationsSubMenu.setVisible(open);
-                consultationsSubMenu.setManaged(open);
-                tbConsultations.setText(open ? "▾" : "▸");
-            });
-
-            if (btnGestionConsultations != null) {
-                btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
-            }
+        try {
+            suivieService = new SuivieServices();
+            reloadFromDb();
+        } catch (Exception ex) {
+            showDbError(ex);
         }
 
-        // ✅ Navigation : Suivie / Thérapie
-        if (btnMenuSuivie != null) {
-            btnMenuSuivie.setOnAction(e -> switchTo("/AjouterSuivie.fxml"));
-        }
-        if (btnMenuTherapie != null) {
-            btnMenuTherapie.setOnAction(e -> switchTo("/AjouterTherapie.fxml"));
+        try {
+            statsService = new Services.StatsServices();
+            loadStatsUI();
+        } catch (Exception ex) {
+            disableStatsUI();
         }
     }
 
+    private void initUiListeners() {
+        if (searchField != null) {
+            ChangeListener<Object> refreshListener = (obs, o, n) -> refreshCards();
+            searchField.textProperty().addListener(refreshListener);
+        }
+        if (btnAjouter != null) {
+            btnAjouter.setOnAction(e -> onAjouter());
+        }
+        if (cardsPane != null) {
+            cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
+                double w = newV.doubleValue();
+                cardsPane.setPrefWrapLength(Math.max(360, w - 40));
+            });
+        }
+    }
+
+    private void initSidebarDropdown() {
+        if (tbConsultations == null || consultationsSubMenu == null) return;
+
+        tbConsultations.setSelected(false);
+        tbConsultations.setText("▸");
+
+        consultationsSubMenu.setVisible(false);
+        consultationsSubMenu.setManaged(false);
+
+        tbConsultations.setOnAction(e -> {
+            boolean open = tbConsultations.isSelected();
+            consultationsSubMenu.setVisible(open);
+            consultationsSubMenu.setManaged(open);
+            tbConsultations.setText(open ? "▾" : "▸");
+        });
+
+        if (btnGestionConsultations != null) {
+            btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
+        }
+    }
+
+    private void initNavigation() {
+        if (btnMenuSuivie != null) btnMenuSuivie.setOnAction(e -> switchTo("/AjouterSuivie.fxml"));
+        if (btnMenuTherapie != null) btnMenuTherapie.setOnAction(e -> switchTo("/AjouterTherapie.fxml"));
+    }
+
+    // -----------------------------
+    // DB load + cards
+    // -----------------------------
     private void reloadFromDb() {
+        if (suivieService == null) return;
         List<Suivie> list = suivieService.afficherSuivie();
         master.setAll(list);
         refreshCards();
     }
 
     private void refreshCards() {
-        cardsPane.getChildren().clear();
+        if (cardsPane == null) return;
 
-        String q = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
+        cardsPane.getChildren().clear();
+        String q = (searchField == null || searchField.getText() == null) ? "" : searchField.getText().trim().toLowerCase();
 
         List<Suivie> filtered = master.stream()
                 .filter(s -> matchesSearch(s, q))
                 .collect(Collectors.toList());
 
-        for (Suivie s : filtered) {
-            cardsPane.getChildren().add(buildCard(s));
-        }
+        for (Suivie s : filtered) cardsPane.getChildren().add(buildCard(s));
 
-        countLabel.setText(filtered.size() + " Suivies");
+        if (countLabel != null) countLabel.setText(filtered.size() + " Suivies");
 
         boolean empty = filtered.isEmpty();
-        emptyBox.setVisible(empty);
-        emptyBox.setManaged(empty);
+        if (emptyBox != null) {
+            emptyBox.setVisible(empty);
+            emptyBox.setManaged(empty);
+        }
     }
 
     private boolean matchesSearch(Suivie s, String q) {
@@ -124,14 +157,11 @@ public class AjouterSuivie {
                 || safe(s.getNomPsy()).toLowerCase().contains(q)
                 || safe(s.getObservation()).toLowerCase().contains(q)
                 || safe(s.getComportement()).toLowerCase().contains(q)
-                || safe(s.getInteractionSociale()).toLowerCase().contains(q);
+                || safe(s.getInteractionSociale()).toLowerCase().contains(q)
+                || safe(s.getStatut()).toLowerCase().contains(q);
     }
 
-    // =========================
-    // CARD
-    // =========================
     private Node buildCard(Suivie s) {
-
         VBox card = new VBox();
         card.getStyleClass().add("suivie-card");
 
@@ -149,7 +179,6 @@ public class AjouterSuivie {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
         band.getChildren().addAll(nameBox, spacer);
 
         Region headerLine = new Region();
@@ -163,6 +192,7 @@ public class AjouterSuivie {
 
         Label info = new Label(
                 "PSY\n" + safe(s.getNomPsy()) +
+                        "\n\nÉTAT\n" + safe(s.getStatut()) +
                         "\n\nDATE\n" + date +
                         "\n\nHEURE\n" + heure +
                         "\n\nSCORES (H/S/A)\n" + s.getScoreHumeur() + " / " + s.getScoreStress() + " / " + s.getScoreAttention() +
@@ -194,80 +224,41 @@ public class AjouterSuivie {
         supprimer.setMaxWidth(Double.MAX_VALUE);
 
         actions.getChildren().addAll(voir, edit, supprimer);
-
         body.getChildren().addAll(info, actions);
+
         card.getChildren().addAll(band, headerLine, body);
         return card;
     }
 
-    // =========================
+    // -----------------------------
     // CRUD
-    // =========================
+    // -----------------------------
     private void onAjouter() {
+        if (!ensureDbReady()) return;
+
         Optional<Suivie> res = showSuivieWindow(null, "Ajouter un suivi");
         res.ifPresent(s -> {
             suivieService.ajouterSuivie(s);
             reloadFromDb();
+            loadStatsUI();
         });
     }
 
     private void onEdit(Suivie exist) {
+        if (!ensureDbReady()) return;
+
         Optional<Suivie> res = showSuivieWindow(exist, "Modifier le suivi");
         res.ifPresent(updated -> {
             updated.setIdSuivie(exist.getIdSuivie());
             suivieService.modifierSuivie(updated);
             reloadFromDb();
+            loadStatsUI();
         });
     }
 
-    // ✅ DETAILS
-    private void onVoir(Suivie s) {
-        Stage stage = createCustomStage("Détails du suivi", 740, 520);
-
-        VBox content = new VBox(14);
-        content.getStyleClass().add("custom-content");
-
-        String date = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalDate().toString();
-        String heure = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalTime().toString();
-
-        GridPane grid = new GridPane();
-        grid.setHgap(16);
-        grid.setVgap(10);
-        grid.getStyleClass().add("details-grid");
-
-        int r = 0;
-        addRow(grid, r++, "Enfant", safe(s.getNomEnfant()));
-        addRow(grid, r++, "Âge", String.valueOf(s.getAge()));
-        addRow(grid, r++, "Psychologue", safe(s.getNomPsy()));
-        addRow(grid, r++, "Date", date);
-        addRow(grid, r++, "Heure", heure);
-        addRow(grid, r++, "Scores (H/S/A)", s.getScoreHumeur()+" / "+s.getScoreStress()+" / "+s.getScoreAttention());
-        addRow(grid, r++, "Comportement", safe(s.getComportement()));
-        addRow(grid, r++, "Interaction", safe(s.getInteractionSociale()));
-
-        Label obsLabel = new Label("Observation");
-        obsLabel.getStyleClass().add("details-label");
-
-        Label obs = new Label(safe(s.getObservation()));
-        obs.setWrapText(true);
-        obs.getStyleClass().add("details-box");
-
-        HBox actions = new HBox(12);
-        actions.setAlignment(Pos.CENTER_RIGHT);
-
-        Button close = new Button("Fermer");
-        close.getStyleClass().addAll("btn-solid-dark", "btn-hover");
-        close.setOnAction(e -> stage.close());
-        actions.getChildren().add(close);
-
-        content.getChildren().addAll(grid, obsLabel, obs, actions);
-        setCenter(stage, content);
-
-        stage.showAndWait();
-    }
-
-    // ✅ SUPPRESSION
     private void onSupprimer(Suivie s) {
+        if (!ensureDbReady()) return;
+
         Stage stage = createCustomStage("Suppression", 640, 320);
 
         VBox content = new VBox(12);
@@ -298,6 +289,7 @@ public class AjouterSuivie {
             suivieService.supprimerSuivie(s.getIdSuivie());
             stage.close();
             reloadFromDb();
+            loadStatsUI();
         });
 
         actions.getChildren().addAll(cancel, del);
@@ -308,73 +300,188 @@ public class AjouterSuivie {
         stage.showAndWait();
     }
 
-    // ✅ AJOUT / MODIF
-    private Optional<Suivie> showSuivieWindow(Suivie s, String title) {
-
-        Stage stage = createCustomStage(title, 980, 620);
+    private void onVoir(Suivie s) {
+        Stage stage = createCustomStage("Détails du suivi", 740, 520);
 
         VBox content = new VBox(14);
         content.getStyleClass().add("custom-content");
 
+        String date = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalDate().toString();
+        String heure = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalTime().toString();
+
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(10);
+        grid.getStyleClass().add("details-grid");
+
+        int r = 0;
+        addRow(grid, r++, "Enfant", safe(s.getNomEnfant()));
+        addRow(grid, r++, "Âge", String.valueOf(s.getAge()));
+        addRow(grid, r++, "Email parent", safe(s.getEmailParent()));
+        addRow(grid, r++, "Niveau séance", String.valueOf(s.getNiveauSeance()));
+        addRow(grid, r++, "Psychologue", safe(s.getNomPsy()));
+        addRow(grid, r++, "État", safe(s.getStatut()));
+        addRow(grid, r++, "Date", date);
+        addRow(grid, r++, "Heure", heure);
+        addRow(grid, r++, "Scores (H/S/A)", s.getScoreHumeur()+" / "+s.getScoreStress()+" / "+s.getScoreAttention());
+        addRow(grid, r++, "Comportement", safe(s.getComportement()));
+        addRow(grid, r++, "Interaction", safe(s.getInteractionSociale()));
+
+        Label obsLabel = new Label("Observation");
+        obsLabel.getStyleClass().add("details-label");
+
+        Label obs = new Label(safe(s.getObservation()));
+        obs.setWrapText(true);
+        obs.getStyleClass().add("details-box");
+
+        HBox actions = new HBox(12);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        Button close = new Button("Fermer");
+        close.getStyleClass().addAll("btn-solid-dark", "btn-hover");
+        close.setOnAction(e -> stage.close());
+
+        actions.getChildren().add(close);
+
+        content.getChildren().addAll(grid, obsLabel, obs, actions);
+        setCenter(stage, content);
+        stage.showAndWait();
+    }
+
+    // ==========================================================
+    // Fenêtre Ajouter / Modifier (bordures + message des erreurs)
+    // ==========================================================
+    private Optional<Suivie> showSuivieWindow(Suivie s, String title) {
+
+        Stage stage = createCustomStage(title, 1000, 680);
+
+        VBox content = new VBox(12);
+        content.getStyleClass().add("custom-content");
+
+        // Message erreurs global
+        Label lblErrors = new Label("");
+        lblErrors.setWrapText(true);
+        lblErrors.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: 700;");
+
         TextField tfNom = new TextField(s == null ? "" : safe(s.getNomEnfant()));
+        TextField tfEmail = new TextField(s == null ? "" : safe(s.getEmailParent()));
+        tfEmail.setPromptText("parent@email.com");
+
         TextField tfAge = new TextField(s == null ? "" : String.valueOf(s.getAge()));
         TextField tfPsy = new TextField(s == null ? "" : safe(s.getNomPsy()));
 
         DatePicker dpDate = new DatePicker(
-                (s == null || s.getDateSuivie() == null) ? LocalDate.now()
+                (s == null || s.getDateSuivie() == null)
+                        ? LocalDate.now()
                         : s.getDateSuivie().toLocalDateTime().toLocalDate()
         );
 
         TextField tfHeure = new TextField(
-                (s == null || s.getDateSuivie() == null) ? "10:00"
-                        : s.getDateSuivie().toLocalDateTime().toLocalTime().toString()
+                (s == null || s.getDateSuivie() == null)
+                        ? "10:00"
+                        : s.getDateSuivie().toLocalDateTime().toLocalTime().withSecond(0).withNano(0).toString()
         );
 
         Spinner<Integer> spH = new Spinner<>(0, 10, s == null ? 5 : s.getScoreHumeur());
         Spinner<Integer> spS = new Spinner<>(0, 10, s == null ? 5 : s.getScoreStress());
         Spinner<Integer> spA = new Spinner<>(0, 10, s == null ? 5 : s.getScoreAttention());
+        Spinner<Integer> spNiveau = new Spinner<>(1, 10, (s == null || s.getNiveauSeance() == null) ? 1 : s.getNiveauSeance());
 
-        TextField tfComp = new TextField(s == null ? "" : safe(s.getComportement()));
-        TextField tfInter = new TextField(s == null ? "" : safe(s.getInteractionSociale()));
+        spH.setEditable(true);
+        spS.setEditable(true);
+        spA.setEditable(true);
+        spNiveau.setEditable(true);
+
+        // État (+ Normal)
+        ComboBox<String> cbEtat = new ComboBox<>();
+        cbEtat.getItems().addAll("Normal", "Immobile", "Il ne bouge pas", "Il n'entend pas", "Il ne voit pas");
+        String etatInit = (s == null) ? "Normal" : safe(s.getStatut());
+        cbEtat.setValue(etatInit.isBlank() ? "Normal" : etatInit);
+
+        ComboBox<String> cbComportement = new ComboBox<>();
+        cbComportement.getItems().addAll("Calme", "Agité");
+        String compInit = (s == null) ? "Calme" : safe(s.getComportement());
+        cbComportement.setValue(compInit.isBlank() ? "Calme" : compInit);
+
+        ComboBox<String> cbInteraction = new ComboBox<>();
+        cbInteraction.getItems().addAll("Interaction totale", "Moyenne", "Faible");
+        String interInit = (s == null) ? "Moyenne" : safe(s.getInteractionSociale());
+        cbInteraction.setValue(interInit.isBlank() ? "Moyenne" : interInit);
 
         TextArea taObs = new TextArea(s == null ? "" : safe(s.getObservation()));
-        taObs.setPrefRowCount(6);
+        taObs.setPrefRowCount(5);
 
-        ComboBox<String> cbStatut = new ComboBox<>();
-        cbStatut.getItems().addAll("Actif", "Terminé", "Annulé", "EFFECTUE");
-        cbStatut.setValue(s == null ? "Actif" : safe(s.getStatut()));
+        // -------- Filtrage strict (optionnel)
+        tfNom.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null) return;
+            String cleaned = newV.replaceAll("[^a-zA-ZÀ-ÿ\\s]", "");
+            if (!cleaned.equals(newV)) tfNom.setText(cleaned);
+            if (cleaned.length() > 40) tfNom.setText(cleaned.substring(0, 40));
+        });
 
+        tfPsy.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null) return;
+            String cleaned = newV.replaceAll("[^a-zA-ZÀ-ÿ\\s\\.\\-]", "");
+            if (!cleaned.equals(newV)) tfPsy.setText(cleaned);
+            if (cleaned.length() > 40) tfPsy.setText(cleaned.substring(0, 40));
+        });
+
+        tfAge.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null) return;
+            String cleaned = newV.replaceAll("[^0-9]", "");
+            if (!cleaned.equals(newV)) tfAge.setText(cleaned);
+            if (cleaned.length() > 3) tfAge.setText(cleaned.substring(0, 3));
+        });
+
+        tfHeure.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null) return;
+            String cleaned = newV.replaceAll("[^0-9:]", "");
+            if (!cleaned.equals(newV)) tfHeure.setText(cleaned);
+            if (cleaned.length() > 5) tfHeure.setText(cleaned.substring(0, 5));
+        });
+
+        tfEmail.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null) return;
+            String cleaned = newV.replaceAll("\\s+", "");
+            if (!cleaned.equals(newV)) tfEmail.setText(cleaned);
+            if (cleaned.length() > 80) tfEmail.setText(cleaned.substring(0, 80));
+        });
+
+        taObs.textProperty().addListener((obs, oldV, newV) -> {
+            if (newV != null && newV.length() > 500) taObs.setText(newV.substring(0, 500));
+        });
+
+        // -------- Layout
         GridPane gp = new GridPane();
         gp.setHgap(18);
         gp.setVgap(14);
         gp.getStyleClass().add("form-grid");
 
         int r = 0;
-        gp.add(label("Nom enfant"), 0, r); gp.add(tfNom, 1, r);
-        gp.add(label("Âge"), 2, r); gp.add(tfAge, 3, r); r++;
+        gp.add(label("Nom enfant *"), 0, r); gp.add(tfNom, 1, r);
+        gp.add(label("Âge *"), 2, r); gp.add(tfAge, 3, r); r++;
 
-        gp.add(label("Nom psy"), 0, r); gp.add(tfPsy, 1, r);
-        gp.add(label("Statut"), 2, r); gp.add(cbStatut, 3, r); r++;
+        gp.add(label("Email parent *"), 0, r); gp.add(tfEmail, 1, r);
+        gp.add(label("Niveau séance *"), 2, r); gp.add(spNiveau, 3, r); r++;
 
-        gp.add(label("Date"), 0, r); gp.add(dpDate, 1, r);
-        gp.add(label("Heure (HH:mm)"), 2, r); gp.add(tfHeure, 3, r); r++;
+        gp.add(label("Nom psy *"), 0, r); gp.add(tfPsy, 1, r);
+        gp.add(label("État *"), 2, r); gp.add(cbEtat, 3, r); r++;
 
-        gp.add(label("Score humeur"), 0, r); gp.add(spH, 1, r);
-        gp.add(label("Score stress"), 2, r); gp.add(spS, 3, r); r++;
+        gp.add(label("Date *"), 0, r); gp.add(dpDate, 1, r);
+        gp.add(label("Heure (HH:mm) *"), 2, r); gp.add(tfHeure, 3, r); r++;
 
-        gp.add(label("Score attention"), 0, r); gp.add(spA, 1, r);
-        gp.add(label("Comportement"), 2, r); gp.add(tfComp, 3, r); r++;
+        gp.add(label("Score humeur *"), 0, r); gp.add(spH, 1, r);
+        gp.add(label("Score stress *"), 2, r); gp.add(spS, 3, r); r++;
 
-        gp.add(label("Interaction sociale"), 0, r);
-        gp.add(tfInter, 1, r, 3, 1); r++;
+        gp.add(label("Score attention *"), 0, r); gp.add(spA, 1, r);
+        gp.add(label("Comportement *"), 2, r); gp.add(cbComportement, 3, r); r++;
 
-        Label obsLabel = new Label("Observation");
+        gp.add(label("Interaction sociale *"), 0, r);
+        gp.add(cbInteraction, 1, r, 3, 1); r++;
+
+        Label obsLabel = new Label("Observation (max 500)");
         obsLabel.getStyleClass().add("details-label");
-
         taObs.getStyleClass().add("details-box");
-
-        HBox actions = new HBox(12);
-        actions.setAlignment(Pos.CENTER_RIGHT);
 
         Button cancel = new Button("Annuler");
         cancel.getStyleClass().addAll("btn-soft", "btn-hover");
@@ -383,65 +490,191 @@ public class AjouterSuivie {
         Button save = new Button("Sauvegarder");
         save.getStyleClass().addAll("btn-solid-dark", "btn-hover");
 
-        actions.getChildren().addAll(cancel, save);
+        HBox actions = new HBox(12, cancel, save);
+        actions.setAlignment(Pos.CENTER_RIGHT);
 
-        content.getChildren().addAll(gp, obsLabel, taObs, actions);
+        content.getChildren().addAll(lblErrors, gp, obsLabel, taObs, actions);
         setCenter(stage, content);
 
         final Suivie[] result = {null};
 
-        // Validation
+        // =====================
+        // VALIDATION PRO TOTALE
+        // =====================
         save.setDisable(true);
-        Runnable validate = () -> {
-            boolean valid = !tfNom.getText().trim().isEmpty() && !tfAge.getText().trim().isEmpty();
-            if (valid) {
-                try {
-                    int a = Integer.parseInt(tfAge.getText().trim());
-                    valid = a >= 1 && a <= 120;
-                } catch (Exception ex) { valid = false; }
+
+        Runnable validateAll = () -> {
+            List<String> errors = new ArrayList<>();
+
+            boolean okNom = validateNom(tfNom, errors);
+            boolean okAge = validateAge(tfAge, errors);
+            boolean okEmail = validateEmail(tfEmail, errors);
+            boolean okPsy = validatePsy(tfPsy, errors);
+            boolean okDate = validateDate(dpDate, errors);
+            boolean okHeure = validateHeure(tfHeure, errors);
+            boolean okEtat = validateCombo(cbEtat, "État", errors);
+            boolean okComp = validateCombo(cbComportement, "Comportement", errors);
+            boolean okInter = validateCombo(cbInteraction, "Interaction sociale", errors);
+
+            // Indicateur global
+            if (errors.isEmpty()) {
+                lblErrors.setText("");
+                save.setDisable(false);
+            } else {
+                lblErrors.setText("Champs à corriger :\n- " + String.join("\n- ", errors));
+                save.setDisable(true);
             }
-            save.setDisable(!valid);
+
+            // Si tu veux : remettre style neutre sur obs (pas obligatoire)
+            taObs.setStyle(STYLE_NONE);
+
+            // option : si tout ok, on garde bordure verte; sinon rouge est déjà mis champ par champ
+            // (déjà fait dans validateX)
         };
-        tfNom.textProperty().addListener((o,a,b)->validate.run());
-        tfAge.textProperty().addListener((o,a,b)->validate.run());
-        validate.run();
 
+        // listeners
+        tfNom.textProperty().addListener((o, a, b) -> validateAll.run());
+        tfAge.textProperty().addListener((o, a, b) -> validateAll.run());
+        tfEmail.textProperty().addListener((o, a, b) -> validateAll.run());
+        tfPsy.textProperty().addListener((o, a, b) -> validateAll.run());
+        tfHeure.textProperty().addListener((o, a, b) -> validateAll.run());
+        dpDate.valueProperty().addListener((o, a, b) -> validateAll.run());
+        cbEtat.valueProperty().addListener((o, a, b) -> validateAll.run());
+        cbComportement.valueProperty().addListener((o, a, b) -> validateAll.run());
+        cbInteraction.valueProperty().addListener((o, a, b) -> validateAll.run());
+        spNiveau.valueProperty().addListener((o, a, b) -> validateAll.run());
+
+        validateAll.run();
+
+        // -------- Save
         save.setOnAction(e -> {
-            int age = Integer.parseInt(tfAge.getText().trim());
-            Timestamp ts = buildTimestamp(dpDate.getValue(), tfHeure.getText().trim());
+            validateAll.run();
+            if (save.isDisable()) {
+                // message déjà affiché dans lblErrors
+                return;
+            }
 
-            result[0] = new Suivie(
-                    tfNom.getText().trim(),
-                    age,
-                    tfPsy.getText().trim(),
-                    ts,
-                    spH.getValue(),
-                    spS.getValue(),
-                    spA.getValue(),
-                    tfComp.getText().trim(),
-                    tfInter.getText().trim(),
-                    taObs.getText().trim(),
-                    cbStatut.getValue()
-            );
-            stage.close();
+            try {
+                int age = Integer.parseInt(tfAge.getText().trim());
+                Timestamp ts = buildTimestamp(dpDate.getValue(), tfHeure.getText().trim());
+
+                Suivie created = new Suivie(
+                        tfNom.getText().trim(),
+                        age,
+                        tfPsy.getText().trim(),
+                        ts,
+                        spH.getValue(),
+                        spS.getValue(),
+                        spA.getValue(),
+                        cbComportement.getValue(),
+                        cbInteraction.getValue(),
+                        taObs.getText().trim(),
+                        cbEtat.getValue(),     // état stocké dans statut
+                        tfEmail.getText().trim(),
+                        spNiveau.getValue(),
+                        null,
+                        null,
+                        null
+                );
+
+                // sécurité setters
+                created.setEmailParent(tfEmail.getText().trim());
+                created.setNiveauSeance(spNiveau.getValue());
+                created.setStatut(cbEtat.getValue());
+                created.setComportement(cbComportement.getValue());
+                created.setInteractionSociale(cbInteraction.getValue());
+
+                result[0] = created;
+                stage.close();
+
+            } catch (Exception ex) {
+                showDbError(ex);
+            }
         });
 
         stage.showAndWait();
         return Optional.ofNullable(result[0]);
     }
 
-    // =========================
-    // CUSTOM WINDOW
-    // =========================
-    private Stage createCustomStage(String title, double w, double h) {
+    // -----------------------------
+    // VALIDATORS (avec bordure)
+    // -----------------------------
+    private boolean validateNom(TextField tf, List<String> errors) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok = v.length() >= 3 && v.length() <= 40 && v.matches("^[A-Za-zÀ-ÿ\\s]+$");
+        tf.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add("Nom enfant (min 3 lettres, lettres/espaces seulement)");
+        return ok;
+    }
 
+    private boolean validatePsy(TextField tf, List<String> errors) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok = v.length() >= 3 && v.length() <= 40 && v.matches("^[A-Za-zÀ-ÿ\\s\\.\\-]+$");
+        tf.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add("Nom psy (min 3, lettres + . - autorisés)");
+        return ok;
+    }
+
+    private boolean validateAge(TextField tf, List<String> errors) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok;
+        try {
+            int age = Integer.parseInt(v);
+            ok = age >= 1 && age <= 120;
+        } catch (Exception e) {
+            ok = false;
+        }
+        tf.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add("Âge (nombre entre 1 et 120)");
+        return ok;
+    }
+
+    private boolean validateEmail(TextField tf, List<String> errors) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok = v.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        tf.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add("Email parent (ex: parent@email.com)");
+        return ok;
+    }
+
+    private boolean validateHeure(TextField tf, List<String> errors) {
+        String v = tf.getText() == null ? "" : tf.getText().trim();
+        boolean ok;
+        try {
+            ok = v.matches("^\\d{2}:\\d{2}$");
+            if (ok) LocalTime.parse(v);
+        } catch (Exception e) {
+            ok = false;
+        }
+        tf.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add("Heure (format HH:mm, ex: 11:00)");
+        return ok;
+    }
+
+    private boolean validateDate(DatePicker dp, List<String> errors) {
+        boolean ok = dp.getValue() != null;
+        dp.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add("Date (obligatoire)");
+        return ok;
+    }
+
+    private boolean validateCombo(ComboBox<String> cb, String label, List<String> errors) {
+        boolean ok = cb.getValue() != null && !cb.getValue().trim().isEmpty();
+        cb.setStyle(ok ? STYLE_OK : STYLE_BAD);
+        if (!ok) errors.add(label + " (obligatoire)");
+        return ok;
+    }
+
+    // -----------------------------
+    // Window helpers
+    // -----------------------------
+    private Stage createCustomStage(String title, double w, double h) {
         Stage stage = new Stage(StageStyle.TRANSPARENT);
         stage.initModality(Modality.APPLICATION_MODAL);
 
         StackPane root = new StackPane();
         root.setPadding(new Insets(18));
         root.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
-
         root.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
 
         BorderPane shell = new BorderPane();
@@ -464,21 +697,14 @@ public class AjouterSuivie {
 
         header.getChildren().addAll(t, spacer, close);
         shell.setTop(header);
-
         shell.setCenter(new Pane());
 
         root.getChildren().add(shell);
 
         final double[] dx = {0};
         final double[] dy = {0};
-        header.setOnMousePressed(e -> {
-            dx[0] = e.getSceneX();
-            dy[0] = e.getSceneY();
-        });
-        header.setOnMouseDragged(e -> {
-            stage.setX(e.getScreenX() - dx[0]);
-            stage.setY(e.getScreenY() - dy[0]);
-        });
+        header.setOnMousePressed(e -> { dx[0] = e.getSceneX(); dy[0] = e.getSceneY(); });
+        header.setOnMouseDragged(e -> { stage.setX(e.getScreenX() - dx[0]); stage.setY(e.getScreenY() - dy[0]); });
 
         Scene scene = new Scene(root, w, h);
         scene.setFill(Color.TRANSPARENT);
@@ -492,25 +718,83 @@ public class AjouterSuivie {
         shell.setCenter(content);
     }
 
-    // =========================
-    // ✅ NAVIGATION (AJOUTÉE)
-    // =========================
     private void switchTo(String fxmlPath) {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
             javafx.scene.Parent root = loader.load();
-
-            javafx.stage.Stage stage = (javafx.stage.Stage) cardsPane.getScene().getWindow();
+            Stage stage = (Stage) cardsPane.getScene().getWindow();
             stage.getScene().setRoot(root);
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    // =========================
-    // HELPERS
-    // =========================
+    // -----------------------------
+    // Stats
+    // -----------------------------
+    private void loadStatsUI() {
+        if (statsService == null) return;
+        if (cbEnfantStats == null || btnRefreshStats == null || monthlyChart == null
+                || lblDeltaHumeur == null || lblDeltaStress == null || lblDeltaAttention == null) return;
+
+        cbEnfantStats.getItems().setAll(statsService.getAllEnfants());
+
+        btnRefreshStats.setOnAction(e -> refreshStats());
+        cbEnfantStats.setOnAction(e -> refreshStats());
+
+        if (!cbEnfantStats.getItems().isEmpty()) {
+            cbEnfantStats.getSelectionModel().select(0);
+            refreshStats();
+        }
+    }
+
+    private void refreshStats() {
+        if (statsService == null) return;
+
+        String enfant = cbEnfantStats.getValue();
+        if (enfant == null || enfant.isBlank()) return;
+
+        Entites.StatsSeanceDelta d = statsService.getLastDelta(enfant);
+
+        if (d == null || d.prevHumeur == null) {
+            lblDeltaHumeur.setText("-");
+            lblDeltaStress.setText("-");
+            lblDeltaAttention.setText("-");
+        } else {
+            lblDeltaHumeur.setText(String.valueOf(d.deltaH()));
+            lblDeltaStress.setText(String.valueOf(d.progressStress()));
+            lblDeltaAttention.setText(String.valueOf(d.deltaA()));
+        }
+
+        monthlyChart.getData().clear();
+
+        var sH = new javafx.scene.chart.XYChart.Series<String, Number>(); sH.setName("Humeur");
+        var sS = new javafx.scene.chart.XYChart.Series<String, Number>(); sS.setName("Stress");
+        var sA = new javafx.scene.chart.XYChart.Series<String, Number>(); sA.setName("Attention");
+
+        List<Entites.StatsMensuelle> list = statsService.getMonthlyStats(enfant);
+        for (Entites.StatsMensuelle m : list) {
+            String label = String.format("%02d/%d", m.month, m.year);
+            sH.getData().add(new javafx.scene.chart.XYChart.Data<>(label, m.avgHumeur));
+            sS.getData().add(new javafx.scene.chart.XYChart.Data<>(label, m.avgStress));
+            sA.getData().add(new javafx.scene.chart.XYChart.Data<>(label, m.avgAttention));
+        }
+
+        monthlyChart.getData().addAll(sH, sS, sA);
+    }
+
+    private void disableStatsUI() {
+        if (cbEnfantStats != null) cbEnfantStats.setDisable(true);
+        if (btnRefreshStats != null) btnRefreshStats.setDisable(true);
+        if (lblDeltaHumeur != null) lblDeltaHumeur.setText("-");
+        if (lblDeltaStress != null) lblDeltaStress.setText("-");
+        if (lblDeltaAttention != null) lblDeltaAttention.setText("-");
+        if (monthlyChart != null) monthlyChart.setVisible(false);
+    }
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
     private Label label(String t) {
         Label l = new Label(t);
         l.getStyleClass().add("details-key");
@@ -518,23 +802,63 @@ public class AjouterSuivie {
     }
 
     private void addRow(GridPane g, int row, String k, String v) {
-        Label lk = new Label(k);
-        lk.getStyleClass().add("details-key");
-
-        Label lv = new Label(v);
-        lv.getStyleClass().add("details-val");
-        lv.setWrapText(true);
-
+        Label lk = new Label(k); lk.getStyleClass().add("details-key");
+        Label lv = new Label(v); lv.getStyleClass().add("details-val"); lv.setWrapText(true);
         g.add(lk, 0, row);
         g.add(lv, 1, row);
     }
 
     private Timestamp buildTimestamp(LocalDate d, String hhmm) {
         LocalTime t;
-        try { t = LocalTime.parse(hhmm.length() == 5 ? hhmm : "10:00"); }
-        catch (Exception e) { t = LocalTime.of(10,0); }
+        try {
+            t = LocalTime.parse(hhmm.length() == 5 ? hhmm : "10:00");
+        } catch (Exception e) {
+            t = LocalTime.of(10, 0);
+        }
         return Timestamp.valueOf(d.atTime(t));
     }
 
     private String safe(String s) { return s == null ? "" : s; }
+
+    private void showDbError(Exception ex) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Erreur");
+        a.setHeaderText("Problème lors de l'opération");
+        a.setContentText(ex == null ? "" : ex.getMessage());
+        a.showAndWait();
+    }
+
+    private boolean ensureDbReady() {
+        try {
+            if (suivieService == null) suivieService = new SuivieServices();
+            if (statsService == null)  statsService = new Services.StatsServices();
+            return true;
+        } catch (Exception ex) {
+            showDbError(ex);
+            return false;
+        }
+    }
+
+    private void initStatsToggle() {
+        if (statsBox == null) return;
+
+        setStatsVisible(false);
+        if (lblToggleStats != null) {
+            lblToggleStats.setOnMouseClicked(e -> setStatsVisible(!statsBox.isVisible()));
+        }
+    }
+
+    private void setStatsVisible(boolean show) {
+        statsBox.setVisible(show);
+        statsBox.setManaged(show);
+
+        if (lblToggleStats != null) {
+            lblToggleStats.setText(show ? "▾ Statistiques" : "▸ Statistiques");
+        }
+
+        if (show && ensureDbReady()) {
+            loadStatsUI();
+            refreshStats();
+        }
+    }
 }

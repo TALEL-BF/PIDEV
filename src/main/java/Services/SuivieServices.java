@@ -18,25 +18,37 @@ public class SuivieServices implements ISuivieServices {
 
     @Override
     public void ajouterSuivie(Suivie s) {
-        String req = "INSERT INTO suivie (NOM_ENFANT, AGE, NOM_PSY, DATE_SUIVIE, SCORE_HUMEUR, SCORE_STRESS, SCORE_ATTENTION, COMPORTEMENT, INTERACTION_SOCIALE, OBSERVATION, STATUT) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String req = "INSERT INTO suivie (NOM_ENFANT, EMAIL_PARENT, AGE, NOM_PSY, DATE_SUIVIE, " +
+                "SCORE_HUMEUR, SCORE_STRESS, SCORE_ATTENTION, NIVEAU_SEANCE, " +
+                "COMPORTEMENT, INTERACTION_SOCIALE, OBSERVATION, STATUT, " +
+                "ID_THERAPIE_RECO, CR_RESUME, CR_PDF_PATH) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             PreparedStatement ps = con.prepareStatement(req);
             ps.setString(1, s.getNomEnfant());
-            ps.setInt(2, s.getAge());
-            ps.setString(3, s.getNomPsy());
+            ps.setString(2, s.getEmailParent());
+            ps.setInt(3, s.getAge());
+            ps.setString(4, s.getNomPsy());
+            ps.setTimestamp(5, s.getDateSuivie());
 
-            // Si tu veux laisser MySQL mettre current_timestamp(), mets null ici OU enlève DATE_SUIVIE de la requête.
-            ps.setTimestamp(4, s.getDateSuivie());
+            ps.setInt(6, s.getScoreHumeur());
+            ps.setInt(7, s.getScoreStress());
+            ps.setInt(8, s.getScoreAttention());
 
-            ps.setInt(5, s.getScoreHumeur());
-            ps.setInt(6, s.getScoreStress());
-            ps.setInt(7, s.getScoreAttention());
-            ps.setString(8, s.getComportement());
-            ps.setString(9, s.getInteractionSociale());
-            ps.setString(10, s.getObservation());
-            ps.setString(11, s.getStatut());
+            if (s.getNiveauSeance() == null) ps.setNull(9, Types.INTEGER);
+            else ps.setInt(9, s.getNiveauSeance());
+
+            ps.setString(10, s.getComportement());
+            ps.setString(11, s.getInteractionSociale());
+            ps.setString(12, s.getObservation());
+            ps.setString(13, s.getStatut());
+
+            if (s.getIdTherapieReco() == null) ps.setNull(14, Types.INTEGER);
+            else ps.setInt(14, s.getIdTherapieReco());
+
+            ps.setString(15, s.getCrResume());
+            ps.setString(16, s.getCrPdfPath());
 
             ps.executeUpdate();
             System.out.println("Suivie ajouté avec succès");
@@ -63,27 +75,40 @@ public class SuivieServices implements ISuivieServices {
 
     @Override
     public void modifierSuivie(Suivie s) {
-        String req = "UPDATE suivie SET NOM_ENFANT = ?, AGE = ?, NOM_PSY = ?, " +
-                "SCORE_HUMEUR = ?, SCORE_STRESS = ?, SCORE_ATTENTION = ?, " +
-                "COMPORTEMENT = ?, INTERACTION_SOCIALE = ?, OBSERVATION = ?, STATUT = ? " +
-                "WHERE ID_SUIVIE = ?";
+        String req = "UPDATE suivie SET NOM_ENFANT=?, EMAIL_PARENT=?, AGE=?, NOM_PSY=?, " +
+                "SCORE_HUMEUR=?, SCORE_STRESS=?, SCORE_ATTENTION=?, NIVEAU_SEANCE=?, " +
+                "COMPORTEMENT=?, INTERACTION_SOCIALE=?, OBSERVATION=?, STATUT=?, " +
+                "ID_THERAPIE_RECO=?, CR_RESUME=?, CR_PDF_PATH=? " +
+                "WHERE ID_SUIVIE=?";
+
 
         try {
             PreparedStatement ps = con.prepareStatement(req);
             ps.setString(1, s.getNomEnfant());
-            ps.setInt(2, s.getAge());
-            ps.setString(3, s.getNomPsy());
+            ps.setString(2, s.getEmailParent());
+            ps.setInt(3, s.getAge());
+            ps.setString(4, s.getNomPsy());
 
-            ps.setInt(4, s.getScoreHumeur());
-            ps.setInt(5, s.getScoreStress());
-            ps.setInt(6, s.getScoreAttention());
+            ps.setInt(5, s.getScoreHumeur());
+            ps.setInt(6, s.getScoreStress());
+            ps.setInt(7, s.getScoreAttention());
 
-            ps.setString(7, s.getComportement());
-            ps.setString(8, s.getInteractionSociale());
-            ps.setString(9, s.getObservation());
-            ps.setString(10, s.getStatut());
+            if (s.getNiveauSeance() == null) ps.setNull(8, Types.INTEGER);
+            else ps.setInt(8, s.getNiveauSeance());
 
-            ps.setInt(11, s.getIdSuivie());
+            ps.setString(9, s.getComportement());
+            ps.setString(10, s.getInteractionSociale());
+            ps.setString(11, s.getObservation());
+            ps.setString(12, s.getStatut());
+
+            if (s.getIdTherapieReco() == null) ps.setNull(13, Types.INTEGER);
+            else ps.setInt(13, s.getIdTherapieReco());
+
+            ps.setString(14, s.getCrResume());
+            ps.setString(15, s.getCrPdfPath());
+
+            ps.setInt(16, s.getIdSuivie());
+
 
             ps.executeUpdate();
             System.out.println("Suivie modifié : ID_SUIVIE = " + s.getIdSuivie());
@@ -115,9 +140,29 @@ public class SuivieServices implements ISuivieServices {
                         rs.getString("COMPORTEMENT"),
                         rs.getString("INTERACTION_SOCIALE"),
                         rs.getString("OBSERVATION"),
-                        rs.getString("STATUT")
+                        rs.getString("STATUT"),
+                        rs.getString("EMAIL_PARENT"),
+                        (Integer) rs.getObject("NIVEAU_SEANCE"),
+                        (Integer) rs.getObject("ID_THERAPIE_RECO"),
+                        rs.getString("CR_RESUME"),
+                        rs.getString("CR_PDF_PATH")
                 );
+
+
+// ✅ nouveaux champs (simple, après construction)
+                s.setEmailParent(rs.getString("EMAIL_PARENT"));
+
+                int n = rs.getInt("NIVEAU_SEANCE");
+                s.setNiveauSeance(rs.wasNull() ? null : n);
+
+                int idt = rs.getInt("ID_THERAPIE_RECO");
+                s.setIdTherapieReco(rs.wasNull() ? null : idt);
+
+                s.setCrResume(rs.getString("CR_RESUME"));
+                s.setCrPdfPath(rs.getString("CR_PDF_PATH"));
+
                 suivies.add(s);
+
             }
 
         } catch (SQLException e) {

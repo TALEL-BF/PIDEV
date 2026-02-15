@@ -17,17 +17,23 @@ public class Suivie {
         private String interactionSociale;
         private String observation;
         private String statut;
+        private String emailParent;
+        private Integer niveauSeance;     // nullable
+        private Integer idTherapieReco;   // nullable
+        private String crResume;
+        private String crPdfPath;
 
-        // 🔹 Constructeur vide
+
+    // 🔹 Constructeur vide
         public Suivie() {
         }
 
         // 🔹 Constructeur sans ID (pour insertion)
         public Suivie(String nomEnfant, int age, String nomPsy,
                       Timestamp dateSuivie, int scoreHumeur, int scoreStress,
-                      int scoreAttention, String comportement,
-                      String interactionSociale, String observation, String statut) {
-
+                      int scoreAttention, String comportement, String interactionSociale,
+                      String observation, String statut, String emailParent, Integer niveauSeance,
+                      Integer idTherapieReco, String crResume, String crPdfPath) {
             this.nomEnfant = nomEnfant;
             this.age = age;
             this.nomPsy = nomPsy;
@@ -39,14 +45,20 @@ public class Suivie {
             this.interactionSociale = interactionSociale;
             this.observation = observation;
             this.statut = statut;
+            this.emailParent = emailParent;
+            this.niveauSeance = niveauSeance;
+            this.idTherapieReco = idTherapieReco;
+            this.crResume = crResume;
+            this.crPdfPath = crPdfPath;
         }
 
         // 🔹 Constructeur complet
-        public Suivie(int idSuivie, String nomEnfant, int age, String nomPsy,
-                      Timestamp dateSuivie, int scoreHumeur, int scoreStress,
-                      int scoreAttention, String comportement,
-                      String interactionSociale, String observation, String statut) {
 
+        public Suivie(int idSuivie, String nomEnfant, int age, String nomPsy,
+                     Timestamp dateSuivie, int scoreHumeur, int scoreStress,
+                     int scoreAttention, String comportement, String interactionSociale,
+                     String observation, String statut, String emailParent, Integer niveauSeance,
+                     Integer idTherapieReco, String crResume, String crPdfPath) {
             this.idSuivie = idSuivie;
             this.nomEnfant = nomEnfant;
             this.age = age;
@@ -59,9 +71,13 @@ public class Suivie {
             this.interactionSociale = interactionSociale;
             this.observation = observation;
             this.statut = statut;
+            this.emailParent = emailParent;
+            this.niveauSeance = niveauSeance;
+            this.idTherapieReco = idTherapieReco;
+            this.crResume = crResume;
+            this.crPdfPath = crPdfPath;
         }
-
-        // 🔹 Getters & Setters
+// 🔹 Getters & Setters
 
         public int getIdSuivie() {
             return idSuivie;
@@ -159,22 +175,44 @@ public class Suivie {
             this.statut = statut;
         }
 
-        @Override
-        public String toString() {
-            return "Suivie{" +
-                    "idSuivie=" + idSuivie +
-                    ", nomEnfant='" + nomEnfant + '\'' +
-                    ", age=" + age +
-                    ", nomPsy='" + nomPsy + '\'' +
-                    ", dateSuivie=" + dateSuivie +
-                    ", scoreHumeur=" + scoreHumeur +
-                    ", scoreStress=" + scoreStress +
-                    ", scoreAttention=" + scoreAttention +
-                    ", comportement='" + comportement + '\'' +
-                    ", interactionSociale='" + interactionSociale + '\'' +
-                    ", observation='" + observation + '\'' +
-                    ", statut='" + statut + '\'' +
-                    '}';
-        }
+    public String getEmailParent() { return emailParent; }
+    public void setEmailParent(String emailParent) { this.emailParent = emailParent; }
+
+    public Integer getNiveauSeance() { return niveauSeance; }
+    public void setNiveauSeance(Integer niveauSeance) { this.niveauSeance = niveauSeance; }
+
+    public Integer getIdTherapieReco() { return idTherapieReco; }
+    public void setIdTherapieReco(Integer idTherapieReco) { this.idTherapieReco = idTherapieReco; }
+
+    public String getCrResume() { return crResume; }
+    public void setCrResume(String crResume) { this.crResume = crResume; }
+
+    public String getCrPdfPath() { return crPdfPath; }
+    public void setCrPdfPath(String crPdfPath) { this.crPdfPath = crPdfPath; }
+
+
+
+    @Override
+    public String toString() {
+        return "Suivie{" +
+                "idSuivie=" + idSuivie +
+                ", nomEnfant='" + nomEnfant + '\'' +
+                ", age=" + age +
+                ", nomPsy='" + nomPsy + '\'' +
+                ", dateSuivie=" + dateSuivie +
+                ", scoreHumeur=" + scoreHumeur +
+                ", scoreStress=" + scoreStress +
+                ", scoreAttention=" + scoreAttention +
+                ", comportement='" + comportement + '\'' +
+                ", interactionSociale='" + interactionSociale + '\'' +
+                ", observation='" + observation + '\'' +
+                ", statut='" + statut + '\'' +
+                ", emailParent='" + emailParent + '\'' +
+                ", niveauSeance=" + niveauSeance +
+                ", idTherapieReco=" + idTherapieReco +
+                ", crResume='" + crResume + '\'' +
+                ", crPdfPath='" + crPdfPath + '\'' +
+                '}';
     }
+}
 

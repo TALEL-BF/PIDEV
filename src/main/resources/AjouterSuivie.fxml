@@ -11,7 +11,12 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.GridPane?>
 
+
+<?import javafx.scene.layout.Region?>
 <BorderPane stylesheets="@styles/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AjouterSuivie">
 
     <!-- SIDEBAR -->
@@ -83,6 +88,46 @@
 
                         <Button fx:id="btnAjouter" styleClass="btn-primary" text="+ Ajouter" />
                     </HBox>
+                    <!-- ✅ Barre Statistiques (toujours visible) -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="stats-header">
+                        <Label fx:id="lblToggleStats" text="▸ Statistiques" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                    </HBox>
+
+                    <!-- ✅ Contenu Statistiques (caché au démarrage) -->
+                    <VBox fx:id="statsBox" spacing="12" visible="false" managed="false">
+                        <VBox spacing="10" styleClass="stats-panel">
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="" /> <!-- juste pour aligner si tu veux -->
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <ComboBox fx:id="cbEnfantStats" promptText="Choisir un enfant..." styleClass="combo"/>
+                                <Button text="Actualiser" fx:id="btnRefreshStats" styleClass="btn-soft"/>
+                            </HBox>
+
+                            <!-- comparaison dernière séance -->
+                            <GridPane hgap="12" vgap="8" styleClass="stats-cards">
+                                <Label text="Δ Humeur" styleClass="stats-k"/>
+                                <Label fx:id="lblDeltaHumeur" text="-" styleClass="stats-v"/>
+
+                                <Label text="Δ Stress (mieux si +)" styleClass="stats-k" GridPane.rowIndex="1"/>
+                                <Label fx:id="lblDeltaStress" text="-" styleClass="stats-v" GridPane.rowIndex="1"/>
+
+                                <Label text="Δ Attention" styleClass="stats-k" GridPane.rowIndex="2"/>
+                                <Label fx:id="lblDeltaAttention" text="-" styleClass="stats-v" GridPane.rowIndex="2"/>
+                            </GridPane>
+
+                            <!-- courbe mensuelle -->
+                            <LineChart fx:id="monthlyChart" prefHeight="260">
+                                <xAxis><CategoryAxis label="Mois"/></xAxis>
+                                <yAxis><NumberAxis label="Moyenne"/></yAxis>
+                            </LineChart>
+
+                        </VBox>
+                    </VBox>
+
+
+
 
                     <!-- Count -->
                     <Label fx:id="countLabel" styleClass="counter-label" text="0 Suivies" />
