@@ -4,10 +4,13 @@ import com.auticare.session.SessionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -19,12 +22,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import java.util.Optional;
+import java.util.ResourceBundle;
 
 @Component
-public class AdminDashboardController {
+public class AdminDashboardController implements Initializable {
 
     @FXML
     private Button btnUsers;
@@ -51,8 +52,6 @@ public class AdminDashboardController {
     @FXML
     private Label adminRoleLabel;
     @FXML
-    private Label userRoleSidebar;
-    @FXML
     private javafx.scene.shape.Circle adminAvatar;
     @FXML
     private StackPane contentArea;
@@ -65,43 +64,36 @@ public class AdminDashboardController {
     // Référence au contrôleur UserFxController pour rafraîchir la liste
     private UserFxController currentUserFxController;
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         System.out.println("=== AdminDashboardController.initialize() ===");
 
         try {
-            // Vérifier si UserManagement.fxml existe
-            URL fxmlUrl = getClass().getResource("/fxml/UserManagement.fxml");
-            System.out.println("URL de UserManagement.fxml: " + fxmlUrl);
-
-            if (fxmlUrl == null) {
-                System.err.println("ERREUR: UserManagement.fxml n'est pas trouvé!");
-                pageTitle.setText("ERREUR");
-                pageSubtitle.setText("Fichier UserManagement.fxml manquant");
-                Label errorLabel = new Label("Le fichier /fxml/UserManagement.fxml est introuvable.\n" +
-                        "Vérifiez qu'il existe dans src/main/resources/fxml/");
-                errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
-                contentArea.getChildren().add(errorLabel);
-                return;
+            // Vérifier que les FXML sont bien injectés
+            if (pageTitle == null) {
+                System.err.println("❌ pageTitle est null - Vérifie le fx:id dans le FXML");
+            }
+            if (pageSubtitle == null) {
+                System.err.println("❌ pageSubtitle est null - Vérifie le fx:id dans le FXML");
+            }
+            if (contentArea == null) {
+                System.err.println("❌ contentArea est null - Vérifie le fx:id dans le FXML");
             }
 
-            // Essayer de charger UserManagement
-            loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
-            updateSidebarStyle(btnUsers);
+            // Mettre à jour le profil admin
             setupAdminProfile();
 
-            System.out.println("Initialisation terminée avec succès!");
+            // Charger UserManagement par défaut
+            loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
+
+            // Mettre à jour le style du bouton actif
+            updateSidebarStyle(btnUsers);
+
+            System.out.println("✅ Initialisation terminée avec succès!");
 
         } catch (Exception e) {
-            System.err.println("Exception dans initialize(): " + e.getMessage());
+            System.err.println("❌ Erreur dans initialize(): " + e.getMessage());
             e.printStackTrace();
-
-            // Afficher l'erreur dans l'interface
-            pageTitle.setText("Erreur");
-            pageSubtitle.setText(e.getMessage());
-            Label errorLabel = new Label("Erreur: " + e.toString());
-            errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px; -fx-wrap-text: true;");
-            contentArea.getChildren().add(errorLabel);
         }
     }
 
@@ -109,14 +101,24 @@ public class AdminDashboardController {
         try {
             com.auticare.entity.User user = SessionManager.getInstance().getCurrentUser();
             if (user != null) {
-                String roleStr = user.getRole() != null ? user.getRole() : "ADMINISTRATEUR";
-                adminNameLabel.setText(user.getName());
-                adminRoleLabel.setText(roleStr);
-                userRoleSidebar.setText(roleStr);
-                System.out.println("Profil admin chargé: " + user.getName());
+                if (adminNameLabel != null) {
+                    adminNameLabel.setText(user.getName());
+                }
+                if (adminRoleLabel != null) {
+                    adminRoleLabel.setText(user.getRole() != null ? user.getRole() : "ADMINISTRATEUR");
+                }
+                System.out.println("✅ Profil admin chargé: " + user.getName());
+            } else {
+                System.out.println("⚠️ Aucun utilisateur connecté");
+                if (adminNameLabel != null) {
+                    adminNameLabel.setText("Admin");
+                }
+                if (adminRoleLabel != null) {
+                    adminRoleLabel.setText("Administrateur");
+                }
             }
         } catch (Exception e) {
-            System.err.println("Erreur dans setupAdminProfile: " + e.getMessage());
+            System.err.println("❌ Erreur dans setupAdminProfile: " + e.getMessage());
         }
     }
 
@@ -128,13 +130,14 @@ public class AdminDashboardController {
 
         updateSidebarStyle(btn);
 
-        if (text.equals("Gestion Utilisateur")) {
-            loadView("/fxml/UserManagement.fxml", "Gestion Utilisateur", "Gérez les membres de la plateforme");
+        if (text.contains("Utilisateur")) {
+            loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
         } else if (text.contains("Cours")) {
             loadView("/fxml/CourseManagement.fxml", "Gestion Cours & Évaluations", "Gérez le contenu éducatif");
-        } else if (text.equals("Suivie")) {
-            loadView("/fxml/FollowUpManagement.fxml", "Gestion des Suivies",
-                    "Gérez les suivies et les informations associées");
+        } else if (text.contains("Suivie")) {
+            loadView("/fxml/FollowUpManagement.fxml", "Gestion des Suivies", "Gérez les suivies");
+        } else if (text.contains("Thérapie")) {
+            loadView("/fxml/TherapieManagement.fxml", "Gestion des Thérapies", "Gérez les thérapies");
         } else {
             loadPlaceholder(text);
         }
@@ -144,40 +147,48 @@ public class AdminDashboardController {
         Button[] buttons = { btnUsers, btnCourses, btnEmploi, btnConsults, btnSuivie, btnTherapie, btnEvents, btnJeux };
         for (Button b : buttons) {
             if (b != null) {
-                b.getStyleClass().removeAll("sidebar-btn-active", "sidebar-sub-btn-active");
+                b.getStyleClass().removeAll("sidebar-btn-active");
+                b.getStyleClass().add("sidebar-btn");
             }
         }
         if (activeBtn != null) {
-            if (activeBtn.getStyleClass().contains("sidebar-sub-btn")) {
-                activeBtn.getStyleClass().add("sidebar-sub-btn-active");
-            } else {
-                activeBtn.getStyleClass().add("sidebar-btn-active");
-            }
+            activeBtn.getStyleClass().remove("sidebar-btn");
+            activeBtn.getStyleClass().add("sidebar-btn-active");
         }
     }
 
     public void loadPlaceholder(String title) {
-        pageTitle.setText(title);
-        pageSubtitle.setText("Module en cours de développement");
-        contentArea.getChildren().clear();
-        Label placeholder = new Label("Architecture Desktop pour " + title + "\nPrêt pour intégration FXML.");
-        placeholder.setStyle("-fx-font-size: 18px; -fx-text-fill: #636e72; -fx-text-alignment: center;");
-        contentArea.getChildren().add(placeholder);
+        if (pageTitle != null) {
+            pageTitle.setText(title);
+        }
+        if (pageSubtitle != null) {
+            pageSubtitle.setText("Module en cours de développement");
+        }
+        if (contentArea != null) {
+            contentArea.getChildren().clear();
+            Label placeholder = new Label("Module " + title + " en cours de développement");
+            placeholder.setStyle("-fx-font-size: 18px; -fx-text-fill: #636e72; -fx-alignment: center;");
+            contentArea.getChildren().add(placeholder);
+        }
     }
 
     public void setContent(Node view, String title, String subtitle) {
-        contentArea.getChildren().setAll(view);
-        pageTitle.setText(title);
-        pageSubtitle.setText(subtitle);
+        if (contentArea != null) {
+            contentArea.getChildren().setAll(view);
+        }
+        if (pageTitle != null) {
+            pageTitle.setText(title);
+        }
+        if (pageSubtitle != null) {
+            pageSubtitle.setText(subtitle);
+        }
     }
 
     public void loadView(String fxmlPath, String title, String subtitle) {
         try {
-            System.out.println("Tentative de chargement: " + fxmlPath);
+            System.out.println("🔄 Chargement de: " + fxmlPath);
 
             URL fxmlUrl = getClass().getResource(fxmlPath);
-            System.out.println("URL complète: " + fxmlUrl);
-
             if (fxmlUrl == null) {
                 throw new IOException("Fichier non trouvé: " + fxmlPath);
             }
@@ -186,7 +197,7 @@ public class AdminDashboardController {
             loader.setControllerFactory(applicationContext::getBean);
             Node view = loader.load();
 
-            // Si c'est UserManagement.fxml, garder une référence au contrôleur
+            // Si c'est UserManagement.fxml, garder une référence
             if (fxmlPath.contains("UserManagement")) {
                 currentUserFxController = loader.getController();
                 System.out.println("✅ Référence à UserFxController sauvegardée");
@@ -198,17 +209,15 @@ public class AdminDashboardController {
         } catch (Exception e) {
             System.err.println("❌ Erreur chargement " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
-            loadPlaceholder(title + " (Error loading FXML)");
+            loadPlaceholder(title);
         }
     }
 
-    // Méthode pour rafraîchir la liste des utilisateurs
     public void refreshUserList() {
-        System.out.println("🔄 Rafraîchissement de la liste des utilisateurs...");
+        System.out.println("🔄 Rafraîchissement de la liste...");
         if (currentUserFxController != null) {
             currentUserFxController.refreshList();
         } else {
-            System.out.println("⚠️ currentUserFxController est null - rechargement de la vue");
             loadView("/fxml/UserManagement.fxml", "Gestion des Utilisateurs", "Gérez les membres de la plateforme");
         }
     }
@@ -216,7 +225,6 @@ public class AdminDashboardController {
     @FXML
     private void handleLogout() {
         try {
-            // Afficher une confirmation
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Déconnexion");
             alert.setHeaderText("Êtes-vous sûr de vouloir vous déconnecter?");
@@ -224,10 +232,8 @@ public class AdminDashboardController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                // Vider la session
                 SessionManager.getInstance().clearSession();
 
-                // Charger la page de login
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
                 loader.setControllerFactory(applicationContext::getBean);
                 Parent root = loader.load();

@@ -70,6 +70,43 @@ public class LoginController {
         }
     }
 
+    @FXML
+    private void handleRegister() {
+        try {
+            System.out.println("🔄 Redirection vers inscription...");
+
+            // Note: Si tu n'as pas Register.fxml, commente cette méthode ou crée le fichier
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Register.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+            Parent root = loader.load();
+
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("AutiCare - Créer un compte");
+            stage.show();
+
+        } catch (IOException e) {
+            System.err.println("❌ Erreur redirection inscription: " + e.getMessage());
+            e.printStackTrace();
+
+            // Afficher une alerte pour informer l'utilisateur
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText("Fichier manquant");
+            alert.setContentText("La page d'inscription (Register.fxml) n'est pas disponible.\nVeuillez contacter l'administrateur.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void handleForgotPassword() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Mot de passe oublié");
+        alert.setHeaderText(null);
+        alert.setContentText("Veuillez contacter l'administrateur pour réinitialiser votre mot de passe.");
+        alert.showAndWait();
+    }
+
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -80,6 +117,7 @@ public class LoginController {
 
     private void loadDashboard(String fxmlPath, String title) {
         try {
+            System.out.println("Chargement de: " + fxmlPath);
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
@@ -95,30 +133,4 @@ public class LoginController {
                     "Impossible de charger le tableau de bord : " + detail);
         }
     }
-
-    @FXML
-    private void handleForgotPassword() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mot de passe oublié");
-        alert.setHeaderText(null);
-        alert.setContentText("Veuillez contacter l'administrateur pour réinitialiser votre mot de passe.");
-        alert.showAndWait();
-    }
-
-    @FXML
-    private void handleRegister() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Register.fxml"));
-            loader.setControllerFactory(applicationContext::getBean);
-            Parent root = loader.load();
-
-            Stage stage = (Stage) emailField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("AutiCare - Créer un compte");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
