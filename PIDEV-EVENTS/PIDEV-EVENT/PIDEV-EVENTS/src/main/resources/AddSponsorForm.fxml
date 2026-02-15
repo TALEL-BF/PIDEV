@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<AnchorPane prefWidth="1100.0" prefHeight="700.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controller.AddSponsorController"
+            stylesheets="@styles/app.css">
+
+    <children>
+        <ScrollPane fitToWidth="true" fitToHeight="true"
+                    AnchorPane.topAnchor="0.0"
+                    AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0"
+                    style="-fx-background-color: #e6f7ff; -fx-border-color: transparent;">  <!-- ← CHANGÉ ICI -->
+            <VBox spacing="25" style="-fx-background-color: #e6f7ff; -fx-padding: 30;">  <!-- ← CHANGÉ ICI -->
+
+                <!-- ========== TITRE ========== -->
+                <Label fx:id="titleLabel" text="Ajouter un sponsor"
+                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+
+                <!-- ========== FORMULAIRE ========== -->
+                <VBox spacing="20"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 20;
+                             -fx-border-radius: 20;
+                             -fx-border-color: #8b5cf6;
+                             -fx-border-width: 2;
+                             -fx-padding: 30;
+                             -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.15), 15, 0, 0, 5);">
+
+                    <!-- NOM -->
+                    <VBox spacing="5">
+                        <Label text="Nom du sponsor" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <TextField fx:id="nomField" promptText="Ex: Orange Tunisie"
+                                   style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-background-color: #f9fafb; -fx-border-color: #e2e8f0; -fx-border-width: 1.5; -fx-padding: 12 15;"/>
+                    </VBox>
+
+                    <!-- TYPE -->
+                    <VBox spacing="5">
+                        <Label text="Type de sponsor" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <ComboBox fx:id="typeBox" promptText="Sélectionnez un type"
+                                  style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-background-color: #f9fafb; -fx-border-color: #e2e8f0; -fx-border-width: 1.5; -fx-padding: 5;">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Or" />
+                                    <String fx:value="Argent" />
+                                    <String fx:value="Bronze" />
+                                    <String fx:value="Platine" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </VBox>
+
+                    <!-- EMAIL -->
+                    <VBox spacing="5">
+                        <Label text="Email" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <TextField fx:id="emailField" promptText="contact@sponsor.com"
+                                   style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-background-color: #f9fafb; -fx-border-color: #e2e8f0; -fx-border-width: 1.5; -fx-padding: 12 15;"/>
+                    </VBox>
+
+                    <!-- TÉLÉPHONE -->
+                    <VBox spacing="5">
+                        <Label text="Téléphone" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <TextField fx:id="telephoneField" promptText="0123456789"
+                                   style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-background-color: #f9fafb; -fx-border-color: #e2e8f0; -fx-border-width: 1.5; -fx-padding: 12 15;"/>
+                    </VBox>
+
+                    <!-- DESCRIPTION -->
+                    <VBox spacing="5">
+                        <Label text="Description" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <TextArea fx:id="descriptionField" promptText="Décrivez le sponsor..."
+                                  prefRowCount="4"
+                                  style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-background-color: #f9fafb; -fx-border-color: #e2e8f0; -fx-border-width: 1.5; -fx-padding: 12;"/>
+                    </VBox>
+
+                    <!-- IMAGE -->
+                    <VBox spacing="5">
+                        <Label text="Logo du sponsor" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <TextField fx:id="imagePathField" promptText="Chemin ou URL du logo" HBox.hgrow="ALWAYS"
+                                       style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-background-color: #f9fafb; -fx-border-color: #e2e8f0; -fx-border-width: 1.5; -fx-padding: 12 15;"/>
+                            <Button text="Parcourir..." onAction="#handleChooseImage"
+                                    style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 12 25; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0, 0, 2);"/>
+                        </HBox>
+                        <StackPane style="-fx-padding: 10 0 0 0;">
+                            <ImageView fx:id="sponsorImageView" fitWidth="120" fitHeight="120" preserveRatio="false"
+                                       style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-background-color: #f9fafb;"/>
+                        </StackPane>
+                    </VBox>
+
+                    <Separator style="-fx-background-color: #e2e8f0; -fx-padding: 10 0;"/>
+
+                    <!-- BOUTONS -->
+                    <HBox spacing="15" alignment="CENTER_RIGHT">
+                        <Button text="Annuler" fx:id="cancelBtn" onAction="#handleCancel"
+                                style="-fx-background-color: transparent; -fx-border-color: #8b5cf6; -fx-text-fill: #8b5cf6; -fx-border-width: 2; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 12 30; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                        <Button text="Ajouter le sponsor" fx:id="saveBtn" onAction="#handleSaveSponsor"
+                                style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 12 30; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 10, 0, 0, 3);"/>
+                    </HBox>
+
+                    <!-- ========== BOUTON RETOUR EN BAS (comme les événements) ========== -->
+                    <HBox alignment="CENTER_LEFT" style="-fx-padding: 15 0 0 0;">
+                        <Button fx:id="backButton" text="← Retour à la liste des sponsors"
+                                onAction="#goBackToSponsorTable"
+                                style="-fx-background-color: transparent; -fx-text-fill: #8b5cf6;
+               -fx-font-weight: bold; -fx-underline: true; -fx-font-size: 14px;
+               -fx-cursor: hand;"/>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+            <!-- Table des événements du sponsor -->
+            <VBox spacing="10" style="-fx-padding: 15 0 0 0;">
+                <Label text="📅 Événements associés"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+
+                <TableView fx:id="eventsSponsorTable" prefHeight="150">
+                    <columns>
+                        <TableColumn fx:id="colEventTitre" text="Événement" prefWidth="200"/>
+                        <TableColumn fx:id="colEventDate" text="Date" prefWidth="100"/>
+                        <TableColumn fx:id="colEventLieu" text="Lieu" prefWidth="150"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Aucun événement associé"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+        </ScrollPane>
+    </children>
+</AnchorPane>

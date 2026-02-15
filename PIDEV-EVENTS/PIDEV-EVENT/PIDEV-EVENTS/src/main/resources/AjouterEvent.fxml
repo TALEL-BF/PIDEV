@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controller.AddEventController"
+            stylesheets="@styles/app.css"
+            prefHeight="600" prefWidth="950"
+            style="-fx-background-color: #e6f7ff;">  <!-- Fond bleu clair -->
+
+    <!-- SIDEBAR - Purple gradient -->
+
+
+    <!-- CONTENT AREA - Formulaire d'ajout -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: transparent;">  <!-- Espacement réduit -->
+
+                <!-- ✅ Titre avec fx:id pour le contrôleur -->
+                <Label fx:id="titleLabel" text="Ajouter un événement"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>  <!-- Police plus petite -->
+
+                <!-- Formulaire -->
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #8b5cf6; -fx-border-width: 2; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.1), 10, 0, 0, 2);">  <!-- Padding réduit -->
+
+                    <!-- Titre -->
+                    <VBox spacing="3">  <!-- Espacement réduit -->
+                        <Label text="Titre" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                        <TextField fx:id="titreField" promptText="Ex: Atelier de peinture" style="-fx-padding: 8;"/>
+                    </VBox>
+
+                    <!-- Type -->
+                    <VBox spacing="3">
+                        <Label text="Type" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                        <ComboBox fx:id="typeBox" promptText="Sélectionnez un type" style="-fx-padding: 5;"/>
+                    </VBox>
+
+                    <!-- Lieu -->
+                    <VBox spacing="3">
+                        <Label text="Lieu" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                        <TextField fx:id="lieuField" promptText="Adresse ou salle" style="-fx-padding: 8;"/>
+                    </VBox>
+
+                    <!-- Participants -->
+                    <VBox spacing="3">
+                        <Label text="Participants maximum" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                        <Spinner fx:id="maxParticipantsSpinner" style="-fx-padding: 5;"/>
+                    </VBox>
+
+                    <!-- Description -->
+                    <!-- Description avec bouton IA -->
+                    <VBox spacing="5">
+                        <Label text="Description" style="-fx-font-weight: bold; -fx-text-fill: #4a5568;"/>
+                        <HBox spacing="10">
+                            <TextArea fx:id="descriptionField" promptText="Décrivez votre événement..."
+                                      prefRowCount="4" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-radius: 10; -fx-border-radius: 10;"/>
+                            <Button fx:id="generateDescBtn"
+                                    text="🤖 Générer"
+                                    style="-fx-background-color: #8b5cf6; -fx-text-fill: white;
+                       -fx-background-radius: 10; -fx-padding: 10 20;
+                       -fx-font-weight: bold; -fx-cursor: hand;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Dates -->
+                    <HBox spacing="8">
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Date début" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                            <DatePicker fx:id="dateDebutPicker" style="-fx-padding: 5;"/>
+                        </VBox>
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Date fin" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                            <DatePicker fx:id="dateFinPicker" style="-fx-padding: 5;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Heures -->
+                    <HBox spacing="8">
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Heure début" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                            <TextField fx:id="heureDebutField" promptText="14:30" style="-fx-padding: 8;"/>
+                        </VBox>
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Heure fin" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                            <TextField fx:id="heureFinField" promptText="16:30" style="-fx-padding: 8;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Image -->
+                    <VBox spacing="3">
+                        <Label text="Image" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                        <HBox spacing="8">
+                            <TextField fx:id="imagePathField" promptText="Chemin de l'image" HBox.hgrow="ALWAYS" style="-fx-padding: 8;"/>
+                            <Button text="Parcourir..." onAction="#handleChooseImage"
+                                    style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 8 15; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 12px;"/>
+                        </HBox>
+                        <StackPane>
+                            <ImageView fx:id="eventImageView" fitWidth="150" fitHeight="120" preserveRatio="false"/>  <!-- Plus petite -->
+                        </StackPane>
+                    </VBox>
+
+                    <!-- Sponsors -->
+                    <VBox spacing="3">
+                        <Label text="Sponsors" style="-fx-font-weight: bold; -fx-text-fill: #4a5568; -fx-font-size: 13px;"/>
+                        <VBox fx:id="sponsorCheckboxContainer" spacing="3"/>
+                        <Button text="Ajouter un sponsor" onAction="#openAddSponsorForm"
+                                style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 6 12; -fx-font-weight: bold; -fx-cursor: hand; -fx-max-width: 180; -fx-font-size: 12px;"/>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!-- Boutons -->
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+                        <Button text="Annuler" fx:id="annulerButton" onAction="#annuler"
+                                style="-fx-background-color: transparent; -fx-border-color: #8b5cf6; -fx-text-fill: #8b5cf6; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 13px;"/>
+                        <Button text="Ajouter" fx:id="ajouterButton" onAction="#ajouterEvent"
+                                style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-size: 13px;"/>
+                    </HBox>
+
+                    <!-- Retour -->
+                    <HBox alignment="CENTER_LEFT">
+                        <Button fx:id="backButton" text="← Retour à la liste" onAction="#goBackToEventTable"
+                                style="-fx-background-color: transparent; -fx-text-fill: #8b5cf6; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand; -fx-font-size: 12px;"/>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+
+        </ScrollPane>
+    </center>
+
+</BorderPane>
