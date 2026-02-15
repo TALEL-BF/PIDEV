@@ -728,5 +728,6 @@
     -fx-font-size: 16;
 }
 .field-ok { -fx-border-color: #22c55e; -fx-border-width: 2; }
+
 .field-bad { -fx-border-color: #ef4444; -fx-border-width: 2; }
 
