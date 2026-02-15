@@ -43,8 +43,6 @@
 
                 <Separator/>
 
-                <Button text="Gestion des utilisateurs"
-                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
 
                 <Button text="Gestion des cours"
                         style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10; -fx-cursor: hand;"/>
@@ -119,7 +117,7 @@
 
                             <HBox spacing="15" alignment="CENTER_RIGHT">
                                 <!-- BOUTON POUR AJOUTER UN COURS -->
-                                <Button text="+ Ajouter un cours"
+                                <Button text="+"
                                         fx:id="ajouterCoursButton"
                                         style="-fx-background-color: #7B2FF7;
                                                -fx-text-fill: white;
@@ -130,7 +128,7 @@
                                                -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
 
                                 <!-- BOUTON POUR AJOUTER UNE ÉVALUATION -->
-                                <Button text="📝 Ajouter évaluation"
+                                <Button text="📝"
                                         fx:id="ajouterEvaluationButton"
                                         style="-fx-background-color: #28A745;
                                                -fx-text-fill: white;

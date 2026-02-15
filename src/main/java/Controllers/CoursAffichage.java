@@ -19,6 +19,9 @@ import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
 
 public class CoursAffichage implements Initializable {
 
@@ -312,7 +315,6 @@ public class CoursAffichage implements Initializable {
             imageView.setImage(null);
         }
     }
-
     private void afficherContenuSimplifie(Cours cours) {
         Stage contentStage = new Stage();
         contentStage.setTitle(cours.getTitre());
@@ -383,18 +385,43 @@ public class CoursAffichage implements Initializable {
             String[] motsList = cours.getMots().split(";");
             String[] imagesList = cours.getImages_mots() != null ? cours.getImages_mots().split(";") : new String[0];
 
+            System.out.println("📝 Affichage - Mots (" + motsList.length + "): " + Arrays.toString(motsList));
+            System.out.println("🖼️ Affichage - Images (" + imagesList.length + "): " + Arrays.toString(imagesList));
+
+            // Limiter le nombre d'images au nombre de mots
+            int nbImages = Math.min(imagesList.length, motsList.length);
+
             for (int i = 0; i < motsList.length; i++) {
                 String mot = motsList[i].trim();
-                String image = (i < imagesList.length) ? imagesList[i].trim() : null;
+                if (mot.isEmpty()) continue;
 
+                // Récupérer l'image au même index (si elle existe)
+                String image = (i < nbImages) ? imagesList[i].trim() : null;
+
+                // Ignorer les valeurs "null" ou vides
+                if (image != null && (image.equals("null") || image.isEmpty())) {
+                    image = null;
+                }
+
+                System.out.println("   Index " + i + " - Mot: '" + mot + "' -> Image: " + image);
+
+                // Vérifier si l'image contient plusieurs fichiers (séparés par ;)
                 if (image != null && image.contains(";")) {
                     String[] multipleImages = image.split(";");
-                    VBox motAvecMultiImages = createMotCardAvecMultiImages(mot, multipleImages);
-                    motsPane.getChildren().add(motAvecMultiImages);
+                    // Pour l'affichage, on prend seulement la première image
+                    String firstImage = multipleImages[0].trim();
+                    VBox motCard = createMotCard(mot, firstImage);
+                    motsPane.getChildren().add(motCard);
+                    System.out.println("      ↳ Multiple images trouvées, utilisation de: " + firstImage);
                 } else {
                     VBox motCard = createMotCard(mot, image);
                     motsPane.getChildren().add(motCard);
                 }
+            }
+
+            // Avertir s'il y a plus d'images que de mots
+            if (imagesList.length > motsList.length) {
+                System.out.println("⚠️ Attention: " + (imagesList.length - motsList.length) + " images supplémentaires ignorées");
             }
         }
 
@@ -406,7 +433,7 @@ public class CoursAffichage implements Initializable {
 
         motsSection.getChildren().add(motsPane);
 
-        // SECTION ÉVALUATION - UNIQUEMENT LE BOUTON PASSER LE QUIZ
+        // SECTION ÉVALUATION
         VBox evaluationSection = new VBox(15);
         evaluationSection.setMaxWidth(1200);
         evaluationSection.setAlignment(Pos.CENTER);
@@ -458,7 +485,7 @@ public class CoursAffichage implements Initializable {
                 )
         );
 
-        // Action pour le quiz - CORRIGÉ
+        // Action pour le quiz
         passerQuizBtn.setOnAction(e -> {
             contentStage.close();
             System.out.println("🎯 Navigation vers le quiz pour le cours ID: " + cours.getId_cours());
@@ -492,7 +519,6 @@ public class CoursAffichage implements Initializable {
         contentStage.setScene(scene);
         contentStage.show();
     }
-
     private VBox createMotCardAvecMultiImages(String mot, String[] imageUrls) {
         VBox card = new VBox(15);
         card.setAlignment(Pos.CENTER);
@@ -647,7 +673,7 @@ public class CoursAffichage implements Initializable {
         StackPane imageContainer = new StackPane();
         imageContainer.setPrefHeight(120);
 
-        if (imageUrl != null && !imageUrl.isEmpty()) {
+        if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.equals("null")) {
             try {
                 String imagePath = "/images/" + imageUrl;
                 URL imageResource = getClass().getResource(imagePath);
