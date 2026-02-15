@@ -63,6 +63,18 @@ public class RDVFormController {
             validateNumericField(txtIdAutiste);
         });
 
+        // Ajout de la validation en temps réel pour la date
+        datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
+            if (newDate != null) {
+                LocalDate today = LocalDate.now();
+                if (newDate.isBefore(today)) {
+                    showError(errorDate, "La date doit être aujourd'hui ou une date future", datePicker);
+                } else {
+                    hideError(errorDate);
+                }
+            }
+        });
+
         // Enable save button always
         btnSave.setDisable(false);
     }
@@ -92,6 +104,14 @@ public class RDVFormController {
         if (datePicker.getValue() == null) {
             showError(errorDate, "La date est requise", datePicker);
             isValid = false;
+        } else {
+            LocalDate selectedDate = datePicker.getValue();
+            LocalDate today = LocalDate.now();
+
+            if (selectedDate.isBefore(today)) {
+                showError(errorDate, "La date doit être aujourd'hui ou une date future", datePicker);
+                isValid = false;
+            }
         }
 
         if (txtIdPsychologue.getText().trim().isEmpty()) {
