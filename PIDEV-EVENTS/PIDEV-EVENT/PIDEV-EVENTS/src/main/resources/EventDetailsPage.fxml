@@ -5,6 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -89,9 +90,9 @@
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true"
                     style="-fx-background-color: transparent; -fx-border-color: transparent;">
-            <VBox spacing="20" alignment="TOP_CENTER" style="-fx-padding: 15; -fx-background-color: transparent;">
+            <VBox spacing="25" style="-fx-padding: 20; -fx-background-color: transparent;">
 
-                <!-- ========== HERO BANNER - EXACTEMENT COMME AVANT ========== -->
+                <!-- ========== HERO BANNER ========== -->
                 <StackPane fx:id="heroStackPane"
                            prefHeight="150"
                            style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-overflow: hidden;
@@ -136,198 +137,135 @@
 
                 <!-- ========== TITRE ========== -->
                 <Label fx:id="eventTitleLabel"
-                       text="Titre de l'Événement"
+                       text="cuisine"
                        style="-fx-font-size: 32px;
                               -fx-font-weight: bold;
                               -fx-text-fill: #7c3aed;
-                              -fx-padding: 10 0 15 0;"
+                              -fx-padding: 0 0 10 0;"
                        maxWidth="Infinity" alignment="CENTER_LEFT"/>
 
-                <!-- ========== GRAND CADRE BLANC ENCORE PLUS GRAND ========== -->
-                <VBox spacing="22" maxWidth="1100"
-                      style="-fx-background-color: white; -fx-background-radius: 25; -fx-padding: 30;
-                             -fx-border-color: #c4b5fd; -fx-border-width: 2; -fx-border-radius: 25;
-                             -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.25), 20, 0, 0, 8);">
+                <!-- ========== GRAND CADRE BLANC ========== -->
+                <VBox spacing="20"
+                      style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25;
+                             -fx-border-color: #c4b5fd; -fx-border-width: 2; -fx-border-radius: 20;
+                             -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 15, 0, 0, 5);">
 
-                    <!-- ========== RANGÉE 1: IMAGE + INFOS ========== -->
-                    <HBox spacing="22" alignment="TOP_CENTER">
+                    <!-- ========== RANGÉE 1: IMAGE + INFORMATIONS ========== -->
+                    <HBox spacing="20" alignment="TOP_CENTER">
 
-                        <!-- IMAGE - Encore plus grande (550px) -->
-                        <StackPane prefWidth="550" maxWidth="550" minWidth="550">
-                            <ImageView fx:id="eventImageView" fitWidth="530" fitHeight="300" preserveRatio="true"
-                                       style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);">
+                        <!-- IMAGE -->
+                        <StackPane prefWidth="500" maxWidth="500" minWidth="500">
+                            <ImageView fx:id="eventImageView" fitWidth="480" fitHeight="270" preserveRatio="true"
+                                       style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1);">
                                 <image><Image url="@assets/event-default.jpg"/></image>
                             </ImageView>
                         </StackPane>
 
-                        <!-- INFOS - Plus grand -->
-                        <VBox spacing="15" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: #faf5ff; -fx-background-radius: 18; -fx-padding: 25;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 18;
-                                     -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.15), 8, 0, 0, 3);">
+                        <!-- INFORMATIONS AVEC LIEN MAP -->
+                        <VBox spacing="12" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: #faf5ff; -fx-background-radius: 15; -fx-padding: 20;
+                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 15;
+                                     -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.1), 5, 0, 0, 2);">
 
                             <Label text="📋 Informations"
-                                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
 
-                            <GridPane hgap="15" vgap="15">
+                            <GridPane hgap="12" vgap="12">
                                 <!-- Date -->
-                                <ImageView fitWidth="28" fitHeight="28" preserveRatio="true" GridPane.rowIndex="0" GridPane.columnIndex="0">
-                                    <image><Image url="@assets/calender.png"/></image>
-                                </ImageView>
-                                <VBox spacing="2" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                                    <Label text="Date" style="-fx-font-size: 12px; -fx-text-fill: #6b4e8a;"/>
-                                    <Label fx:id="dateLabel" text="15 Mars 2026" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-                                </VBox>
+                                <Label text="📅" style="-fx-font-size: 18px;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <Label text="15 Mars 2026" style="-fx-font-size: 15px; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                                 <!-- Heure -->
-                                <ImageView fitWidth="28" fitHeight="28" preserveRatio="true" GridPane.rowIndex="1" GridPane.columnIndex="0">
-                                    <image><Image url="@assets/clock.png"/></image>
-                                </ImageView>
-                                <VBox spacing="2" GridPane.rowIndex="1" GridPane.columnIndex="1">
-                                    <Label text="Horaire" style="-fx-font-size: 12px; -fx-text-fill: #6b4e8a;"/>
-                                    <Label fx:id="timeLabel" text="14:30 - 16:30" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-                                </VBox>
+                                <Label text="⏰" style="-fx-font-size: 18px;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <Label text="14:30 - 16:30" style="-fx-font-size: 15px; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
                                 <!-- Lieu -->
-                                <ImageView fitWidth="28" fitHeight="28" preserveRatio="true" GridPane.rowIndex="2" GridPane.columnIndex="0">
-                                    <image><Image url="@assets/lieu1.png"/></image>
-                                </ImageView>
-                                <VBox spacing="2" GridPane.rowIndex="2" GridPane.columnIndex="1">
-                                    <Label text="Lieu" style="-fx-font-size: 12px; -fx-text-fill: #6b4e8a;"/>
-                                    <Label fx:id="locationLabel" text="Espace Culturel, Tunis" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-                                </VBox>
+                                <Label text="📍" style="-fx-font-size: 18px;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <Label text="Espace Culturel, Tunis" style="-fx-font-size: 15px; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <!-- LIEN MAP AJOUTÉ -->
+                                <Label text="🗺️" style="-fx-font-size: 18px;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <Hyperlink fx:id="mapLink"
+                                           text="Voir sur Google Maps"
+                                           style="-fx-font-size: 14px; -fx-text-fill: #7c3aed; -fx-font-weight: bold;"
+                                           onAction="#openMap"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
                                 <!-- Type -->
-                                <ImageView fitWidth="28" fitHeight="28" preserveRatio="true" GridPane.rowIndex="3" GridPane.columnIndex="0">
-                                    <image><Image url="@assets/yeno.png"/></image>
-                                </ImageView>
-                                <VBox spacing="2" GridPane.rowIndex="3" GridPane.columnIndex="1">
-                                    <Label text="Type" style="-fx-font-size: 12px; -fx-text-fill: #6b4e8a;"/>
-                                    <Label fx:id="typeLabel" text="Atelier" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                                </VBox>
+                                <Label text="🏷️" style="-fx-font-size: 18px;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <Label text="Atelier" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
                             </GridPane>
                         </VBox>
                     </HBox>
 
-                    <!-- ========== RANGÉE 2: DESCRIPTION (même largeur que l'image) + PARTICIPANTS ========== -->
-                    <HBox spacing="22" alignment="TOP_CENTER">
+                    <!-- ========== RANGÉE 2: DESCRIPTION + PARTICIPANTS ========== -->
+                    <HBox spacing="20" alignment="TOP_CENTER">
 
-                        <!-- DESCRIPTION - Même largeur que l'image (550px) -->
-                        <VBox prefWidth="550" maxWidth="550" minWidth="550"
-                              style="-fx-background-color: #faf5ff; -fx-background-radius: 18; -fx-padding: 25;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 18;
-                                     -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.15), 8, 0, 0, 3);">
+                        <!-- DESCRIPTION AVEC TAGS -->
+                        <VBox prefWidth="500" maxWidth="500" minWidth="500"
+                              style="-fx-background-color: #faf5ff; -fx-background-radius: 15; -fx-padding: 20;
+                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 15;
+                                     -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.1), 5, 0, 0, 2);">
 
                             <Label text="📝 Description"
-                                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
 
-                            <TextArea fx:id="descriptionArea"
-                                      wrapText="true"
-                                      editable="false"
-                                      prefRowCount="6"
-                                      style="-fx-font-size: 15px; -fx-background-color: white;
-                                             -fx-border-color: #e9d5ff; -fx-border-radius: 12;
-                                             -fx-background-radius: 12; -fx-padding: 12;"/>
+                            <Label text="La cuisine est l'art et la technique de préparer des aliments pour les manger."
+                                   wrapText="true"
+                                   style="-fx-font-size: 14px; -fx-padding: 10 0 10 0; -fx-text-fill: #4a5568;"/>
 
-                            <FlowPane fx:id="tagsContainer" hgap="10" vgap="8" style="-fx-padding: 10 0 0 0;"/>
+                            <!-- TAGS -->
+                            <FlowPane hgap="8" vgap="6" style="-fx-padding: 5 0 0 0;">
+                                <Label text="#Bien-être" style="-fx-background-color: #ede9fe; -fx-padding: 5 12; -fx-background-radius: 20; -fx-font-size: 12px; -fx-text-fill: #7c3aed;"/>
+                                <Label text="#Atelier" style="-fx-background-color: #ede9fe; -fx-padding: 5 12; -fx-background-radius: 20; -fx-font-size: 12px; -fx-text-fill: #7c3aed;"/>
+                                <Label text="#Groupe" style="-fx-background-color: #ede9fe; -fx-padding: 5 12; -fx-background-radius: 20; -fx-font-size: 12px; -fx-text-fill: #7c3aed;"/>
+                                <Label text="#Écoute" style="-fx-background-color: #ede9fe; -fx-padding: 5 12; -fx-background-radius: 20; -fx-font-size: 12px; -fx-text-fill: #7c3aed;"/>
+                            </FlowPane>
                         </VBox>
 
-                        <!-- PARTICIPANTS - Plus grand -->
-                        <VBox spacing="18" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: #faf5ff; -fx-background-radius: 18; -fx-padding: 25;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 18;
-                                     -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.15), 8, 0, 0, 3);">
+                        <!-- PARTICIPANTS -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: #faf5ff; -fx-background-radius: 15; -fx-padding: 20;
+                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 15;
+                                     -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.1), 5, 0, 0, 2);">
 
                             <Label text="👥 Participants"
-                                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
 
-                            <HBox alignment="CENTER" spacing="30">
-                                <VBox alignment="CENTER" spacing="5">
-                                    <Label fx:id="inscritsCount" text="24" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                                    <Label text="Inscrits" style="-fx-font-size: 14px; -fx-text-fill: #6b4e8a;"/>
+                            <HBox alignment="CENTER" spacing="25">
+                                <VBox alignment="CENTER" spacing="3">
+                                    <Label text="4" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                                    <Label text="Inscrits" style="-fx-font-size: 13px; -fx-text-fill: #6b4e8a;"/>
                                 </VBox>
-                                <Label text="/" style="-fx-font-size: 42px; -fx-text-fill: #d8c9ff;"/>
-                                <VBox alignment="CENTER" spacing="5">
-                                    <Label fx:id="maxParticipantsLabel" text="50" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #6b4e8a;"/>
-                                    <Label text="Places" style="-fx-font-size: 14px; -fx-text-fill: #6b4e8a;"/>
+                                <Label text="/" style="-fx-font-size: 36px; -fx-text-fill: #d8c9ff;"/>
+                                <VBox alignment="CENTER" spacing="3">
+                                    <Label text="11" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #6b4e8a;"/>
+                                    <Label text="Places" style="-fx-font-size: 13px; -fx-text-fill: #6b4e8a;"/>
                                 </VBox>
                             </HBox>
 
-                            <ProgressBar fx:id="participantsProgress" prefWidth="280" progress="0.48"
-                                         style="-fx-accent: #8b5cf6; -fx-pref-height: 12; -fx-background-radius: 8;"/>
+                            <ProgressBar prefWidth="250" progress="0.36"
+                                         style="-fx-accent: #8b5cf6; -fx-pref-height: 8; -fx-background-radius: 5;"/>
                         </VBox>
                     </HBox>
 
-                    <!-- ========== BOUTONS PLUS GRANDS ========== -->
-                    <HBox spacing="30" alignment="CENTER" style="-fx-padding: 20 0 5 0;">
-                        <Button fx:id="rapportIABtn" text="🤖 Rapport IA"
-                                style="-fx-background-color: white; -fx-text-fill: #7c3aed; -fx-font-size: 16px;
-                                   -fx-font-weight: bold; -fx-background-radius: 35; -fx-padding: 12 40;
-                                   -fx-border-color: #8b5cf6; -fx-border-width: 2; -fx-border-radius: 35;
-                                   -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 6, 0, 0, 2);"/>
+                    <!-- ========== BOUTONS ========== -->
+                    <HBox spacing="25" alignment="CENTER" style="-fx-padding: 15 0 0 0;">
+                        <Button fx:id="rapportIABtn" text="Rapport IA"
+                                style="-fx-background-color: white; -fx-text-fill: #7c3aed; -fx-font-size: 15px;
+                                   -fx-font-weight: bold; -fx-background-radius: 30; -fx-padding: 10 35;
+                                   -fx-border-color: #8b5cf6; -fx-border-width: 2; -fx-border-radius: 30;
+                                   -fx-cursor: hand;"/>
 
-                        <Button fx:id="registerBtn" text="✅ Participer"
-                                style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 16px;
-                                   -fx-font-weight: bold; -fx-background-radius: 35; -fx-padding: 12 50;
-                                   -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.5), 10, 0, 0, 3);"/>
+                        <Button fx:id="registerBtn" text="Participer"
+                                style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 15px;
+                                   -fx-font-weight: bold; -fx-background-radius: 30; -fx-padding: 10 45;
+                                   -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 5, 0, 0, 1);"/>
                     </HBox>
                 </VBox>
 
-                <!-- ========== SPONSORS TRÈS GRANDS ========== -->
-                <VBox spacing="22" alignment="CENTER" maxWidth="1100"
-                      style="-fx-background-color: linear-gradient(to bottom, #faf5ff, #f0e6ff);
-                             -fx-background-radius: 28; -fx-padding: 35;
-                             -fx-border-color: #c4b5fd; -fx-border-width: 2; -fx-border-radius: 28;
-                             -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 22, 0, 0, 8);">
-
-                    <Label text="✨ Nos partenaires de confiance ✨"
-                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-
-                    <FlowPane fx:id="sponsorsFlowPane" hgap="35" vgap="30" alignment="CENTER">
-                        <!-- Sponsor 1 - Très grand -->
-                        <VBox alignment="CENTER" spacing="12"
-                              style="-fx-background-color: white; -fx-background-radius: 22; -fx-padding: 25; -fx-min-width: 200; -fx-min-height: 180;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 22;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 3);">
-                            <Label text="🌟" style="-fx-font-size: 48px;"/>
-                            <Label text="AutiCare Foundation" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                            <Label text="Partenaire officiel" style="-fx-font-size: 13px; -fx-text-fill: #6b4e8a;"/>
-                        </VBox>
-
-                        <!-- Sponsor 2 - Très grand -->
-                        <VBox alignment="CENTER" spacing="12"
-                              style="-fx-background-color: white; -fx-background-radius: 22; -fx-padding: 25; -fx-min-width: 200; -fx-min-height: 180;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 22;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 3);">
-                            <Label text="✨" style="-fx-font-size: 48px;"/>
-                            <Label text="Éducation Pour Tous" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                            <Label text="Depuis 2010" style="-fx-font-size: 13px; -fx-text-fill: #6b4e8a;"/>
-                        </VBox>
-
-                        <!-- Sponsor 3 - Très grand -->
-                        <VBox alignment="CENTER" spacing="12"
-                              style="-fx-background-color: white; -fx-background-radius: 22; -fx-padding: 25; -fx-min-width: 200; -fx-min-height: 180;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 22;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 3);">
-                            <Label text="⭐" style="-fx-font-size: 48px;"/>
-                            <Label text="Handicap International" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                            <Label text="Engagement solidaire" style="-fx-font-size: 13px; -fx-text-fill: #6b4e8a;"/>
-                        </VBox>
-
-                        <!-- Sponsor 4 - Très grand -->
-                        <VBox alignment="CENTER" spacing="12"
-                              style="-fx-background-color: white; -fx-background-radius: 22; -fx-padding: 25; -fx-min-width: 200; -fx-min-height: 180;
-                                     -fx-border-color: #d8c9ff; -fx-border-width: 1.5; -fx-border-radius: 22;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 3);">
-                            <Label text="💫" style="-fx-font-size: 48px;"/>
-                            <Label text="Inclusion Solidaire" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                            <Label text="Ensemble pour tous" style="-fx-font-size: 13px; -fx-text-fill: #6b4e8a;"/>
-                        </VBox>
-                    </FlowPane>
-
-                    <Label text="Ils nous soutiennent ❤️"
-                           style="-fx-font-size: 15px; -fx-font-style: italic; -fx-text-fill: #6b4e8a; -fx-padding: 15 0 0 0;"/>
-                </VBox>
+                <!-- ========== ESPACE POUR SPONSORS (OPTIONNEL) ========== -->
+                <Region prefHeight="20"/>
             </VBox>
         </ScrollPane>
     </center>
