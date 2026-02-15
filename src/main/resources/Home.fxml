@@ -26,7 +26,7 @@
             </HBox>
 
             <Label text="Connecté en tant que" styleClass="muted"/>
-            <Label text="Admin" styleClass="badge"/>
+            <Label text="Autiste" styleClass="badge"/>
 
             <VBox spacing="8">
                 <Label text="GESTION" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11; -fx-font-weight: 700;">
