@@ -49,14 +49,14 @@ public class EvaluationAjout implements Initializable {
     @FXML private TableColumn<Evaluation, Integer> scoreColumn;
     @FXML private TableColumn<Evaluation, Void> actionsColumn;
 
-    // Map pour les labels d'erreur
+
     private Map<Control, Label> errorLabels = new HashMap<>();
 
-    // Styles pour la validation
+
     private static final String STYLE_VALIDE = "-fx-border-color: #00C853; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
     private static final String STYLE_INVALIDE = "-fx-border-color: #D32F2F; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
 
-    // Patterns de validation
+
     private static final Pattern CARACTERES_AUTORISES = Pattern.compile("^[a-zA-Z0-9\\s\\-',.!?()]+$");
     private static final Pattern PONCTUATION_EXCESSIVE = Pattern.compile(".*[!?.,]{2,}.*");
 
@@ -151,7 +151,7 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void setupValidation() {
-        // Validation de la question
+
         questionArea.textProperty().addListener((obs, old, newValue) -> {
             validerQuestion();
         });
@@ -161,17 +161,17 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-        // Validation des choix
+
         setupChoixValidation(choix1Field, "Choix 1");
         setupChoixValidation(choix2Field, "Choix 2");
         setupChoixValidation(choix3Field, "Choix 3");
 
-        // Validation de la bonne réponse
+
         bonneReponseCombo.valueProperty().addListener((obs, old, newValue) -> {
             validerBonneReponse();
         });
 
-        // Validation du score
+
         scoreField.textProperty().addListener((obs, old, newValue) -> {
             validerScore();
         });
@@ -181,20 +181,18 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-        // Validation du cours
+
         coursCombo.valueProperty().addListener((obs, old, newValue) -> {
             validerCours();
         });
     }
 
-    /**
-     * Configure la validation pour un champ de choix
-     */
+
     private void setupChoixValidation(TextField field, String nomChamp) {
         // Validation à chaque frappe
         field.textProperty().addListener((obs, old, newValue) -> {
             if (field.isFocused()) {
-                // Validation en temps réel avec délai pour éviter trop de calculs
+
                 javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(300));
                 pause.setOnFinished(e -> {
                     validerChoix(field, nomChamp);
@@ -204,7 +202,7 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-        // Validation à la perte de focus
+
         field.focusedProperty().addListener((obs, old, newValue) -> {
             if (!newValue) {
                 validerChoix(field, nomChamp);
@@ -213,9 +211,7 @@ public class EvaluationAjout implements Initializable {
         });
     }
 
-    /**
-     * Valide la question
-     */
+
     private boolean validerQuestion() {
         String question = questionArea.getText();
 
@@ -227,7 +223,7 @@ public class EvaluationAjout implements Initializable {
 
         String trimmed = question.trim();
 
-        // Vérifier le nombre de mots
+
         String[] mots = trimmed.split("\\s+");
         if (mots.length < 3) {
             questionArea.setStyle(STYLE_INVALIDE);
@@ -241,7 +237,7 @@ public class EvaluationAjout implements Initializable {
             return false;
         }
 
-        // Vérifier que la question se termine par un point d'interrogation
+
         if (!trimmed.endsWith("?")) {
             questionArea.setStyle(STYLE_INVALIDE);
             showError(questionArea, "La question doit se terminer par un point d'interrogation (?)");
@@ -253,35 +249,27 @@ public class EvaluationAjout implements Initializable {
         return true;
     }
 
-    /**
-     * Valide le choix 1
-     */
+
     private boolean validerChoix1() {
         return validerChoix(choix1Field, "Choix 1");
     }
 
-    /**
-     * Valide le choix 2
-     */
+
     private boolean validerChoix2() {
         return validerChoix(choix2Field, "Choix 2");
     }
 
-    /**
-     * Valide le choix 3
-     */
+
     private boolean validerChoix3() {
         return validerChoix(choix3Field, "Choix 3");
     }
 
-    /**
-     * Méthode générique de validation d'un choix
-     */
+
     private boolean validerChoix(TextField field, String nomChamp) {
         String choix = field.getText();
         List<String> erreurs = new ArrayList<>();
 
-        // 1. Champ obligatoire
+
         if (choix == null || choix.trim().isEmpty()) {
             field.setStyle(STYLE_INVALIDE);
             showError(field, nomChamp + " est obligatoire");
@@ -290,33 +278,33 @@ public class EvaluationAjout implements Initializable {
 
         String trimmed = choix.trim();
 
-        // 2. Longueur minimale (2 caractères)
+
         if (trimmed.length() < 2) {
             erreurs.add(nomChamp + " doit contenir au moins 2 caractères (actuellement: " + trimmed.length() + ")");
         }
 
-        // 3. Longueur maximale (100 caractères)
+
         if (trimmed.length() > 100) {
             erreurs.add(nomChamp + " ne doit pas dépasser 100 caractères (actuellement: " + trimmed.length() + ")");
         }
 
-        // 4. Caractères autorisés uniquement (lettres, chiffres, ponctuation de base)
+
         if (!CARACTERES_AUTORISES.matcher(trimmed).matches()) {
             erreurs.add(nomChamp + " ne doit contenir que des lettres, chiffres et ponctuation de base (.,!?()'-)");
         }
 
-        // 5. Pas de ponctuation excessive ("!!", "..", "??", etc.)
+
         if (PONCTUATION_EXCESSIVE.matcher(trimmed).matches()) {
             erreurs.add(nomChamp + " ne doit pas contenir de ponctuation répétée (ex: '!!', '..', '??')");
         }
 
-        // 6. Vérification que les choix ne sont pas identiques entre eux
+
         List<String> erreursDoublons = verifierDoublonsChoix(trimmed, field);
         erreurs.addAll(erreursDoublons);
 
         if (!erreurs.isEmpty()) {
             field.setStyle(STYLE_INVALIDE);
-            showError(field, erreurs.get(0)); // Afficher la première erreur
+            showError(field, erreurs.get(0));
             return false;
         }
 
@@ -325,9 +313,7 @@ public class EvaluationAjout implements Initializable {
         return true;
     }
 
-    /**
-     * Vérifie que les choix ne sont pas identiques entre eux
-     */
+
     private List<String> verifierDoublonsChoix(String valeur, TextField fieldActuel) {
         List<String> erreurs = new ArrayList<>();
 
@@ -335,14 +321,14 @@ public class EvaluationAjout implements Initializable {
         String choix2 = choix2Field.getText() != null ? choix2Field.getText().trim() : "";
         String choix3 = choix3Field.getText() != null ? choix3Field.getText().trim() : "";
 
-        // Compter combien de fois la valeur apparaît (ignorer les champs vides)
+
         int occurrences = 0;
 
         if (!choix1.isEmpty() && valeur.equalsIgnoreCase(choix1)) occurrences++;
         if (!choix2.isEmpty() && valeur.equalsIgnoreCase(choix2)) occurrences++;
         if (!choix3.isEmpty() && valeur.equalsIgnoreCase(choix3)) occurrences++;
 
-        // Si plus d'une occurrence, il y a un doublon
+
         if (occurrences > 1) {
             // Déterminer quels choix sont en conflit
             List<String> conflits = new ArrayList<>();
@@ -370,9 +356,7 @@ public class EvaluationAjout implements Initializable {
         return erreurs;
     }
 
-    /**
-     * Valide la bonne réponse
-     */
+
     private boolean validerBonneReponse() {
         String bonneReponse = bonneReponseCombo.getValue();
 
@@ -382,7 +366,7 @@ public class EvaluationAjout implements Initializable {
             return false;
         }
 
-        // Vérifier que la bonne réponse correspond à l'un des choix
+
         String choix1 = choix1Field.getText().trim();
         String choix2 = choix2Field.getText().trim();
         String choix3 = choix3Field.getText().trim();
@@ -398,9 +382,7 @@ public class EvaluationAjout implements Initializable {
         return true;
     }
 
-    /**
-     * Valide le score
-     */
+
     private boolean validerScore() {
         String scoreText = scoreField.getText();
 
@@ -432,9 +414,7 @@ public class EvaluationAjout implements Initializable {
         }
     }
 
-    /**
-     * Valide la sélection du cours
-     */
+
     private boolean validerCours() {
         Cours cours = coursCombo.getValue();
         if (cours == null) {
@@ -448,9 +428,7 @@ public class EvaluationAjout implements Initializable {
         }
     }
 
-    /**
-     * Valide tous les champs du formulaire
-     */
+
     private boolean validateAllFields() {
         boolean questionValide = validerQuestion();
         boolean choix1Valide = validerChoix1();

@@ -51,7 +51,7 @@ public class PasserEvaluation implements Initializable {
         evaluationServices = new EvaluationServices();
         coursServices = new CoursServices();
 
-        // Récupérer l'ID du cours depuis les paramètres
+
         Map<String, String> params = Navigation.getParameters();
         if (params.containsKey("coursId")) {
             try {
@@ -84,11 +84,10 @@ public class PasserEvaluation implements Initializable {
             return;
         }
 
-        // Initialiser les tableaux de suivi
+
         reponsesUtilisateur = new String[questions.size()];
         reponsesCorrectes = new boolean[questions.size()];
 
-        // Afficher la première question
         currentQuestionIndex = 0;
         afficherQuestion(currentQuestionIndex);
         mettreAJourProgression();
@@ -111,7 +110,7 @@ public class PasserEvaluation implements Initializable {
                 currentQuestionIndex++;
                 afficherQuestion(currentQuestionIndex);
             } else {
-                // Dernière question, afficher le bouton terminer
+
                 terminerButton.setVisible(true);
                 terminerButton.setManaged(true);
                 suivantButton.setVisible(false);
@@ -139,7 +138,7 @@ public class PasserEvaluation implements Initializable {
             });
         });
 
-        // Réinitialiser le feedback quand on change de réponse
+
         reponsesGroup.selectedToggleProperty().addListener((obs, old, newVal) -> {
             feedbackLabel.setText("");
             feedbackLabel.setStyle("-fx-background-color: transparent;");
@@ -157,7 +156,7 @@ public class PasserEvaluation implements Initializable {
         choix2Radio.setText(question.getChoix2());
         choix3Radio.setText(question.getChoix3());
 
-        // Restaurer la réponse précédente si elle existe
+
         if (reponsesUtilisateur[index] != null) {
             String reponse = reponsesUtilisateur[index];
             if (reponse.equals(question.getChoix1())) {
@@ -171,7 +170,7 @@ public class PasserEvaluation implements Initializable {
             reponsesGroup.selectToggle(null);
         }
 
-        // Mettre à jour les boutons de navigation
+
         precedentButton.setDisable(index == 0);
 
         if (index == questions.size() - 1) {
@@ -186,7 +185,7 @@ public class PasserEvaluation implements Initializable {
             terminerButton.setManaged(false);
         }
 
-        // Réinitialiser le feedback
+
         feedbackLabel.setText("");
         feedbackLabel.setStyle("-fx-background-color: transparent;");
 
@@ -204,17 +203,17 @@ public class PasserEvaluation implements Initializable {
         String reponse = selected.getText();
         Evaluation question = questions.get(currentQuestionIndex);
 
-        // Sauvegarder la réponse
+
         reponsesUtilisateur[currentQuestionIndex] = reponse;
 
-        // Vérifier si la réponse est correcte
+
         boolean correct = reponse.equals(question.getBonne_reponse());
         reponsesCorrectes[currentQuestionIndex] = correct;
 
-        // Mettre à jour le score
+
         mettreAJourScore();
 
-        // Afficher un feedback
+
         if (correct) {
             showFeedback("✅ Bonne réponse ! (+" + question.getScore() + " point" + (question.getScore() > 1 ? "s" : "") + ")", "#28A745");
         } else {
@@ -246,7 +245,7 @@ public class PasserEvaluation implements Initializable {
     }
 
     private void afficherResultats() {
-        // Calculer le score final
+
         int scoreMax = questions.stream().mapToInt(Evaluation::getScore).sum();
         double pourcentage = (scoreTotal * 100.0) / scoreMax;
 
@@ -282,11 +281,11 @@ public class PasserEvaluation implements Initializable {
         }
         int incorrectCount = questions.size() - correctCount;
 
-        // Créer une boîte de dialogue personnalisée
+
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Résultats du quiz");
 
-        // Style du header
+
         dialog.getDialogPane().setHeaderText(null);
         VBox headerBox = new VBox(5);
         headerBox.setAlignment(Pos.CENTER);
@@ -299,12 +298,12 @@ public class PasserEvaluation implements Initializable {
 
         headerBox.getChildren().addAll(headerLabel, coursLabel);
 
-        // Contenu des résultats
+
         VBox content = new VBox(20);
         content.setStyle("-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 15;");
         content.setAlignment(Pos.CENTER);
 
-        // Score avec cercle de progression
+
         StackPane scoreCircle = new StackPane();
         scoreCircle.setPrefSize(150, 150);
         scoreCircle.setStyle("-fx-background-color: " + couleur + "20; -fx-background-radius: 75; -fx-border-color: " + couleur + "; -fx-border-width: 3; -fx-border-radius: 75;");
@@ -321,13 +320,13 @@ public class PasserEvaluation implements Initializable {
         scoreBox.getChildren().addAll(scoreValue, pourcentageLabel);
         scoreCircle.getChildren().add(scoreBox);
 
-        // Statistiques en grille
+
         GridPane statsGrid = new GridPane();
         statsGrid.setHgap(30);
         statsGrid.setVgap(15);
         statsGrid.setAlignment(Pos.CENTER);
 
-        // Ligne 1: Questions totales
+
         Label totalIcon = new Label("📊");
         totalIcon.setStyle("-fx-font-size: 24px;");
         Label totalLabel = new Label(questions.size() + " question" + (questions.size() > 1 ? "s" : ""));
@@ -335,7 +334,7 @@ public class PasserEvaluation implements Initializable {
         statsGrid.add(totalIcon, 0, 0);
         statsGrid.add(totalLabel, 1, 0);
 
-        // Ligne 2: Réponses correctes
+
         Label correctIcon = new Label("✅");
         correctIcon.setStyle("-fx-font-size: 24px;");
         Label correctLabel = new Label(correctCount + " correcte" + (correctCount > 1 ? "s" : ""));
@@ -343,7 +342,7 @@ public class PasserEvaluation implements Initializable {
         statsGrid.add(correctIcon, 0, 1);
         statsGrid.add(correctLabel, 1, 1);
 
-        // Ligne 3: Réponses incorrectes
+
         if (incorrectCount > 0) {
             Label incorrectIcon = new Label("❌");
             incorrectIcon.setStyle("-fx-font-size: 24px;");
@@ -353,18 +352,18 @@ public class PasserEvaluation implements Initializable {
             statsGrid.add(incorrectLabel, 1, 2);
         }
 
-        // Appréciation
+
         Label appreciationLabel = new Label("⭐ " + appreciation);
         appreciationLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: " + couleur + "; -fx-padding: 10 0 0 0;");
 
-        // Boutons
+
         ButtonType detailsBtn = new ButtonType("📋 Voir détails", ButtonBar.ButtonData.LEFT);
         ButtonType recommencerBtn = new ButtonType("🔄 Recommencer", ButtonBar.ButtonData.OTHER);
         ButtonType fermerBtn = new ButtonType("✅ Terminer", ButtonBar.ButtonData.OK_DONE);
 
         dialog.getDialogPane().getButtonTypes().addAll(detailsBtn, recommencerBtn, fermerBtn);
 
-        // Assembler le contenu
+
         content.getChildren().addAll(scoreCircle, statsGrid, appreciationLabel);
 
         VBox mainContent = new VBox(15);
@@ -374,11 +373,11 @@ public class PasserEvaluation implements Initializable {
         dialog.getDialogPane().setPrefWidth(500);
         dialog.getDialogPane().setStyle("-fx-background-color: #F0F8FF; -fx-background-radius: 20; -fx-padding: 20;");
 
-        // Gérer les actions
+
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent()) {
             if (result.get() == recommencerBtn) {
-                // Recommencer le quiz
+
                 currentQuestionIndex = 0;
                 scoreTotal = 0;
                 reponsesUtilisateur = new String[questions.size()];
@@ -387,24 +386,24 @@ public class PasserEvaluation implements Initializable {
                 afficherQuestion(0);
                 mettreAJourProgression();
 
-                // Réafficher les boutons de navigation
+
                 suivantButton.setVisible(true);
                 suivantButton.setManaged(true);
                 terminerButton.setVisible(false);
                 terminerButton.setManaged(false);
 
             } else if (result.get() == detailsBtn) {
-                // Voir les détails des réponses
+
                 afficherDetailsReponses();
             } else {
-                // Fermer et retourner à la liste des cours
+
                 Navigation.navigateTo("coursaffichage.fxml", "Liste des cours");
             }
         }
     }
 
     private void afficherDetailsReponses() {
-        // Créer une boîte de dialogue pour afficher le détail des réponses
+
         Dialog<Void> detailsDialog = new Dialog<>();
         detailsDialog.setTitle("Détail des réponses");
         detailsDialog.setHeaderText("Vos réponses en détail");
@@ -433,7 +432,7 @@ public class PasserEvaluation implements Initializable {
                     "; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: " +
                     (correct ? "#28A745" : "#FF4444") + "; -fx-border-width: 1; -fx-border-radius: 10;");
 
-            // En-tête de la question
+
             HBox headerBox = new HBox(10);
             headerBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -448,12 +447,12 @@ public class PasserEvaluation implements Initializable {
 
             headerBox.getChildren().addAll(numeroLabel, spacer, pointsLabel);
 
-            // Question
+
             Label questionLabel = new Label(q.getQuestion());
             questionLabel.setWrapText(true);
             questionLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-            // Réponse de l'utilisateur
+
             HBox reponseBox = new HBox(10);
             reponseBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -468,7 +467,7 @@ public class PasserEvaluation implements Initializable {
 
             questionBox.getChildren().addAll(headerBox, questionLabel, reponseBox);
 
-            // Si la réponse est incorrecte, afficher la bonne réponse
+
             if (!correct && reponsesUtilisateur[i] != null) {
                 HBox bonneReponseBox = new HBox(10);
                 bonneReponseBox.setAlignment(Pos.CENTER_LEFT);
@@ -486,7 +485,7 @@ public class PasserEvaluation implements Initializable {
             content.getChildren().add(questionBox);
         }
 
-        // Résumé en bas
+
         HBox summaryBox = new HBox(20);
         summaryBox.setAlignment(Pos.CENTER);
         summaryBox.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10;");
@@ -507,7 +506,7 @@ public class PasserEvaluation implements Initializable {
         detailsDialog.showAndWait();
     }
 
-    // Méthodes pour les effets de survol
+
     @FXML
     private void survolPrecedent() {
         precedentButton.setStyle("-fx-background-color: #F0E6FF; -fx-border-color: #7B2FF7; -fx-text-fill: #7B2FF7; -fx-border-radius: 25; -fx-padding: 12 30; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;");

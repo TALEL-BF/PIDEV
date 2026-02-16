@@ -342,7 +342,7 @@ public class CoursAjout implements Initializable {
             }
         }
 
-        // Sauvegarder les images existantes
+
         Map<String, String> imagesExistantes = new HashMap<>();
         for (ImageMotLigne ligne : imagesMotLignes) {
             if (ligne.hasImage()) {
@@ -350,11 +350,11 @@ public class CoursAjout implements Initializable {
             }
         }
 
-        // Nettoyer
+
         imagesMotLignes.clear();
         imagesMotsContainer.getChildren().clear();
 
-        // Créer les nouvelles lignes
+
         for (int i = 0; i < motsActuels.size(); i++) {
             String mot = motsActuels.get(i);
 
@@ -369,7 +369,7 @@ public class CoursAjout implements Initializable {
             imagesMotsContainer.getChildren().add(nouvelleLigne.getLigneContainer());
         }
 
-        // Forcer le rafraîchissement
+
         javafx.application.Platform.runLater(() -> {
             imagesMotsContainer.requestLayout();
             imagesMotsContainer.applyCss();

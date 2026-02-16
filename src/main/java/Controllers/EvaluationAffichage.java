@@ -64,7 +64,7 @@ public class EvaluationAffichage implements Initializable {
         loadEvaluations();
         setupNavigation();
 
-        // Afficher le titre du cours si filtré
+
         if (coursFiltreId != null) {
             Cours cours = coursServices.getById(coursFiltreId);
             if (cours != null && coursTitreLabel != null) {
