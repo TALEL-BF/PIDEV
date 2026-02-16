@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -24,7 +25,7 @@ public class RegisterController {
     @FXML private PasswordField confirmPasswordField;
     @FXML private Button btnRegister;
 
-    // Labels d'erreur (obligatoires)
+    // Labels d'erreur
     @FXML private Label nameErrorLabel;
     @FXML private Label emailErrorLabel;
     @FXML private Label phoneErrorLabel;
@@ -39,6 +40,8 @@ public class RegisterController {
 
     @FXML
     private void handleRegister() {
+        System.out.println("🔄 Tentative d'inscription...");
+
         // Réinitialiser les erreurs
         clearErrors();
 
@@ -47,9 +50,11 @@ public class RegisterController {
             return;
         }
 
+        String email = emailField.getText().trim().toLowerCase();
+
         // Vérifier si l'email existe déjà
-        if (userService.existsByEmail(emailField.getText())) {
-            emailErrorLabel.setText("Cet email est déjà utilisé");
+        if (userService.existsByEmail(email)) {
+            emailErrorLabel.setText("❌ Cet email est déjà utilisé");
             emailErrorLabel.setVisible(true);
             return;
         }
@@ -57,38 +62,51 @@ public class RegisterController {
         try {
             // Créer nouvel utilisateur
             User user = new User();
-            user.setName(nameField.getText());
-            user.setEmail(emailField.getText());
-            user.setPhoneNumber(phoneField.getText());
+            user.setName(nameField.getText().trim());
+            user.setEmail(email);
+            user.setPhoneNumber(phoneField.getText().trim());
             user.setPassword(passwordField.getText());
-            user.setRole("Parent");
-            user.setStatus("En attente");
+            user.setRole("Parent"); // Rôle par défaut
+            user.setStatus("En attente"); // Statut par défaut
             user.setRegistrationDate(LocalDate.now());
+
+            System.out.println("📝 Sauvegarde de l'utilisateur: " + email);
 
             User savedUser = userService.saveUser(user);
 
             if (savedUser != null) {
+                System.out.println("✅ Compte créé avec succès! ID: " + savedUser.getId());
                 showSuccess("Compte créé avec succès! Veuillez vous connecter.");
+
+                // Rediriger vers la page de connexion
                 handleBackToLogin();
+            } else {
+                showError("Erreur lors de la création du compte");
             }
 
         } catch (Exception e) {
+            System.err.println("❌ Erreur lors de l'inscription: " + e.getMessage());
             e.printStackTrace();
-            showError("Erreur lors de la création du compte");
+            showError("Erreur: " + e.getMessage());
         }
     }
 
     private boolean validateInputs() {
         boolean isValid = true;
 
-        // Validation du nom
         String name = nameField.getText();
+        String email = emailField.getText();
+        String phone = phoneField.getText();
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+
+        // Validation du nom
         if (name == null || name.trim().isEmpty()) {
-            nameErrorLabel.setText("Le nom est requis");
+            nameErrorLabel.setText("❌ Le nom est requis");
             nameErrorLabel.setVisible(true);
             isValid = false;
-        } else if (name.length() < 3) {
-            nameErrorLabel.setText("Le nom doit contenir au moins 3 caractères");
+        } else if (name.trim().length() < 2) {
+            nameErrorLabel.setText("❌ Le nom doit contenir au moins 2 caractères");
             nameErrorLabel.setVisible(true);
             isValid = false;
         } else {
@@ -96,13 +114,12 @@ public class RegisterController {
         }
 
         // Validation de l'email
-        String email = emailField.getText();
         if (email == null || email.trim().isEmpty()) {
-            emailErrorLabel.setText("L'email est requis");
+            emailErrorLabel.setText("❌ L'email est requis");
             emailErrorLabel.setVisible(true);
             isValid = false;
-        } else if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            emailErrorLabel.setText("Format d'email invalide");
+        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            emailErrorLabel.setText("❌ Format d'email invalide");
             emailErrorLabel.setVisible(true);
             isValid = false;
         } else {
@@ -110,10 +127,10 @@ public class RegisterController {
         }
 
         // Validation du téléphone (optionnel)
-        String phone = phoneField.getText();
-        if (phone != null && !phone.isEmpty()) {
-            if (!phone.matches("^[0-9]{8,15}$")) {
-                phoneErrorLabel.setText("Le téléphone doit contenir 8 à 15 chiffres");
+        if (phone != null && !phone.trim().isEmpty()) {
+            String cleanPhone = phone.replaceAll("\\s+", "").replace("+", "").replace("-", "");
+            if (!cleanPhone.matches("^[0-9]{8,15}$")) {
+                phoneErrorLabel.setText("❌ Le téléphone doit contenir 8 à 15 chiffres");
                 phoneErrorLabel.setVisible(true);
                 isValid = false;
             } else {
@@ -124,13 +141,12 @@ public class RegisterController {
         }
 
         // Validation du mot de passe
-        String password = passwordField.getText();
-        if (password == null || password.isEmpty()) {
-            passwordErrorLabel.setText("Le mot de passe est requis");
+        if (password == null || password.trim().isEmpty()) {
+            passwordErrorLabel.setText("❌ Le mot de passe est requis");
             passwordErrorLabel.setVisible(true);
             isValid = false;
         } else if (password.length() < 6) {
-            passwordErrorLabel.setText("Le mot de passe doit contenir au moins 6 caractères");
+            passwordErrorLabel.setText("❌ Le mot de passe doit contenir au moins 6 caractères");
             passwordErrorLabel.setVisible(true);
             isValid = false;
         } else {
@@ -138,9 +154,12 @@ public class RegisterController {
         }
 
         // Validation de la confirmation
-        String confirmPassword = confirmPasswordField.getText();
-        if (!password.equals(confirmPassword)) {
-            confirmPasswordErrorLabel.setText("Les mots de passe ne correspondent pas");
+        if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+            confirmPasswordErrorLabel.setText("❌ Veuillez confirmer le mot de passe");
+            confirmPasswordErrorLabel.setVisible(true);
+            isValid = false;
+        } else if (!password.equals(confirmPassword)) {
+            confirmPasswordErrorLabel.setText("❌ Les mots de passe ne correspondent pas");
             confirmPasswordErrorLabel.setVisible(true);
             isValid = false;
         } else {
@@ -177,6 +196,8 @@ public class RegisterController {
     @FXML
     private void handleBackToLogin() {
         try {
+            System.out.println("🔄 Retour à la page de connexion");
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
@@ -185,7 +206,9 @@ public class RegisterController {
             stage.setScene(new Scene(root));
             stage.setTitle("AutiCare - Connexion");
             stage.show();
+
         } catch (IOException e) {
+            System.err.println("❌ Erreur retour connexion: " + e.getMessage());
             e.printStackTrace();
         }
     }
