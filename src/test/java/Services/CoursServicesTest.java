@@ -24,7 +24,6 @@ public class CoursServicesTest {
     @Test
     @Order(1)
     void testAjouterCours() {
-        // Création d'un cours de test
         Cours cours = new Cours(
                 "Test Cours Unitaire",
                 "Ceci est une description de test pour le cours unitaire",

@@ -79,11 +79,11 @@ public class Navigation {
                 return;
             }
 
-            // Charger le fichier FXML
+
             FXMLLoader loader = new FXMLLoader(Navigation.class.getResource(path));
             Parent root = loader.load();
 
-            // Créer et afficher la scène
+
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("AutiCare - " + title);
@@ -129,11 +129,11 @@ public class Navigation {
                 return;
             }
 
-            // Charger le fichier FXML
+
             FXMLLoader loader = new FXMLLoader(Navigation.class.getResource(path));
             Parent root = loader.load();
 
-            // Créer et configurer la nouvelle fenêtre
+
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("AutiCare - " + title);

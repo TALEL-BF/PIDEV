@@ -16,7 +16,7 @@ public class EvaluationServices {
         coursServices = new CoursServices();
     }
 
-    // Ajouter une question d'évaluation
+
     public boolean ajouter(Evaluation evaluation) {
         String req = "INSERT INTO evaluation (id_cours, question, choix1, choix2, choix3, bonne_reponse, score) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -46,7 +46,7 @@ public class EvaluationServices {
         return false;
     }
 
-    // Ajouter plusieurs questions pour un cours
+
     public boolean ajouterPlusieurs(List<Evaluation> evaluations) {
         boolean allSuccess = true;
         for (Evaluation e : evaluations) {
@@ -57,7 +57,6 @@ public class EvaluationServices {
         return allSuccess;
     }
 
-    // Récupérer toutes les évaluations
     public List<Evaluation> getAll() {
         List<Evaluation> evaluations = new ArrayList<>();
         String req = "SELECT e.*, c.* FROM evaluation e " +
@@ -76,7 +75,7 @@ public class EvaluationServices {
         return evaluations;
     }
 
-    // Récupérer les évaluations par ID de cours
+
     public List<Evaluation> getByCoursId(int coursId) {
         List<Evaluation> evaluations = new ArrayList<>();
         String req = "SELECT e.*, c.* FROM evaluation e " +
@@ -97,7 +96,7 @@ public class EvaluationServices {
         return evaluations;
     }
 
-    // Récupérer une évaluation par ID
+
     public Evaluation getById(int id) {
         String req = "SELECT e.*, c.* FROM evaluation e " +
                 "JOIN cours c ON e.id_cours = c.id_cours " +
@@ -116,7 +115,7 @@ public class EvaluationServices {
         return null;
     }
 
-    // Modifier une évaluation
+
     public boolean modifier(Evaluation evaluation) {
         String req = "UPDATE evaluation SET question = ?, choix1 = ?, choix2 = ?, " +
                 "choix3 = ?, bonne_reponse = ?, score = ? WHERE id_eval = ?";
@@ -140,7 +139,7 @@ public class EvaluationServices {
         }
     }
 
-    // Supprimer une évaluation
+
     public boolean supprimer(int id) {
         String req = "DELETE FROM evaluation WHERE id_eval = ?";
         try {
@@ -156,7 +155,7 @@ public class EvaluationServices {
         }
     }
 
-    // Supprimer toutes les évaluations d'un cours
+
     public boolean supprimerParCours(int coursId) {
         String req = "DELETE FROM evaluation WHERE id_cours = ?";
         try {
@@ -171,7 +170,7 @@ public class EvaluationServices {
         }
     }
 
-    // Compter le nombre de questions pour un cours
+
     public int compterParCours(int coursId) {
         String req = "SELECT COUNT(*) FROM evaluation WHERE id_cours = ?";
         try {
@@ -187,7 +186,7 @@ public class EvaluationServices {
         return 0;
     }
 
-    // Calculer le score total pour un cours
+
     public int getScoreTotalParCours(int coursId) {
         String req = "SELECT SUM(score) FROM evaluation WHERE id_cours = ?";
         try {
@@ -203,13 +202,13 @@ public class EvaluationServices {
         return 0;
     }
 
-    // Vérifier si une réponse est correcte
+
     public boolean verifierReponse(int evaluationId, String reponse) {
         Evaluation e = getById(evaluationId);
         return e != null && e.getBonne_reponse().equals(reponse);
     }
 
-    // Extraire une évaluation du ResultSet
+
     private Evaluation extractEvaluationFromResultSet(ResultSet rs) throws SQLException {
         Evaluation evaluation = new Evaluation();
         evaluation.setId_eval(rs.getInt("e.id_eval"));
@@ -221,7 +220,7 @@ public class EvaluationServices {
         evaluation.setBonne_reponse(rs.getString("e.bonne_reponse"));
         evaluation.setScore(rs.getInt("e.score"));
 
-        // Créer l'objet Cours associé
+
         Cours cours = new Cours(
                 rs.getInt("c.id_cours"),
                 rs.getString("c.titre"),

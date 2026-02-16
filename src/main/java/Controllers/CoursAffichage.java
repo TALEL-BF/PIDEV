@@ -61,14 +61,14 @@ public class CoursAffichage implements Initializable {
             });
         }
 
-        // Navigation pour le bouton Ajouter évaluation
+
         if (ajouterEvaluationButton != null) {
             ajouterEvaluationButton.setOnAction(event -> {
                 System.out.println("📝 Navigation vers l'ajout d'évaluation...");
                 Navigation.navigateTo("evaluationajout.fxml", "Ajouter des questions");
             });
 
-            // Effet hover pour le bouton vert
+
             ajouterEvaluationButton.setOnMouseEntered(e ->
                     ajouterEvaluationButton.setStyle("-fx-background-color: #218838; " +
                             "-fx-text-fill: white; " +
@@ -106,7 +106,7 @@ public class CoursAffichage implements Initializable {
         }
     }
     private VBox createCourseCard(Cours cours) {
-        // Carte principale avec design moderne
+
         VBox card = new VBox(0);
         card.setPrefWidth(280);
         card.setPrefHeight(380);
@@ -118,7 +118,7 @@ public class CoursAffichage implements Initializable {
                         "-fx-transition: all 0.3s ease;"
         );
 
-        // Effet de survol amélioré
+
         card.setOnMouseEntered(e -> {
             card.setStyle(
                     "-fx-background-color: white;" +
@@ -141,7 +141,7 @@ public class CoursAffichage implements Initializable {
             );
         });
 
-        // ===== CONTENEUR D'IMAGE AVEC OVERLAY GRADIENT =====
+
         StackPane imageContainer = new StackPane();
         imageContainer.setPrefHeight(160);
         imageContainer.setStyle(
@@ -149,13 +149,13 @@ public class CoursAffichage implements Initializable {
                         "-fx-background-color: linear-gradient(to bottom, #7B2FF7, #9F5FF7);"
         );
 
-        // Image du cours avec masque d'arrondi
+
         ImageView courseImageView = new ImageView();
         courseImageView.setFitHeight(160);
         courseImageView.setFitWidth(280);
         courseImageView.setPreserveRatio(false);
 
-        // Rectangle pour clip l'image aux coins arrondis
+
         Rectangle clip = new Rectangle(300, 180);
         clip.setArcWidth(24);
         clip.setArcHeight(24);
@@ -178,7 +178,7 @@ public class CoursAffichage implements Initializable {
             setDefaultCourseImage(courseImageView, cours);
         }
 
-        // Overlay gradient pour meilleure lisibilité des badges
+
         Region gradientOverlay = new Region();
         gradientOverlay.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);" +
@@ -188,7 +188,7 @@ public class CoursAffichage implements Initializable {
         gradientOverlay.setMaxHeight(70);
         StackPane.setAlignment(gradientOverlay, Pos.TOP_CENTER);
 
-        // Badge de type de cours (plus élégant)
+
         Label typeBadge = new Label(cours.getType_cours());
         String typeColor = getTypeColor(cours.getType_cours());
         typeBadge.setStyle(
@@ -208,11 +208,10 @@ public class CoursAffichage implements Initializable {
 
         imageContainer.getChildren().addAll(courseImageView, gradientOverlay, typeBadge);
 
-        // ===== CONTENEUR DE CONTENU =====
+
         VBox contentContainer = new VBox(15);
         contentContainer.setStyle("-fx-padding: 20 20 15 20;");
 
-        // Titre avec icône
         HBox titleBox = new HBox(10);
         titleBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -231,7 +230,7 @@ public class CoursAffichage implements Initializable {
 
         titleBox.getChildren().addAll(titleIcon, titleLabel);
 
-        // Description avec limite de caractères
+
         String description = cours.getDescription();
         if (description.length() > 80) {
             description = description.substring(0, 77) + "...";
@@ -245,7 +244,7 @@ public class CoursAffichage implements Initializable {
                         "-fx-line-spacing: 2;"
         );
 
-        // ===== GRILLE D'INFORMATIONS =====
+
         GridPane infoGrid = new GridPane();
         infoGrid.setHgap(20);
         infoGrid.setVgap(10);
@@ -264,7 +263,7 @@ public class CoursAffichage implements Initializable {
         HBox niveauBox = new HBox(5, niveauIcon, niveauLabel);
         niveauBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Durée
+
         Label dureeIcon = new Label("⏱️");
         dureeIcon.setStyle("-fx-font-size: 16px;");
         Label dureeLabel = new Label(cours.getDuree() + " min");
@@ -769,7 +768,7 @@ public class CoursAffichage implements Initializable {
                             imagesContainer.getChildren().add(imageView);
                         }
                     } catch (Exception e) {
-                        // Ignorer les erreurs
+
                     }
                 }
             }
