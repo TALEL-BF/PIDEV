@@ -10,5 +10,7 @@ public interface ITherapieServices {
     void supprimerTherapie(int idTherapie) throws SQLException;
     void modifierTherapie(Therapie t) throws SQLException;
     List<Therapie> afficherTherapie() throws SQLException;
+    List<Therapie> chercherTherapiesAdaptees(String nivH, String nivA, String nivS);
+
 
 }

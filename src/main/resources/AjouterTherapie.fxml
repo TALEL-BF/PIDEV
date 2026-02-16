@@ -51,14 +51,19 @@
                       visible="false" managed="false"
                       spacing="8"
                       styleClass="submenu">
-                    <Button fx:id="btnMenuSuivie" text="Suivie" styleClass="submenu-item"/>
-                    <Button fx:id="btnMenuTherapie" text="Thérapie" styleClass="submenu-item"/>
+                    <Button fx:id="btnSubSuivie"   text="Suivie"   styleClass="subBtn"/>
+                    <Button fx:id="btnSubTherapie" text="Thérapie" styleClass="subBtn"/>
+                    <Button fx:id="btnSubArticles" text="Articles" styleClass="subBtn"/>
+
+
                 </VBox>
 
                 <Button fx:id="btnMenuEvents" text="Gestion Evenements" styleClass="menu-item"/>
                 <Button fx:id="btnMenuJeux" text="Gestion Jeux" styleClass="menu-item"/>
             </VBox>
+            <Region VBox.vgrow="ALWAYS" />
 
+            <Button styleClass="logoutBtn" text="⎋ Déconnexion" />
         </VBox>
     </left>
 

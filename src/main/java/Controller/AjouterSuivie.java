@@ -6,9 +6,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
@@ -17,7 +19,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
+import Entites.Therapie;
+import Services.TherapieServices;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,10 +34,17 @@ public class AjouterSuivie {
     @FXML private TextField searchField;
     @FXML private Button btnAjouter;
     @FXML private VBox emptyBox;
+    @FXML
+    private BorderPane root;
 
     @FXML private ToggleButton tbConsultations;
     @FXML private VBox consultationsSubMenu;
     @FXML private Button btnGestionConsultations;
+
+    @FXML private Button btnSubSuivie;
+    @FXML private Button btnSubTherapie;
+    @FXML private Button btnSubArticles;
+
 
     @FXML private Button btnMenuSuivie;
     @FXML private Button btnMenuTherapie;
@@ -46,6 +56,8 @@ public class AjouterSuivie {
     @FXML private javafx.scene.chart.LineChart<String, Number> monthlyChart;
     @FXML private VBox statsBox;
     @FXML private Label lblToggleStats;
+    @FXML private Button btnMenuArticles;
+
 
     private SuivieServices suivieService;
     private Services.StatsServices statsService;
@@ -77,6 +89,27 @@ public class AjouterSuivie {
         } catch (Exception ex) {
             disableStatsUI();
         }
+
+        // ✅ On est dans Gestion Consultations -> Suivie au démarrage
+        setParentConsultationsActive(true);
+        setSubActive(btnSubSuivie);
+
+// Clicks
+        btnSubSuivie.setOnAction(e -> {
+            setSubActive(btnSubSuivie);
+            switchTo("/AjouterSuivie.fxml");   // ou la page Suivie
+        });
+
+        btnSubTherapie.setOnAction(e -> {
+            setSubActive(btnSubTherapie);
+            switchTo("/AjouterTherapie.fxml"); // ou la page Thérapie
+        });
+
+        btnSubArticles.setOnAction(e -> {
+            setSubActive(btnSubArticles);
+            switchTo("/GestionArticlesBack.fxml"); // ou ta page Articles
+        });
+
     }
 
     private void initUiListeners() {
@@ -150,6 +183,8 @@ public class AjouterSuivie {
             emptyBox.setVisible(empty);
             emptyBox.setManaged(empty);
         }
+        if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
+
     }
 
     private boolean matchesSearch(Suivie s, String q) {
@@ -325,6 +360,22 @@ public class AjouterSuivie {
         addRow(grid, r++, "Date", date);
         addRow(grid, r++, "Heure", heure);
         addRow(grid, r++, "Scores (H/S/A)", s.getScoreHumeur()+" / "+s.getScoreStress()+" / "+s.getScoreAttention());
+        // ✅ Affichage de l’exercice recommandé
+        String exerciceNom = "Aucun exercice choisi";
+
+        try {
+            TherapieServices ts = new TherapieServices();
+            Therapie t = ts.getTherapieById(s.getIdTherapieReco());
+
+            if (t != null && t.getNomExercice() != null) {
+                exerciceNom = t.getNomExercice();
+            }
+        } catch (Exception ex) {
+            exerciceNom = "Erreur chargement exercice";
+        }
+
+        addRow(grid, r++, "Exercice recommandé", exerciceNom);
+
         addRow(grid, r++, "Comportement", safe(s.getComportement()));
         addRow(grid, r++, "Interaction", safe(s.getInteractionSociale()));
 
@@ -337,6 +388,25 @@ public class AjouterSuivie {
 
         HBox actions = new HBox(12);
         actions.setAlignment(Pos.CENTER_RIGHT);
+
+        Button btnExercices = new Button("Exercices adaptés");
+        btnExercices.getStyleClass().addAll("btn-solid-dark","btn-hover");
+
+        btnExercices.setOnAction(e -> {
+            try {
+                showExercicesAdaptesWindow(s);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Erreur");
+                a.setHeaderText("Exercices adaptés - erreur");
+                a.setContentText(ex.getMessage());
+                a.showAndWait();
+            }
+        });
+
+        actions.getChildren().add(0, btnExercices);
+
 
         Button close = new Button("Fermer");
         close.getStyleClass().addAll("btn-solid-dark", "btn-hover");
@@ -796,41 +866,30 @@ public class AjouterSuivie {
 
     private void switchTo(String fxmlPath) {
         try {
-            var url = getClass().getResource(fxmlPath);
-            if (url == null) {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setTitle("Navigation");
-                a.setHeaderText("FXML introuvable");
-                a.setContentText("Chemin : " + fxmlPath);
-                a.showAndWait();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent newRoot = loader.load();
+
+            // ✅ toujours safe (root موجود في نفس الصفحة)
+            Scene scene = root.getScene();
+            if (scene == null) {
+                // fallback (au cas où)
+                Stage stage = (Stage) root.getScene().getWindow();
+                stage.getScene().setRoot(newRoot);
                 return;
             }
 
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(url);
-            javafx.scene.Parent root = loader.load();
-
-            // Prend n'importe quel node sûr (btnMenuTherapie ici)
-            Stage stage = (Stage) btnMenuTherapie.getScene().getWindow();
-            stage.getScene().setRoot(root);
+            scene.setRoot(newRoot);
 
         } catch (Exception ex) {
             ex.printStackTrace();
-
-            // Remonter la cause réelle
-            Throwable cause = ex;
-            while (cause.getCause() != null) cause = cause.getCause();
-
             Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("Navigation");
+            a.setTitle("Erreur Navigation");
             a.setHeaderText("Erreur lors du chargement");
-            a.setContentText(
-                    "FXML: " + fxmlPath + "\n\n" +
-                            "Erreur: " + ex.getClass().getSimpleName() + " - " + String.valueOf(ex.getMessage()) + "\n\n" +
-                            "Cause: " + cause.getClass().getSimpleName() + " - " + String.valueOf(cause.getMessage())
-            );
+            a.setContentText("FXML: " + fxmlPath + "\nErreur: " + ex.getMessage());
             a.showAndWait();
         }
     }
+
 
 
     // -----------------------------
@@ -964,4 +1023,90 @@ public class AjouterSuivie {
             refreshStats();
         }
     }
+    private String niveauFromScore(int score) {
+        // sécurité si data ancienne contient 0
+        if (score <= 0) return "faible";
+
+        if (score <= 3) return "faible";
+        if (score <= 6) return "moyenne";
+        return "elevee"; // 7..10
+    }
+
+
+    private void showExercicesAdaptesWindow(Suivie s) {
+
+        String nivH = niveauFromScore(s.getScoreHumeur());
+        String nivA = niveauFromScore(s.getScoreAttention());
+        String nivS = niveauFromScore(s.getScoreStress());
+
+        TherapieServices ts = new TherapieServices();
+        List<Therapie> adaptees = ts.chercherTherapiesAdaptees(nivH, nivA, nivS);
+
+        Stage st = createCustomStage("Exercices adaptés", 700, 500);
+
+        ListView<Therapie> listView = new ListView<>();
+        listView.getItems().addAll(adaptees);
+
+        listView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Therapie t, boolean empty) {
+                super.updateItem(t, empty);
+                if (empty || t == null) {
+                    setText(null);
+                } else {
+                    setText(t.getNomExercice() +
+                            " | Durée: " + t.getDureeMin() + " min" +
+                            " | Objectif: " + t.getObjectif());
+                }
+            }
+        });
+
+        Button choisir = new Button("Choisir cet exercice");
+        choisir.getStyleClass().addAll("btn-solid-dark","btn-hover");
+
+        choisir.setOnAction(ev -> {
+            Therapie selected = listView.getSelectionModel().getSelectedItem();
+            if (selected == null) return;
+
+            s.setIdTherapieReco(selected.getIdTherapie());
+
+            SuivieServices ss = new SuivieServices();
+            ss.modifierSuivie(s);
+
+            st.close();
+        });
+
+        VBox root = new VBox(15,
+                new Label("Niveaux détectés : "
+                        + "Humeur=" + nivH
+                        + ", Attention=" + nivA
+                        + ", Stress=" + nivS),
+                listView,
+                choisir);
+
+        root.setPadding(new Insets(20));
+
+        setCenter(st, root);
+        st.showAndWait();
+    }
+
+    private void setParentConsultationsActive(boolean active){
+        btnGestionConsultations.getStyleClass().remove("sideBtnActive");
+        if(active) btnGestionConsultations.getStyleClass().add("sideBtnActive");
+    }
+
+    private void setSubActive(Button selected){
+        // reset
+        btnSubSuivie.getStyleClass().remove("subBtnActive");
+        btnSubTherapie.getStyleClass().remove("subBtnActive");
+        btnSubArticles.getStyleClass().remove("subBtnActive");
+
+        // active only the clicked one
+        selected.getStyleClass().add("subBtnActive");
+
+        // parent stays active as long as we are in this module
+        setParentConsultationsActive(true);
+    }
+
+
 }

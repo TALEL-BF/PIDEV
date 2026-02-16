@@ -21,6 +21,9 @@ public class Therapie {
     private String comportement;
     private String interaction;
 
+
+
+
     private Integer niveau; // (optionnel) si tu veux garder NIVEAU int (nullable)
 
     public Therapie() {}
@@ -112,6 +115,7 @@ public class Therapie {
     public Integer getNiveau() { return niveau; }
     public void setNiveau(Integer niveau) { this.niveau = niveau; }
 
+
     @Override
     public String toString() {
         return "Therapie{" +
@@ -129,6 +133,7 @@ public class Therapie {
                 ", niveauxStresse='" + niveauxStresse + '\'' +
                 ", comportement='" + comportement + '\'' +
                 ", interaction='" + interaction + '\'' +
+
                 ", niveau=" + niveau +
                 '}';
     }

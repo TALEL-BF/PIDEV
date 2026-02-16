@@ -34,9 +34,17 @@ public class AjouterTherapie {
     @FXML private VBox consultationsSubMenu;
     @FXML private Button btnGestionConsultations;
 
+
+    @FXML private Button btnSubSuivie;
+    @FXML private Button btnSubTherapie;
+    @FXML private Button btnSubArticles;
+
+
     // Submenu navigation
     @FXML private Button btnMenuSuivie;
     @FXML private Button btnMenuTherapie;
+    @FXML private Button btnMenuArticles;
+
 
     private final TherapieServices therapieService = new TherapieServices();
     private final ObservableList<Therapie> master = FXCollections.observableArrayList();
@@ -84,6 +92,27 @@ public class AjouterTherapie {
         // navigation
         if (btnMenuSuivie != null) btnMenuSuivie.setOnAction(e -> switchTo("/AjouterSuivie.fxml"));
         if (btnMenuTherapie != null) btnMenuTherapie.setOnAction(e -> switchTo("/AjouterTherapie.fxml"));
+        if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
+// ✅ On est dans Gestion Consultations -> Suivie au démarrage
+        setParentConsultationsActive(true);
+        setSubActive(btnSubSuivie);
+
+// Clicks
+        btnSubSuivie.setOnAction(e -> {
+            setSubActive(btnSubSuivie);
+            switchTo("/AjouterSuivie.fxml");   // ou la page Suivie
+        });
+
+        btnSubTherapie.setOnAction(e -> {
+            setSubActive(btnSubTherapie);
+            switchTo("/AjouterTherapie.fxml"); // ou la page Thérapie
+        });
+
+        btnSubArticles.setOnAction(e -> {
+            setSubActive(btnSubArticles);
+            switchTo("/GestionArticlesBack.fxml"); // ou ta page Articles
+        });
+
     }
 
     private void switchTo(String fxmlPath) {
@@ -697,4 +726,23 @@ public class AjouterTherapie {
         String v = s.trim();
         return v.isEmpty() ? null : v;
     }
+
+    private void setParentConsultationsActive(boolean active){
+        btnGestionConsultations.getStyleClass().remove("sideBtnActive");
+        if(active) btnGestionConsultations.getStyleClass().add("sideBtnActive");
+    }
+
+    private void setSubActive(Button selected){
+        // reset
+        btnSubSuivie.getStyleClass().remove("subBtnActive");
+        btnSubTherapie.getStyleClass().remove("subBtnActive");
+        btnSubArticles.getStyleClass().remove("subBtnActive");
+
+        // active only the clicked one
+        selected.getStyleClass().add("subBtnActive");
+
+        // parent stays active as long as we are in this module
+        setParentConsultationsActive(true);
+    }
+
 }
