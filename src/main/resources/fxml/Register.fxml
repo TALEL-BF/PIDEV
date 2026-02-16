@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -13,93 +14,101 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="700.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../styles.css"
-    xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.auticare.controller.RegisterController">
+<AnchorPane prefHeight="750.0" prefWidth="1000.0" style="-fx-background-color: linear-gradient(to bottom right, #7B2FF7, #5F0FFF);"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.auticare.controller.RegisterController">
+
     <children>
-        <VBox alignment="CENTER" prefWidth="450.0" spacing="20.0" styleClass="card"
-            AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="225.0"
-            AnchorPane.rightAnchor="225.0" AnchorPane.topAnchor="30.0">
-            <children>
-                <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true"
-                    preserveRatio="true">
+        <!-- Carte d'inscription -->
+        <VBox alignment="CENTER" prefWidth="450.0" spacing="15.0"
+              style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 20, 0, 0, 10); -fx-padding: 30;"
+              AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="275.0"
+              AnchorPane.rightAnchor="275.0" AnchorPane.topAnchor="30.0">
+
+            <!-- Logo -->
+            <VBox alignment="CENTER" spacing="5">
+                <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@../images/logo.png" />
                     </image>
                 </ImageView>
-                <VBox alignment="CENTER" spacing="5.0">
-                    <children>
-                        <Label styleClass="page-title" text="Créer un compte" textFill="#7b2ff7">
-                            <font>
-                                <Font name="System Bold" size="24.0" />
-                            </font>
-                        </Label>
-                        <Label text="Rejoignez la communauté AutiCare" textFill="#636e72" />
-                    </children>
-                </VBox>
-                <ScrollPane fitToWidth="true"
-                    style="-fx-background-color: transparent; -fx-background: transparent;">
-                    <content>
-                        <VBox spacing="10.0" style="-fx-background-color: transparent;">
-                            <children>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label styleClass="form-label" text="NOM COMPLET" />
-                                        <TextField fx:id="nameField" prefHeight="40.0"
-                                            promptText="Votre nom" styleClass="text-field-custom" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label styleClass="form-label" text="EMAIL" />
-                                        <TextField fx:id="emailField" prefHeight="40.0"
-                                            promptText="nom@exemple.com"
-                                            styleClass="text-field-custom" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label styleClass="form-label" text="TÉLÉPHONE" />
-                                        <TextField fx:id="phoneField" prefHeight="40.0"
-                                            promptText="+216 22 123 456"
-                                            styleClass="text-field-custom" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label styleClass="form-label" text="MOT DE PASSE" />
-                                        <PasswordField fx:id="passwordField" prefHeight="40.0"
-                                            promptText="••••••••" styleClass="text-field-custom" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="5.0">
-                                    <children>
-                                        <Label styleClass="form-label" text="CONFIRMER MOT DE PASSE" />
-                                        <PasswordField fx:id="confirmPasswordField"
-                                            prefHeight="40.0"
-                                            promptText="••••••••" styleClass="text-field-custom" />
-                                    </children>
-                                </VBox>
-                            </children>
+                <Label text="AutiCare" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;" />
+            </VBox>
+
+            <!-- Titre -->
+            <Label text="Créer un compte" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1E293B;" />
+            <Label text="Rejoignez la communauté AutiCare" style="-fx-font-size: 14px; -fx-text-fill: #64748B;" />
+
+            <!-- Formulaire avec ScrollPane pour éviter le débordement -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox spacing="15.0" style="-fx-background-color: transparent; -fx-padding: 5 0 0 0;">
+
+                        <!-- NOM COMPLET -->
+                        <VBox spacing="3.0">
+                            <Label text="NOM COMPLET" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748B;" />
+                            <TextField fx:id="nameField" promptText="Votre nom"
+                                       style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px;" />
+                            <Label fx:id="nameErrorLabel" text="Le nom est requis"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 2 0 0 5;"
+                                   visible="false" managed="false" />
                         </VBox>
-                    </content>
-                </ScrollPane>
-                <Button fx:id="btnRegister" maxWidth="1.7976931348623157E308"
-                    mnemonicParsing="false"
-                    onAction="#handleRegister" prefHeight="45.0" styleClass="btn-primary"
-                    text="CRÉER MON COMPTE" />
-                <HBox alignment="CENTER" spacing="5.0">
-                    <children>
-                        <Label text="Déjà un compte ?" textFill="#636e72" />
-                        <Hyperlink onAction="#handleBackToLogin"
-                            style="-fx-text-fill: #7b2ff7; -fx-padding: 0; -fx-font-weight: bold;"
-                            text="Se connecter" />
-                    </children>
-                </HBox>
-            </children>
-            <padding>
-                <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
-            </padding>
+
+                        <!-- EMAIL -->
+                        <VBox spacing="3.0">
+                            <Label text="EMAIL" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748B;" />
+                            <TextField fx:id="emailField" promptText="nom@exemple.com"
+                                       style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px;" />
+                            <Label fx:id="emailErrorLabel" text="Format d'email invalide"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 2 0 0 5;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- TÉLÉPHONE -->
+                        <VBox spacing="3.0">
+                            <Label text="TÉLÉPHONE" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748B;" />
+                            <TextField fx:id="phoneField" promptText="+216 22 123 456"
+                                       style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px;" />
+                            <Label fx:id="phoneErrorLabel" text="Le téléphone doit contenir 8 à 15 chiffres"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 2 0 0 5;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- MOT DE PASSE -->
+                        <VBox spacing="3.0">
+                            <Label text="MOT DE PASSE" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748B;" />
+                            <PasswordField fx:id="passwordField" promptText="••••••••"
+                                           style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px;" />
+                            <Label fx:id="passwordErrorLabel" text="Le mot de passe doit contenir au moins 6 caractères"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 2 0 0 5;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- CONFIRMER MOT DE PASSE -->
+                        <VBox spacing="3.0">
+                            <Label text="CONFIRMER MOT DE PASSE" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748B;" />
+                            <PasswordField fx:id="confirmPasswordField" promptText="••••••••"
+                                           style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px;" />
+                            <Label fx:id="confirmPasswordErrorLabel" text="Les mots de passe ne correspondent pas"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 2 0 0 5;"
+                                   visible="false" managed="false" />
+                        </VBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- Bouton d'inscription -->
+            <Button fx:id="btnRegister" text="CRÉER MON COMPTE" maxWidth="1.7976931348623157E308"
+                    style="-fx-background-color: linear-gradient(to right, #7B2FF7, #9F7AEA); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 15 0; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(123,47,247,0.3), 10, 0, 0, 2);"
+                    onAction="#handleRegister" />
+
+            <!-- Lien vers connexion -->
+            <HBox alignment="CENTER" spacing="5.0">
+                <Label text="Déjà un compte ?" style="-fx-text-fill: #64748B;" />
+                <Hyperlink onAction="#handleBackToLogin"
+                           style="-fx-text-fill: #7B2FF7; -fx-font-weight: bold; -fx-border-color: transparent;"
+                           text="Se connecter" />
+            </HBox>
         </VBox>
     </children>
 </AnchorPane>

@@ -21,84 +21,65 @@
     </padding>
 
     <children>
-        <!-- Header avec titre et bouton d'ajout -->
-        <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <!-- Header avec titre -->
+        <VBox spacing="5.0">
             <children>
-                <VBox>
-                    <children>
-                        <Label styleClass="page-title" text="Gestion des Utilisateurs">
-                            <font>
-                                <Font name="System Bold" size="28.0" />
-                            </font>
-                        </Label>
-                        <Label styleClass="page-subtitle" text="Gérez les membres de la plateforme" />
-                    </children>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS" />
-                <Button fx:id="btnAddUser" mnemonicParsing="false" onAction="#showAddUserParams"
-                        styleClass="btn-primary" text="+ Ajouter un membre">
+                <Label styleClass="page-title" text="Gestion des utilisateurs">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <Label styleClass="page-subtitle" text="Gérez les membres de la plateforme AutiCare" />
+            </children>
+        </VBox>
+
+        <!-- Barre de recherche et bouton d'ajout -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="search-section">
+            <children>
+                <TextField fx:id="searchField" promptText="Rechercher un utilisateur par nom ou email..."
+                           styleClass="search-field" HBox.hgrow="ALWAYS">
                     <font>
                         <Font size="14.0" />
                     </font>
-                </Button>
+                </TextField>
+                <Button fx:id="btnAddUser" text="+ Ajouter un membre" styleClass="btn-add"
+                        onAction="#showAddUserParams" />
             </children>
         </HBox>
 
-        <!-- Filtres améliorés -->
-        <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="20.0" styleClass="filters-card">
+        <!-- Filtres -->
+        <HBox spacing="20.0" styleClass="filters-section">
             <children>
-                <!-- Recherche -->
-                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
                     <children>
-                        <Label styleClass="filter-label" text="🔍 RECHERCHE" />
-                        <TextField fx:id="searchField" prefHeight="45.0"
-                                   promptText="Rechercher par nom ou email..."
-                                   styleClass="search-field" />
-                    </children>
-                </VBox>
-
-                <!-- Filtre rôle -->
-                <VBox prefWidth="200.0" spacing="8.0">
-                    <children>
-                        <Label styleClass="filter-label" text="👥 RÔLE" />
-                        <ComboBox fx:id="roleFilter" prefHeight="45.0" prefWidth="200.0"
-                                  promptText="Tous les rôles" styleClass="filter-combo" />
-                    </children>
-                </VBox>
-
-                <!-- Filtre statut -->
-                <VBox prefWidth="200.0" spacing="8.0">
-                    <children>
-                        <Label styleClass="filter-label" text="⚡ STATUT" />
-                        <ComboBox fx:id="statusFilter" prefHeight="45.0" prefWidth="200.0"
-                                  promptText="Tous les statuts" styleClass="filter-combo" />
-                    </children>
-                </VBox>
-            </children>
-        </HBox>
-
-        <!-- Tableau avec compteur -->
-        <VBox styleClass="table-container" VBox.vgrow="ALWAYS">
-            <children>
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="table-header">
-                    <children>
-                        <Label styleClass="table-title" text="📋 Liste des utilisateurs" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="userCountLabel" styleClass="user-count" text="12 utilisateurs" />
+                        <Label styleClass="filter-label" text="Rôle :" />
+                        <ComboBox fx:id="roleFilter" prefWidth="160.0" promptText="Tous les rôles"
+                                  styleClass="filter-combo" />
                     </children>
                 </HBox>
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Label styleClass="filter-label" text="Statut :" />
+                        <ComboBox fx:id="statusFilter" prefWidth="160.0" promptText="Tous les statuts"
+                                  styleClass="filter-combo" />
+                    </children>
+                </HBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="userCountLabel" styleClass="user-count-badge" text="14 utilisateurs" />
+            </children>
+        </HBox>
 
-                <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
+        <!-- Tableau des utilisateurs -->
+        <VBox styleClass="table-container" VBox.vgrow="ALWAYS">
+            <children>
+                <TableView fx:id="userTable" VBox.vgrow="ALWAYS" styleClass="user-table">
                     <columns>
-                        <TableColumn fx:id="colUser" prefWidth="300.0" text="UTILISATEUR" />
-                        <TableColumn fx:id="colContact" prefWidth="280.0" text="CONTACT" />
+                        <TableColumn fx:id="colUser" prefWidth="350.0" text="UTILISATEUR" />
+                        <TableColumn fx:id="colContact" prefWidth="300.0" text="CONTACT" />
                         <TableColumn fx:id="colRole" prefWidth="150.0" text="RÔLE" />
                         <TableColumn fx:id="colStatus" prefWidth="130.0" text="STATUT" />
                         <TableColumn fx:id="colActions" prefWidth="120.0" text="ACTIONS" />
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                    </columnResizePolicy>
                 </TableView>
             </children>
         </VBox>

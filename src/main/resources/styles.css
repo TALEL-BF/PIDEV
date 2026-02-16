@@ -1,287 +1,198 @@
-/* ================= MAIN ================= */
-.root {
-    -fx-font-family: 'Segoe UI', 'Poppins', sans-serif;
+/* ========== STYLE COMME TON AMI ========== */
+
+/* Search Section */
+.search-section {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 5, 0, 0, 0);
 }
 
-.main-bg {
-    -fx-background-color: #f5f7fb;
+.search-field {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-padding: 12px 15px;
+    -fx-font-size: 14px;
 }
 
-/* ================= SIDEBAR ================= */
-.sidebar {
-    -fx-background-color: linear-gradient(to bottom, #6A5AE0, #8E7BFF);
-    -fx-padding: 18;
-    -fx-pref-width: 260;
+.search-field:focused {
+    -fx-border-color: #6A5AE0;
 }
 
-/* Header */
-.sidebar-header {
-    -fx-padding: 10 0 20 0;
+/* Filters Section */
+.filters-section {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 15px 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 5, 0, 0, 0);
 }
 
-/* Titre application */
-.app-title {
-    -fx-text-fill: white;
+.filter-label {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.filter-combo {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-pref-height: 40px;
+}
+
+/* Count Label */
+.count-label {
+    -fx-text-fill: #1e293b;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
 }
 
-.app-subtitle {
-    -fx-text-fill: #E0E0FF;
-    -fx-font-size: 12px;
-}
-
-/* Texte discret */
-.muted {
-    -fx-text-fill: #E5E5FF;
-    -fx-font-size: 11px;
-}
-
-/* Badge utilisateur */
-.badge {
-    -fx-background-color: rgba(255,255,255,0.25);
-    -fx-text-fill: white;
-    -fx-padding: 4 10;
-    -fx-background-radius: 20;
-}
-
-/* Boutons menu */
-.menu-item {
-    -fx-background-color: transparent;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 10 15;
-    -fx-background-radius: 8;
-}
-
-/* Hover */
-.menu-item:hover {
-    -fx-background-color: rgba(255,255,255,0.15);
-}
-
-/* Actif */
-.menu-item.active {
-    -fx-background-color: rgba(255,255,255,0.22);
-}
-
-/* ================= PAGE TITLE ================= */
-.page-title {
-    -fx-font-size: 24px;
+.count-number {
+    -fx-text-fill: #6A5AE0;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1B1F3B;
-}
-
-.page-subtitle {
-    -fx-font-size: 14px;
-    -fx-text-fill: #6B7280;
-    -fx-padding: 0 0 15 0;
-}
-
-/* ================= CARDS ================= */
-.modern-card {
-    -fx-background-color: white;
-    -fx-background-radius: 16px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
-    -fx-padding: 20px;
-}
-
-/* ================= FORM LABELS ================= */
-.form-label {
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #6B7280;
-    -fx-text-transform: uppercase;
-    -fx-padding: 0 0 5 0;
-}
-
-/* ================= TEXT FIELDS ================= */
-.text-field-custom {
-    -fx-background-color: white;
-    -fx-background-radius: 10px;
-    -fx-border-color: #E5E7EB;
-    -fx-border-radius: 10px;
-    -fx-padding: 8px 15px;
-    -fx-font-size: 13px;
-}
-
-.text-field-custom:focused {
-    -fx-border-color: #6A5AE0;
-    -fx-effect: dropshadow(gaussian, rgba(106,90,224,0.1), 5, 0, 0, 0);
-}
-
-/* ================= COMBOBOX ================= */
-.combo-box {
-    -fx-background-color: white;
-    -fx-background-radius: 10px;
-    -fx-border-color: #E5E7EB;
-    -fx-border-radius: 10px;
-}
-
-.combo-box .list-cell {
-    -fx-padding: 8px 15px;
-    -fx-font-size: 13px;
-}
-
-/* ================= BUTTONS ================= */
-.btn-primary {
-    -fx-background-color: #6A5AE0;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 13px;
-    -fx-background-radius: 10px;
-    -fx-padding: 10px 20px;
-    -fx-cursor: hand;
-}
-
-.btn-primary:hover {
-    -fx-background-color: #5A4AC0;
-    -fx-effect: dropshadow(gaussian, rgba(106,90,224,0.3), 10, 0, 0, 2);
-}
-
-/* ================= TABLE VIEW ================= */
-.table-view {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-}
-
-.table-view .column-header-background {
-    -fx-background-color: #F9FAFB;
-    -fx-background-radius: 12px 12px 0 0;
-    -fx-padding: 10 0;
-}
-
-.table-view .column-header {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-}
-
-.table-view .column-header .label {
-    -fx-text-fill: #6B7280;
-    -fx-font-weight: bold;
-    -fx-font-size: 11px;
-    -fx-text-transform: uppercase;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 10;
-}
-
-.table-row-cell {
-    -fx-background-color: white;
-    -fx-border-color: #F3F4F6;
-    -fx-border-width: 0 0 1 0;
-    -fx-padding: 8 0;
-}
-
-.table-row-cell:hover {
-    -fx-background-color: #F9FAFB;
-}
-
-/* ================= BADGES ROLE ================= */
-.badge-role {
+    -fx-background-color: #f0e7ff;
+    -fx-padding: 5px 12px;
     -fx-background-radius: 20px;
-    -fx-padding: 4px 12px;
-    -fx-font-size: 11px;
+}
+
+/* Table Container */
+.table-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+}
+
+/* Table Styling */
+.user-table {
+    -fx-background-color: transparent;
+}
+
+.user-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px 8px 0 0;
+}
+
+.user-table .column-header .label {
+    -fx-text-fill: #475569;
     -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-transform: uppercase;
 }
 
-.badge-apprenant {
-    -fx-background-color: #E8F0FE;
-    -fx-text-fill: #1A73E8;
+.user-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1 0;
+    -fx-pref-height: 60px;
 }
 
-.badge-parent {
-    -fx-background-color: #F3E8FF;
-    -fx-text-fill: #8B5CF6;
+.user-table .table-row-cell:hover {
+    -fx-background-color: #f8fafc;
 }
 
-.badge-educateur {
-    -fx-background-color: #E0F2FE;
-    -fx-text-fill: #0284C7;
-}
-
-.badge-therapeute {
-    -fx-background-color: #FFE4E8;
-    -fx-text-fill: #E11D48;
-}
-
-.badge-admin {
-    -fx-background-color: #FEF3C7;
-    -fx-text-fill: #D97706;
-}
-
-/* ================= BADGES STATUS ================= */
-.badge-actif {
-    -fx-background-color: #DCFCE7;
-    -fx-text-fill: #059669;
-}
-
-.badge-en-attente {
-    -fx-background-color: #FEF9C3;
-    -fx-text-fill: #CA8A04;
-}
-
-.badge-inactif {
-    -fx-background-color: #FEE2E2;
-    -fx-text-fill: #DC2626;
-}
-
-/* ================= AVATAR ================= */
+/* Avatar dans le tableau */
 .user-avatar {
-    -fx-background-color: #F3F4F6;
+    -fx-background-color: #6A5AE0;
     -fx-background-radius: 50%;
-    -fx-min-width: 40px;
-    -fx-min-height: 40px;
-    -fx-max-width: 40px;
-    -fx-max-height: 40px;
+    -fx-min-width: 45px;
+    -fx-min-height: 45px;
+    -fx-max-width: 45px;
+    -fx-max-height: 45px;
     -fx-alignment: CENTER;
 }
 
-.avatar-circle {
-    -fx-fill: #F3F4F6;
-    -fx-stroke: #6A5AE0;
-    -fx-stroke-width: 2;
+.user-avatar-circle {
+    -fx-fill: linear-gradient(to bottom right, #6A5AE0, #8E7BFF);
 }
 
-.avatar-text {
-    -fx-font-size: 16px;
+.user-avatar-text {
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #6A5AE0;
+    -fx-text-fill: white;
 }
 
-/* ================= USER INFO ================= */
 .user-name {
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1B1F3B;
-    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
 }
 
-.user-date {
-    -fx-text-fill: #6B7280;
-    -fx-font-size: 11px;
-}
-
-/* ================= CONTACT INFO ================= */
-.contact-email {
-    -fx-text-fill: #4B5563;
-    -fx-font-size: 13px;
-}
-
-.contact-phone {
-    -fx-text-fill: #6B7280;
+.user-email {
+    -fx-text-fill: #64748b;
     -fx-font-size: 12px;
 }
 
-/* ================= ACTION BUTTONS ================= */
+/* Badges */
+.role-badge {
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 12px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.role-admin {
+    -fx-background-color: #fef3c7;
+    -fx-text-fill: #d97706;
+}
+
+.role-parent {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #2563eb;
+}
+
+.role-educator {
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0284c7;
+}
+
+.role-therapist {
+    -fx-background-color: #fae8ff;
+    -fx-text-fill: #c026d3;
+}
+
+.role-learner {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #16a34a;
+}
+
+.status-badge {
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 12px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.status-active {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #16a34a;
+}
+
+.status-pending {
+    -fx-background-color: #fef9c3;
+    -fx-text-fill: #ca8a04;
+}
+
+.status-inactive {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #dc2626;
+}
+
+/* Action Buttons */
 .action-button {
     -fx-background-color: transparent;
     -fx-cursor: hand;
+    -fx-font-size: 18px;
     -fx-padding: 5px;
-    -fx-background-radius: 5px;
-    -fx-font-size: 16px;
 }
 
 .action-button:hover {
-    -fx-background-color: #F3F4F6;
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 5px;
 }
 
 .btn-view {
@@ -289,47 +200,232 @@
 }
 
 .btn-edit {
-    -fx-text-fill: #8B5CF6;
+    -fx-text-fill: #f59e0b;
 }
 
 .btn-delete {
+    -fx-text-fill: #ef4444;
+}
+/* Styles pour les messages d'erreur */
+.error-label {
     -fx-text-fill: #EF4444;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 0 0 5;
 }
 
-/* ================= FILTER SECTION ================= */
-.filter-section {
+/* Style pour les champs en erreur */
+.text-field-error {
+    -fx-border-color: #EF4444;
+    -fx-border-width: 2;
+}
+
+.password-field-error {
+    -fx-border-color: #EF4444;
+    -fx-border-width: 2;
+}
+/* ========== STYLES GÉNÉRAUX ========== */
+.main-bg {
+    -fx-background-color: #f5f7fb;
+}
+
+/* ========== PAGE TITLES ========== */
+.page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-font-family: 'Poppins';
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748b;
+    -fx-font-family: 'Poppins';
+}
+
+/* ========== SEARCH SECTION ========== */
+.search-section {
     -fx-background-color: white;
     -fx-background-radius: 16px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 8, 0, 0, 1);
     -fx-padding: 20px;
-    -fx-spacing: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
 }
 
-/* ================= EMPTY STATE ================= */
-.empty-state {
-    -fx-alignment: CENTER;
-    -fx-padding: 60px;
-}
-
-.empty-state-text {
+.search-field {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12px;
+    -fx-padding: 14px 18px;
     -fx-font-size: 14px;
-    -fx-text-fill: #9CA3AF;
+    -fx-font-family: 'Poppins';
+}
 
-    /* Badges spécifiques */
-    .badge-role {
-        -fx-background-radius: 20px;
-        -fx-padding: 4px 12px;
-        -fx-font-size: 11px;
-        -fx-font-weight: bold;
-    }
+.search-field:focused {
+    -fx-border-color: #667eea;
+    -fx-effect: dropshadow(gaussian, rgba(102,126,234,0.1), 5, 0, 0, 0);
+}
 
-    .badge-apprenant { -fx-background-color: #E8F0FE; -fx-text-fill: #1A73E8; }
-    .badge-parent { -fx-background-color: #F3E8FF; -fx-text-fill: #8B5CF6; }
-    .badge-educateur { -fx-background-color: #E0F2FE; -fx-text-fill: #0284C7; }
-    .badge-therapeute { -fx-background-color: #FFE4E8; -fx-text-fill: #E11D48; }
-    .badge-admin { -fx-background-color: #FEF3C7; -fx-text-fill: #D97706; }
+/* ========== FILTERS SECTION ========== */
+.filters-section {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-padding: 18px 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+}
 
-    .badge-actif { -fx-background-color: #DCFCE7; -fx-text-fill: #059669; }
-    .badge-en-attente { -fx-background-color: #FEF9C3; -fx-text-fill: #CA8A04; }
-    .badge-inactif { -fx-background-color: #FEE2E2; -fx-text-fill: #DC2626; }
+.filter-label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Poppins';
+}
+
+.filter-combo {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+    -fx-pref-height: 40px;
+}
+
+/* ========== USER COUNT BADGE ========== */
+.user-count-badge {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-padding: 8px 18px;
+    -fx-background-radius: 30px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Poppins';
+    -fx-effect: dropshadow(gaussian, rgba(102,126,234,0.3), 8, 0, 0, 2);
+}
+
+/* ========== TABLE CONTAINER ========== */
+.table-container {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+}
+
+.user-table {
+    -fx-background-color: transparent;
+}
+
+.user-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.user-table .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-transform: uppercase;
+    -fx-font-family: 'Poppins';
+}
+
+.user-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1 0;
+    -fx-pref-height: 70px;
+}
+
+.user-table .table-row-cell:hover {
+    -fx-background-color: #f8fafc;
+}
+
+/* ========== BUTTON ADD ========== */
+.btn-add {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 14px 25px;
+    -fx-background-radius: 12px;
+    -fx-cursor: hand;
+    -fx-font-family: 'Poppins';
+    -fx-effect: dropshadow(gaussian, rgba(102,126,234,0.3), 10, 0, 0, 2);
+}
+
+.btn-add:hover {
+    -fx-background-color: linear-gradient(to right, #5a67d8, #6b46a1);
+    -fx-effect: dropshadow(gaussian, rgba(102,126,234,0.4), 15, 0, 0, 3);
+}
+
+/* ========== AVATAR ========== */
+.user-avatar-circle {
+    -fx-fill: linear-gradient(to bottom right, #667eea, #764ba2);
+    -fx-stroke: white;
+    -fx-stroke-width: 2;
+}
+
+.user-avatar-text {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.user-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 15px;
+    -fx-font-family: 'Poppins';
+}
+
+.user-date {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 11px;
+    -fx-font-family: 'Poppins';
+}
+
+/* ========== BADGES ========== */
+.role-badge {
+    -fx-background-radius: 20px;
+    -fx-padding: 5px 12px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Poppins';
+}
+
+.role-admin {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #b91c1c;
+}
+
+.role-parent {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e40af;
+}
+
+.role-educator {
+    -fx-background-color: #e0f2fe;
+    -fx-text-fill: #0369a1;
+}
+
+.role-therapist {
+    -fx-background-color: #fae8ff;
+    -fx-text-fill: #a21caf;
+}
+
+.role-learner {
+    -fx-background-color: #d1fae5;
+    -fx-text-fill: #047857;
+}
+
+.status-active {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+}
+
+.status-pending {
+    -fx-background-color: #fed7aa;
+    -fx-text-fill: #9a3412;
+}
+
+.status-inactive {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
 }

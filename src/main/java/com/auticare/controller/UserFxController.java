@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -58,6 +59,8 @@ public class UserFxController {
     private TableColumn<User, String> colStatus;
     @FXML
     private TableColumn<User, User> colActions;
+    @FXML
+    private Label userCountLabel;
 
     private ObservableList<User> userList = FXCollections.observableArrayList();
     private FilteredList<User> filteredData;
@@ -85,6 +88,7 @@ public class UserFxController {
         statusFilter.valueProperty().addListener((obs, old, newVal) -> updateFilter());
 
         userTable.setItems(filteredData);
+        updateUserCount();
         System.out.println("✅ Initialisation terminée - " + userList.size() + " utilisateurs dans la liste");
     }
 
@@ -102,12 +106,12 @@ public class UserFxController {
                     box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
                     // Créer l'avatar (photo ou initiale)
-                    javafx.scene.layout.StackPane avatar = createAvatar(user);
+                    StackPane avatar = createAvatar(user);
 
                     // Informations utilisateur
                     VBox text = new VBox(2);
                     Label name = new Label(user.getName());
-                    name.setStyle("-fx-font-weight: bold; -fx-text-fill: #2d3436; -fx-font-size: 14px;");
+                    name.getStyleClass().add("user-name");
 
                     String dateText = "Inscrit le ";
                     if (user.getRegistrationDate() != null) {
@@ -116,7 +120,7 @@ public class UserFxController {
                         dateText += "N/A";
                     }
                     Label date = new Label(dateText);
-                    date.setStyle("-fx-text-fill: #636e72; -fx-font-size: 11px;");
+                    date.getStyleClass().add("user-date");
 
                     text.getChildren().addAll(name, date);
                     box.getChildren().addAll(avatar, text);
@@ -125,7 +129,7 @@ public class UserFxController {
             }
 
             // Méthode pour créer l'avatar avec photo ou initiale
-            private javafx.scene.layout.StackPane createAvatar(User user) {
+            private StackPane createAvatar(User user) {
                 // Vérifier si l'utilisateur a une photo
                 if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
                     try {
@@ -147,30 +151,32 @@ public class UserFxController {
                         if (imageFile.exists()) {
                             Image image = new Image(imageFile.toURI().toString());
                             ImageView imageView = new ImageView(image);
-                            imageView.setFitHeight(40);
-                            imageView.setFitWidth(40);
+                            imageView.setFitHeight(45);
+                            imageView.setFitWidth(45);
                             imageView.setPreserveRatio(true);
 
                             // Découper en cercle
-                            Circle clip = new Circle(20, 20, 20);
+                            Circle clip = new Circle(22.5, 22.5, 22.5);
                             imageView.setClip(clip);
 
                             System.out.println("✅ Photo chargée avec succès pour: " + user.getName());
-                            return new javafx.scene.layout.StackPane(imageView);
+                            return new StackPane(imageView);
                         } else {
                             System.out.println("⚠️ Fichier photo non trouvé pour: " + user.getName());
                         }
                     } catch (Exception e) {
                         System.err.println("❌ Erreur chargement photo pour " + user.getName() + ": " + e.getMessage());
-                        e.printStackTrace();
                     }
                 }
 
                 // Pas de photo ou erreur de chargement, utiliser l'initiale
-                Circle circle = new Circle(20, Color.web("#f1f2f6"));
+                Circle circle = new Circle(22.5);
+                circle.getStyleClass().add("avatar-circle");
+
                 Label initialLabel = new Label(user.getName().substring(0, 1).toUpperCase());
-                initialLabel.setStyle("-fx-text-fill: #7b2ff7; -fx-font-weight: bold; -fx-font-size: 16px;");
-                return new javafx.scene.layout.StackPane(circle, initialLabel);
+                initialLabel.getStyleClass().add("avatar-text");
+
+                return new StackPane(circle, initialLabel);
             }
         });
 
@@ -185,10 +191,10 @@ public class UserFxController {
                 } else {
                     VBox box = new VBox(2);
                     Label email = new Label(user.getEmail());
-                    email.setStyle("-fx-text-fill: #4B5563; -fx-font-size: 13px;");
+                    email.getStyleClass().add("contact-email");
 
                     Label phone = new Label(user.getPhoneNumber() != null ? user.getPhoneNumber() : "--");
-                    phone.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 12px;");
+                    phone.getStyleClass().add("contact-phone");
 
                     box.getChildren().addAll(email, phone);
                     setGraphic(box);
@@ -210,23 +216,22 @@ public class UserFxController {
                 if (empty || role == null || role.isEmpty()) {
                     setGraphic(null);
                 } else {
-                    Label badge = new Label(role.toUpperCase());
-                    badge.setStyle("-fx-background-radius: 20px; -fx-padding: 4px 12px; -fx-font-size: 11px; -fx-font-weight: bold;");
+                    Label badge = new Label(role);
+                    badge.getStyleClass().add("badge-role");
 
-                    // Appliquer la couleur selon le rôle
                     String roleLower = role.toLowerCase();
                     if (roleLower.contains("admin")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #eceaff; -fx-text-fill: #6c5ce7;");
+                        badge.getStyleClass().add("role-admin");
                     } else if (roleLower.contains("parent")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #e3f2fd; -fx-text-fill: #1e88e5;");
+                        badge.getStyleClass().add("role-parent");
                     } else if (roleLower.contains("educateur") || roleLower.contains("éducateur")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #e0f7fa; -fx-text-fill: #00acc1;");
+                        badge.getStyleClass().add("role-educator");
                     } else if (roleLower.contains("therapeute") || roleLower.contains("thérapeute")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #fce4ec; -fx-text-fill: #d81b60;");
+                        badge.getStyleClass().add("role-therapist");
                     } else if (roleLower.contains("apprenant")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #e8eaf6; -fx-text-fill: #3f51b5;");
+                        badge.getStyleClass().add("role-learner");
                     } else {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #f5f5f5; -fx-text-fill: #757575;");
+                        badge.getStyleClass().add("role-default");
                     }
 
                     setGraphic(badge);
@@ -249,18 +254,17 @@ public class UserFxController {
                     setGraphic(null);
                 } else {
                     Label badge = new Label(status);
-                    badge.setStyle("-fx-background-radius: 20px; -fx-padding: 4px 12px; -fx-font-size: 11px; -fx-font-weight: bold;");
+                    badge.getStyleClass().add("badge-role");
 
-                    // Appliquer la couleur selon le statut
                     String statusLower = status.toLowerCase();
                     if (statusLower.contains("actif")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #e8f5e9; -fx-text-fill: #43a047;");
+                        badge.getStyleClass().add("status-active");
                     } else if (statusLower.contains("en attente")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #fff3e0; -fx-text-fill: #fb8c00;");
+                        badge.getStyleClass().add("status-pending");
                     } else if (statusLower.contains("inactif")) {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #ffebee; -fx-text-fill: #e53935;");
+                        badge.getStyleClass().add("status-inactive");
                     } else {
-                        badge.setStyle(badge.getStyle() + "-fx-background-color: #f5f5f5; -fx-text-fill: #757575;");
+                        badge.getStyleClass().add("status-default");
                     }
 
                     setGraphic(badge);
@@ -281,15 +285,15 @@ public class UserFxController {
                     actions.setAlignment(javafx.geometry.Pos.CENTER);
 
                     Button btnView = new Button("👁");
-                    btnView.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 16px; -fx-text-fill: #6c5ce7;");
+                    btnView.getStyleClass().addAll("action-button", "btn-view");
                     btnView.setOnAction(e -> showProfileView(user));
 
                     Button btnEdit = new Button("✏");
-                    btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 16px; -fx-text-fill: #4834d4;");
+                    btnEdit.getStyleClass().addAll("action-button", "btn-edit");
                     btnEdit.setOnAction(e -> showEditView(user));
 
                     Button btnDelete = new Button("🗑");
-                    btnDelete.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 16px; -fx-text-fill: #e74c3c;");
+                    btnDelete.getStyleClass().addAll("action-button", "btn-delete");
                     btnDelete.setOnAction(e -> deleteUser(user));
 
                     actions.getChildren().addAll(btnView, btnEdit, btnDelete);
@@ -316,6 +320,9 @@ public class UserFxController {
 
             return matchesSearch && matchesRole && matchesStatus;
         });
+
+        // Mettre à jour le compteur après filtrage
+        updateUserCount();
     }
 
     private void loadUsers() {
@@ -324,18 +331,26 @@ public class UserFxController {
             List<User> users = userService.getAllUsers();
             System.out.println("📋 " + users.size() + " utilisateurs trouvés");
 
-            // Debug: afficher les détails et les photos
+            // Debug: afficher les détails
             for (User user : users) {
                 System.out.println("   - " + user.getName() +
                         " | Rôle: " + user.getRole() +
-                        " | Statut: " + user.getStatus() +
-                        " | Photo: " + (user.getPhotoUrl() != null ? user.getPhotoUrl() : "aucune"));
+                        " | Statut: " + user.getStatus());
             }
 
             userList.setAll(users);
+            updateUserCount();
+
         } catch (Exception e) {
             System.err.println("❌ Erreur chargement: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void updateUserCount() {
+        if (userCountLabel != null) {
+            int count = filteredData != null ? filteredData.size() : userList.size();
+            userCountLabel.setText(String.valueOf(count));
         }
     }
 

@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 @Component
@@ -75,8 +76,15 @@ public class LoginController {
         try {
             System.out.println("🔄 Redirection vers inscription...");
 
-            // Note: Si tu n'as pas Register.fxml, commente cette méthode ou crée le fichier
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Register.fxml"));
+            // Vérifier que le fichier Register.fxml existe
+            URL resource = getClass().getResource("/fxml/Register.fxml");
+            System.out.println("🔍 URL de Register.fxml: " + resource);
+
+            if (resource == null) {
+                throw new IOException("Fichier Register.fxml non trouvé dans /fxml/");
+            }
+
+            FXMLLoader loader = new FXMLLoader(resource);
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
 
@@ -117,8 +125,33 @@ public class LoginController {
 
     private void loadDashboard(String fxmlPath, String title) {
         try {
-            System.out.println("Chargement de: " + fxmlPath);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            System.out.println("🔍 Chargement de: " + fxmlPath);
+
+            // Vérifier que le fichier existe
+            URL resource = getClass().getResource(fxmlPath);
+            System.out.println("📁 URL complète: " + resource);
+
+            if (resource == null) {
+                // Afficher tous les fichiers disponibles dans /fxml/ pour debug
+                URL dir = getClass().getResource("/fxml/");
+                if (dir != null) {
+                    try {
+                        java.io.File folder = new java.io.File(dir.toURI());
+                        System.out.println("📋 Fichiers disponibles dans /fxml/:");
+                        java.io.File[] files = folder.listFiles();
+                        if (files != null) {
+                            for (java.io.File file : files) {
+                                System.out.println("   - " + file.getName());
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println("❌ Erreur lors de la lecture du dossier: " + e.getMessage());
+                    }
+                }
+                throw new IOException("Fichier non trouvé: " + fxmlPath);
+            }
+
+            FXMLLoader loader = new FXMLLoader(resource);
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
 
@@ -126,7 +159,11 @@ public class LoginController {
             stage.setScene(new Scene(root));
             stage.setTitle(title);
             stage.show();
+
+            System.out.println("✅ Chargement réussi: " + fxmlPath);
+
         } catch (Exception e) {
+            System.err.println("❌ Erreur: " + e.getMessage());
             e.printStackTrace();
             String detail = (e.getMessage() != null) ? e.getMessage() : e.toString();
             showAlert(Alert.AlertType.ERROR, "Erreur de chargement",
