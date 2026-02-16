@@ -11,7 +11,7 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controller.EmotionDetectionController"
             stylesheets="@styles/app.css"
-            prefWidth="900" prefHeight="700"
+            prefWidth="1300" prefHeight="800"
             style="-fx-background-color: #e6f3ff;">
 
     <!-- ========== SIDEBAR ========== -->
