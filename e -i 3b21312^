@@ -1,0 +1,26 @@
+[33m054b4f8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mgestion_event[m[33m)[m  enhancing face emotion recognition via MediaPipe and DeepFace
+[33m3b21312[m  enhancing face emotion recognition via MediaPipe and DeepFace
+[33m7dee068[m[33m ([m[1;31morigin/gestion_event[m[33m)[m  Amélioration de l’interface
+[33me4a0242[m amélioration du fonctionnalite generation et telechargement du rapport en pdf
+[33me300e7c[m ajouter le test unitaire
+[33m51b3513[m  amelioration affichage carte evenement
+[33m33cb55e[m  amelioration de l'interface du event details
+[33m907a9cc[m implementation du controle de saisie pour sponsors
+[33m321bd72[m implementation du controle de saisie pour events
+[33m8d75deb[m amelioration du pdf
+[33m77c076d[m amelioration de la generation de la description des evenements
+[33m8268e2e[m génération du rapport par ai + export PDF
+[33mcbe950a[m Amelioration de la detection d emotion par voix haute
+[33mb583aa9[m  Amelioration de la detection d’emotion par ia
+[33m94b9cc1[m implementation du detection d'emotions par ai
+[33m6effe2a[m  Amelioration de l’interface des details d’evenement
+[33me432afc[m ajout de la generation automatique de la description de l'evenement via ia
+[33ma5ac361[m ajout de la generation automatique de la description de l'evenement via ia
+[33m0edf51f[m Correction de la methode modifier evenement
+[33m9699ba9[m  implementation des fonctionnalites recherche et filtrage des sponsors
+[33m6beed3d[m implementation des fonctionnalites  recherche et filtrage des evenement
+[33m2686e92[m Amélioration de l'interface du sponsor
+[33m5f46cdd[m Amélioration de l'interface événement
+[33m31df0b0[m  crud of second entity sponsor
+[33m88232c0[m crud of first entity evnt
+[33mfc0ab19[m connection with data base

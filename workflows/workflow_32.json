@@ -1,0 +1,66 @@
+{
+    "3": {
+        "class_type": "KSampler",
+        "inputs": {
+            "seed": 1771435057536,
+            "steps": 20,
+            "cfg": 7.5,
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "denoise": 1,
+            "model": ["10", 0],
+            "positive": ["6", 0],
+            "negative": ["7", 0],
+            "latent_image": ["5", 0]
+        }
+    },
+    "4": {
+        "class_type": "CheckpointLoaderSimple",
+        "inputs": {
+            "ckpt_name": "cartoonStyleClassic_v1.safetensors"
+        }
+    },
+    "5": {
+        "class_type": "EmptyLatentImage",
+        "inputs": {
+            "width": 512,
+            "height": 512,
+            "batch_size": 16
+        }
+    },
+    "6": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+            "text": "cartoon style, Exploration du monde animal, Explore les animaux du monde ! Observe leurs couleurs, leurs bruits et leurs comportements uniques. Un moment doux et accueillant pour découvrir la nature., bizerte, 10 people, cute characters, bright colors, 2d animation",
+            "clip": ["4", 1]
+        }
+    },
+    "7": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+            "text": "blurry, low quality, distorted, ugly, bad anatomy",
+            "clip": ["4", 1]
+        }
+    },
+    "8": {
+        "class_type": "VAEDecode",
+        "inputs": {
+            "samples": ["3", 0],
+            "vae": ["4", 2]
+        }
+    },
+    "9": {
+        "class_type": "SaveImage",
+        "inputs": {
+            "filename_prefix": "event_32",
+            "images": ["8", 0]
+        }
+    },
+    "10": {
+        "class_type": "AnimateDiffLoader",
+        "inputs": {
+            "model": ["4", 0],
+            "motion_module": "mm_sd_v15.ckpt"
+        }
+    }
+}

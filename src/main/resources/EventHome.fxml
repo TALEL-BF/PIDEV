@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controller.EventHome"
+            stylesheets="@styles/app.css"
+            prefHeight="600" prefWidth="950">
+
+    <!-- SIDEBAR - Dégradé violet -->
+    <left>
+        <VBox style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 15; -fx-spacing: 12;">
+
+            <!-- Header with logo -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <ImageView fitWidth="80" fitHeight="80" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo.png"/>
+                    </image>
+                </ImageView>
+                <VBox>
+                    <Label text="AutiCare" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;"/>
+                    <Label text="Gestion des événements" style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- User info -->
+            <Label text="Connecté en tant que" style="-fx-text-fill: #C4B5FD; -fx-font-size: 13px;"/>
+            <Label text="👤 Administrateur"
+                   style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white;
+                          -fx-padding: 8 15; -fx-background-radius: 30; -fx-font-weight: bold;"/>
+
+            <Separator style="-fx-background-color: #C4B5FD; -fx-opacity: 0.3;"/>
+
+            <!-- ========== MENU AVEC SOUS-MENU ========== -->
+            <VBox spacing="8">
+                <Button text="📚 gestion des utilisateur"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                   -fx-alignment: CENTER_LEFT; -fx-padding: 6 12; -fx-background-radius: 10;
+                   -fx-font-size: 12px; -fx-cursor: hand;"/>
+
+                <Button text="🗓️gestion des cours"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                   -fx-alignment: CENTER_LEFT; -fx-padding: 6 12; -fx-background-radius: 10;
+                   -fx-font-size: 12px; -fx-cursor: hand;"/>
+                <Button text="📚 gestion des emploi"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                   -fx-alignment: CENTER_LEFT; -fx-padding: 6 12; -fx-background-radius: 10;
+                   -fx-font-size: 12px; -fx-cursor: hand;"/>
+
+                <Button text="🗓️gestion des consultation"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                   -fx-alignment: CENTER_LEFT; -fx-padding: 6 12; -fx-background-radius: 10;
+                   -fx-font-size: 12px; -fx-cursor: hand;"/>
+                <!-- 🎪 PARENT avec sous-menu -->
+                <VBox spacing="4">
+                    <Button fx:id="eventsParentBtn" text=" 🎉 Gestion des événements "
+                            style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white;
+                                   -fx-alignment: CENTER_LEFT; -fx-padding: 12 15; -fx-background-radius: 12;
+                                   -fx-cursor: hand; -fx-font-weight: bold;"/>
+
+                    <!-- SOUS-MENU (Événements et Sponsors) - VERSION RÉDUITE -->
+                    <VBox fx:id="eventsSubmenu" spacing="5" style="-fx-padding: 5 0 5 25;">
+                        <Button fx:id="btnListEvents" text=" 📅 Événements"
+                                style="-fx-background-color: rgba(255,255,255,0.1);
+                                       -fx-background-radius: 20;
+                                       -fx-text-fill: white;
+                                       -fx-alignment: CENTER_LEFT;
+                                       -fx-padding: 6 12;
+                                       -fx-font-size: 13px;
+                                       -fx-font-weight: bold;
+                                       -fx-cursor: hand;
+                                       -fx-border-color: #C4B5FD;
+                                       -fx-border-width: 1;
+                                       -fx-border-radius: 20;"/>
+                        <Button fx:id="btnSponsors" text=" 🤝 Sponsors"
+                                style="-fx-background-color: rgba(255,255,255,0.1);
+                                       -fx-background-radius: 20;
+                                       -fx-text-fill: white;
+                                       -fx-alignment: CENTER_LEFT;
+                                       -fx-padding: 6 12;
+                                       -fx-font-size: 13px;
+                                       -fx-font-weight: bold;
+                                       -fx-cursor: hand;
+                                       -fx-border-color: #C4B5FD;
+                                       -fx-border-width: 1;
+                                       -fx-border-radius: 20;"/>
+                    </VBox>
+                    <Button text="🗓️gestion des jeux"
+                            style="-fx-background-color: transparent; -fx-text-fill: white;
+                   -fx-alignment: CENTER_LEFT; -fx-padding: 6 12; -fx-background-radius: 10;
+                   -fx-font-size: 12px; -fx-cursor: hand;"/>
+                </VBox>
+            </VBox>
+
+            <VBox VBox.vgrow="ALWAYS"/>
+            <Label text="💡 Un espace pensé pour chaque autiste"
+                   wrapText="true"
+                   style="-fx-text-fill: #C4B5FD; -fx-font-size: 12px; -fx-font-style: italic; -fx-padding: 10 0 0 0;"/>
+            <Label text="✨ v1.0.0" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
+
+        </VBox>
+    </left>
+
+    <!-- CONTENT AREA -->
+    <center>
+        <StackPane fx:id="contentArea" style="-fx-background-color: #f8fafc; -fx-padding: 20;"/>
+    </center>
+
+</BorderPane>

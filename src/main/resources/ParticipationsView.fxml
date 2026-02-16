@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controller.ParticipationsController"
+            prefWidth="1200" prefHeight="800"
+            style="-fx-background-color: linear-gradient(to bottom right, #f8f0ff, #e9e0ff);">
+
+    <!-- ========== HAUT DE PAGE MAGIQUE ========== -->
+    <top>
+        <VBox alignment="CENTER" spacing="10" style="-fx-padding: 30 30 10 30;">
+
+            <!-- Titre avec étoiles -->
+            <HBox alignment="CENTER" spacing="20">
+                <Label text="✨" style="-fx-font-size: 40px;"/>
+                <Label text="Les amis de l'événement"
+                       style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+                <Label text="✨" style="-fx-font-size: 40px;"/>
+            </HBox>
+
+            <!-- Nom de l'événement -->
+            <Label fx:id="eventTitleLabel" text=""
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #6d28d9;
+                          -fx-background-color: white; -fx-padding: 10 30;
+                          -fx-background-radius: 50; -fx-border-color: #c4b5fd;
+                          -fx-border-width: 3; -fx-border-radius: 50;"/>
+
+            <!-- Petit message -->
+            <Label text="🌟 Chaque ami est spécial ! 🌟"
+                   style="-fx-font-size: 16px; -fx-text-fill: #6b7280; -fx-font-style: italic;"/>
+        </VBox>
+    </top>
+
+    <!-- ========== CENTRE AVEC CARTES ========== -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true"
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox spacing="25" style="-fx-padding: 20;">
+
+                <!-- GRILLE DE CARTES -->
+                <FlowPane fx:id="participantsGrid"
+                          hgap="25" vgap="25"
+                          alignment="CENTER"
+                          style="-fx-padding: 20;"/>
+
+                <!-- MESSAGE SI AUCUN PARTICIPANT -->
+                <VBox fx:id="emptyMessage"
+                      alignment="CENTER"
+                      spacing="20"
+                      visible="false"
+                      managed="false"
+                      style="-fx-padding: 50;">
+                    <Label text="🧸" style="-fx-font-size: 80px;"/>
+                    <Label text="Oh oh ! Personne n'est encore inscrit..."
+                           style="-fx-font-size: 24px; -fx-text-fill: #6b7280; -fx-font-weight: bold;"/>
+                    <Label text="Sois le premier à participer !"
+                           style="-fx-font-size: 18px; -fx-text-fill: #9ca3af;"/>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ========== BAS DE PAGE ========== -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 20;">
+            <Button text="← Retour à l'aventure"
+                    onAction="#handleRetour"
+                    style="-fx-background-color: #f0f0f0; -fx-text-fill: #6d28d9;
+                           -fx-background-radius: 40; -fx-padding: 12 35;
+                           -fx-font-size: 16px; -fx-font-weight: bold;
+                           -fx-cursor: hand; -fx-border-color: #c4b5fd;
+                           -fx-border-width: 3; -fx-border-radius: 40;
+                           -fx-effect: dropshadow(gaussian, rgba(196,181,253,0.5), 8, 0, 0, 3);"/>
+        </HBox>
+    </bottom>
+</BorderPane>
