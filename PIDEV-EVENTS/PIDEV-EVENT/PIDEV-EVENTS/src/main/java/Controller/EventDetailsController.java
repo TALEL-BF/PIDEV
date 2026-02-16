@@ -554,4 +554,5 @@ public class EventDetailsController {
             e.printStackTrace();
         }
     }
+
 }
