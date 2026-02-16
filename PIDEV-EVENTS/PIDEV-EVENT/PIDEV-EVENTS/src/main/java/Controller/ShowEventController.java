@@ -308,20 +308,21 @@ public class ShowEventController {
         double IMAGE_HEIGHT = 140;
         double CORNER_RADIUS = 20;
 
-        // ===================== CARD =====================
+        // ===================== CARTE =====================
         VBox card = new VBox(0);
         card.setPrefWidth(CARD_WIDTH);
         card.setMinWidth(CARD_WIDTH);
         card.setMaxWidth(CARD_WIDTH);
         card.setStyle(
-                "-fx-background-color: linear-gradient(to bottom right, #faf5ff, #f3e8ff);" +  // ← Violet très très léger
+                "-fx-background-color: linear-gradient(to bottom right, #faf5ff, #f3e8ff);" +
                         "-fx-background-radius: " + CORNER_RADIUS + ";" +
                         "-fx-border-radius: " + CORNER_RADIUS + ";" +
                         "-fx-border-color: #e0d7ff;" +
                         "-fx-border-width: 1;" +
                         "-fx-effect: dropshadow(gaussian, rgba(139,92,246,0.15), 10, 0, 0, 4);"
         );
-        // ===================== IMAGE PRINCIPALE =====================
+
+        // ===================== IMAGE AVEC BADGE =====================
         VBox imageWrapper = new VBox();
         imageWrapper.setPadding(new Insets(8, 8, 0, 8));
 
@@ -338,6 +339,7 @@ public class ShowEventController {
         eventImage.setPreserveRatio(false);
         eventImage.setClip(clip);
         loadEventImage(e, eventImage);
+
         imageContainer.getChildren().add(eventImage);
 
         // Badge date
@@ -358,36 +360,42 @@ public class ShowEventController {
         imageContainer.getChildren().add(dateBadge);
         imageWrapper.getChildren().add(imageContainer);
 
-        // ===================== BANDE HEURE + LIEU =====================
-        HBox infoBand = new HBox(10);
+        // ===================== BANDE INFOS (Lieu à gauche, Heure à droite) =====================
+        HBox infoBand = new HBox();
         infoBand.setAlignment(Pos.CENTER_LEFT);
         infoBand.setPadding(new Insets(8, 12, 8, 12));
         infoBand.setStyle("-fx-background-color: linear-gradient(to right, #8b5cf6, #a78bfa);");
 
-        if (e.getHeureDebut() != null && e.getHeureFin() != null) {
-            Label timeLabel = new Label("⏰ " + formatTime(e.getHeureDebut()) + " - " + formatTime(e.getHeureFin()));
-            timeLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
-            infoBand.getChildren().add(timeLabel);
-        }
-
+        // Lieu à gauche
         if (e.getLieu() != null && !e.getLieu().isEmpty()) {
             Label locationLabel = new Label("📍 " + e.getLieu());
             locationLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
             infoBand.getChildren().add(locationLabel);
         }
 
+        // Pousseur flexible pour séparer lieu et heure
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        infoBand.getChildren().add(spacer);
+
+        // Heure à droite
+        if (e.getHeureDebut() != null && e.getHeureFin() != null) {
+            Label timeLabel = new Label("⏰ " + formatTime(e.getHeureDebut()) + " - " + formatTime(e.getHeureFin()));
+            timeLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+            infoBand.getChildren().add(timeLabel);
+        }
+
         VBox topSection = new VBox(6);
         topSection.getChildren().addAll(imageWrapper, infoBand);
 
-        // ===================== CONTENU =====================
+        // ===================== CONTENU TEXTE =====================
         VBox content = new VBox(8);
         content.setPadding(new Insets(12));
 
-        // ✅ Titre avec IMAGE au lieu d'émoji
+        // Titre avec icône
         HBox titleBox = new HBox(10);
         titleBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Image selon le type d'événement
         ImageView typeIcon = new ImageView();
         typeIcon.setFitWidth(55);
         typeIcon.setFitHeight(55);
@@ -399,7 +407,6 @@ public class ShowEventController {
             if (imageUrl != null) {
                 typeIcon.setImage(new Image(imageUrl.toString()));
             } else {
-                // Image par défaut
                 URL defaultIcon = getClass().getResource("/assets/event-default.png");
                 if (defaultIcon != null) {
                     typeIcon.setImage(new Image(defaultIcon.toString()));
@@ -412,10 +419,9 @@ public class ShowEventController {
         Label title = new Label(e.getTitre());
         title.setWrapText(true);
         title.setStyle("-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
-
         titleBox.getChildren().addAll(typeIcon, title);
 
-        // ✅ Participants avec IMAGE au lieu d'émoji
+        // Participants
         HBox participantsBox = new HBox(8);
         participantsBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -435,10 +441,9 @@ public class ShowEventController {
 
         Label participantsValue = new Label(e.getMaxParticipant() + " participants");
         participantsValue.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 13px;");
-
         participantsBox.getChildren().addAll(participantsIcon, participantsValue);
 
-        // Bouton détails
+        // Bouton
         Button detailsBtn = new Button("Voir détails");
         detailsBtn.setMaxWidth(Double.MAX_VALUE);
         detailsBtn.setStyle(
@@ -452,10 +457,35 @@ public class ShowEventController {
         );
         detailsBtn.setOnAction(ev -> openEventDetails(e));
 
+        // Hover bouton
+        detailsBtn.setOnMouseEntered(ev -> {
+            detailsBtn.setStyle(
+                    "-fx-background-color: #8b5cf6;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 30;" +
+                            "-fx-padding: 10 20;" +
+                            "-fx-border-color: #8b5cf6;" +
+                            "-fx-border-radius: 30;"
+            );
+        });
+
+        detailsBtn.setOnMouseExited(ev -> {
+            detailsBtn.setStyle(
+                    "-fx-background-color: #f5f0ff;" +
+                            "-fx-text-fill: #8b5cf6;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 30;" +
+                            "-fx-padding: 10 20;" +
+                            "-fx-border-color: #d9c9ff;" +
+                            "-fx-border-radius: 30;"
+            );
+        });
+
         content.getChildren().addAll(titleBox, participantsBox, detailsBtn);
         card.getChildren().addAll(topSection, content);
 
-        // Hover effect
+        // ===================== HOVER =====================
         card.setOnMouseEntered(ev -> {
             card.setScaleX(1.02);
             card.setScaleY(1.02);
@@ -473,7 +503,7 @@ public class ShowEventController {
             card.setScaleX(1.0);
             card.setScaleY(1.0);
             card.setStyle(
-                    "-fx-background-color: white;" +
+                    "-fx-background-color: linear-gradient(to bottom right, #faf5ff, #f3e8ff);" +
                             "-fx-background-radius: " + CORNER_RADIUS + ";" +
                             "-fx-border-radius: " + CORNER_RADIUS + ";" +
                             "-fx-border-color: #e0d7ff;" +
@@ -754,6 +784,7 @@ public class ShowEventController {
             Stage stage = (Stage) eventsGrid.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle(event.getTitre());
+
             stage.show();
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -4,6 +4,7 @@ import Entites.Event;
 import Entites.Sponsor;
 import Services.EventServices;
 import Services.SponsorServices;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -21,10 +22,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.EventObject;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,6 +111,7 @@ public class EventDetailsController {
 
         // Initialiser les avis
         initFeedbacks();
+
     }
 
     public void setEvent(Event event) {
@@ -546,13 +550,10 @@ public class EventDetailsController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    @FXML
-    private void openMap() {
-        try {
-            Desktop.getDesktop().browse(new URI("https://maps.google.com/?q=Espace+Culturel+Tunis"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
+
+
+
+
 
 }

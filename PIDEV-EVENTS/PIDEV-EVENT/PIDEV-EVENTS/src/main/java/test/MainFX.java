@@ -9,7 +9,7 @@ public class MainFX extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            System.out.println("🔍 Looking for: /AjouterEvent.fxml");
+            System.out.println("🔍 Lookistage.setMaximized(true);ng for: /AjouterEvent.fxml");
 
             // THIS IS THE CRITICAL LINE
             java.net.URL fxmlUrl = getClass().getResource("/ShowEvent.fxml");
@@ -23,6 +23,7 @@ public class MainFX extends Application {
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Scene scene = new Scene(loader.load());
+
             stage.setTitle("AutiCare - Événements");
             stage.setScene(scene);
             stage.show();

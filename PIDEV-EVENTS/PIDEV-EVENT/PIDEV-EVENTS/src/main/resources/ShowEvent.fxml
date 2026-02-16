@@ -12,7 +12,7 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controller.ShowEventController"
             stylesheets="@styles/app.css"
-            prefWidth="1300" prefHeight="800"
+            prefWidth="1520" prefHeight="850"
             style="-fx-background-color: #f8fafc;">
 
     <!-- ================= SIDEBAR (violet) ================= -->
