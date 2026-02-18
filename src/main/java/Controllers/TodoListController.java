@@ -29,6 +29,8 @@ public class TodoListController implements Initializable {
     @FXML
     private TextField newTodoField;
     @FXML
+    private ComboBox<String> statusComboBox; // NOUVEAU : pour choisir le statut à l'ajout
+    @FXML
     private Button addTodoButton;
     @FXML
     private Label todoCountLabel;
@@ -142,6 +144,12 @@ public class TodoListController implements Initializable {
             );
         }
 
+        // Configuration du ComboBox de statut pour l'ajout
+        if (statusComboBox != null) {
+            statusComboBox.setItems(FXCollections.observableArrayList("À faire", "En cours", "Terminé"));
+            statusComboBox.setValue("À faire"); // Valeur par défaut
+        }
+
         // Configuration du bouton d'ajout
         addTodoButton.setOnAction(e -> addTodo());
         newTodoField.setOnAction(e -> addTodo());
@@ -206,55 +214,61 @@ public class TodoListController implements Initializable {
         todoListContainer.getChildren().clear();
 
         String filter = filterComboBox.getValue();
+        System.out.println("Filtre sélectionné: " + filter); // Debug
 
-        // Filtrer les todos selon la sélection
-        List<Todo> filteredTodos;
+        // Si le filtre est "Toutes les tâches", on affiche tout
         if (filter.equals("Toutes les tâches")) {
-            filteredTodos = new ArrayList<>(todos);
-        } else {
-            filteredTodos = todos.stream()
-                    .filter(t -> t.getStatut().equals(filter))
-                    .toList();
-        }
+            // Afficher les 3 colonnes avec toutes les tâches
+            VBox aFaireBox = createStatutSection("À faire", "⭕");
+            VBox enCoursBox = createStatutSection("En cours", "🔄");
+            VBox termineBox = createStatutSection("Terminé", "✅");
 
-        if (filteredTodos.isEmpty()) {
-            showEmptyState();
-            return;
-        }
-
-        // Afficher les 3 colonnes
-        VBox aFaireBox = createStatutSection("À faire", "⭕");
-        VBox enCoursBox = createStatutSection("En cours", "🔄");
-        VBox termineBox = createStatutSection("Terminé", "✅");
-
-        // Placer chaque todo dans la bonne colonne selon son statut
-        for (Todo todo : filteredTodos) {
-            HBox item = createTodoItem(todo);
-            switch (todo.getStatut()) {
-                case "À faire":
-                    aFaireBox.getChildren().add(item);
-                    break;
-                case "En cours":
-                    enCoursBox.getChildren().add(item);
-                    break;
-                case "Terminé":
-                    termineBox.getChildren().add(item);
-                    break;
-                default:
-                    aFaireBox.getChildren().add(item);
+            // Placer chaque todo dans la bonne colonne selon son statut
+            for (Todo todo : todos) {
+                HBox item = createTodoItem(todo);
+                switch (todo.getStatut()) {
+                    case "À faire":
+                        aFaireBox.getChildren().add(item);
+                        break;
+                    case "En cours":
+                        enCoursBox.getChildren().add(item);
+                        break;
+                    case "Terminé":
+                        termineBox.getChildren().add(item);
+                        break;
+                    default:
+                        aFaireBox.getChildren().add(item);
+                }
             }
+
+            HBox columnsBox = new HBox(20);
+            columnsBox.setAlignment(Pos.TOP_LEFT);
+            columnsBox.getChildren().addAll(aFaireBox, enCoursBox, termineBox);
+
+            // Ajuster la largeur des colonnes
+            aFaireBox.setPrefWidth(450);
+            enCoursBox.setPrefWidth(450);
+            termineBox.setPrefWidth(450);
+
+            todoListContainer.getChildren().add(columnsBox);
+        }
+        // Sinon, on filtre par statut
+        else {
+            // Créer une seule colonne pour le statut filtré
+            VBox filterBox = createStatutSection(filter, getIconeForStatut(filter));
+
+            // Ajouter seulement les todos du statut sélectionné
+            for (Todo todo : todos) {
+                if (todo.getStatut().equals(filter)) {
+                    HBox item = createTodoItem(todo);
+                    filterBox.getChildren().add(item);
+                }
+            }
+
+            filterBox.setPrefWidth(450);
+            todoListContainer.getChildren().add(filterBox);
         }
 
-        HBox columnsBox = new HBox(20);
-        columnsBox.setAlignment(Pos.TOP_LEFT);
-        columnsBox.getChildren().addAll(aFaireBox, enCoursBox, termineBox);
-
-        // Ajuster la largeur des colonnes pour un tableau plus large
-        aFaireBox.setPrefWidth(450);
-        enCoursBox.setPrefWidth(450);
-        termineBox.setPrefWidth(450);
-
-        todoListContainer.getChildren().add(columnsBox);
         updateCounts();
     }
 
@@ -397,13 +411,13 @@ public class TodoListController implements Initializable {
 
         actions.getChildren().addAll(editButton, deleteButton);
 
-        // Événements - Action de la checkbox CORRIGÉE
+        // Événements - Action de la checkbox
         checkBox.setOnAction(e -> {
             if (checkBox.isSelected()) {
                 todo.setStatut("Terminé");
                 showNotification("✅ Tâche terminée !");
             } else {
-                // CORRECTION: Quand on décoche, la tâche retourne dans "À faire"
+                // Quand on décoche, la tâche retourne dans "À faire"
                 todo.setStatut("À faire");
                 showNotification("📋 Tâche à faire");
             }
@@ -470,6 +484,7 @@ public class TodoListController implements Initializable {
         return button;
     }
 
+    // MODIFICATION ICI - Ajout avec choix du statut
     private void addTodo() {
         String titre = newTodoField.getText().trim();
         if (titre.isEmpty()) {
@@ -477,11 +492,24 @@ public class TodoListController implements Initializable {
             return;
         }
 
-        Todo newTodo = new Todo(nextId++, titre, "", "À faire", LocalDate.now());
+        // Récupérer le statut choisi dans le ComboBox
+        String statutChoisi = statusComboBox.getValue();
+        if (statutChoisi == null) {
+            statutChoisi = "À faire"; // Valeur par défaut
+        }
+
+        Todo newTodo = new Todo(nextId++, titre, "", statutChoisi, LocalDate.now());
         todos.add(newTodo);
         saveTodos();
 
         newTodoField.clear();
+        // Remettre le statut par défaut pour le prochain ajout
+        statusComboBox.setValue("À faire");
+
+        // Garder le filtre actuel ou remettre sur "Toutes les tâches"
+        // Si vous voulez voir la nouvelle tâche, décommentez la ligne suivante :
+        // filterComboBox.setValue("Toutes les tâches");
+
         displayTodos();
         showNotification("✅ Tâche ajoutée avec succès");
     }

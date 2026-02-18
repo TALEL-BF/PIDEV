@@ -21,7 +21,7 @@
               AnchorPane.leftAnchor="0.0"
               AnchorPane.rightAnchor="0.0">
 
-            <!-- ================= SIDEBAR (IDENTIQUE À COURSAJOUT) ================= -->
+            <!-- ================= SIDEBAR ================= -->
             <VBox prefWidth="220.0"
                   minWidth="220.0"
                   maxWidth="220.0"
@@ -118,7 +118,7 @@
                                            -fx-border-width: 2;"/>
                         </HBox>
 
-                        <!-- Barre d'ajout et filtre -->
+                        <!-- Barre d'ajout avec choix du statut -->
                         <HBox spacing="15" alignment="CENTER_LEFT">
                             <HBox spacing="10" HBox.hgrow="ALWAYS"
                                   style="-fx-background-color: white;
@@ -133,6 +133,17 @@
                                                   -fx-font-size: 15px;
                                                   -fx-border-width: 0;
                                                   -fx-background-color: transparent;"/>
+
+                                <!-- NOUVEAU : ComboBox pour choisir le statut -->
+                                <ComboBox fx:id="statusComboBox"
+                                          prefWidth="120"
+                                          style="-fx-background-radius: 25;
+                                                 -fx-padding: 8 10;
+                                                 -fx-background-color: #F0E6FF;
+                                                 -fx-border-color: #7B2FF7;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 25;"/>
+
                                 <Button fx:id="addTodoButton"
                                         text="Ajouter"
                                         style="-fx-background-color: #7B2FF7;
@@ -197,7 +208,7 @@
                             </VBox>
                         </HBox>
 
-                        <!-- Tableau Kanban avec ScrollPane PLUS LONG -->
+                        <!-- Tableau Kanban avec ScrollPane -->
                         <VBox spacing="15"
                               style="-fx-background-color: white;
                                      -fx-background-radius: 20;
@@ -216,10 +227,10 @@
                                 <Label fx:id="totalCountLabel" text="0" style="-fx-text-fill: #7B2FF7; -fx-font-weight: bold; -fx-font-size: 14px;"/>
                             </HBox>
 
-                            <!-- ScrollPane pour le tableau des tâches - HAUTEUR AUGMENTÉE -->
+                            <!-- ScrollPane pour le tableau des tâches -->
                             <ScrollPane fitToWidth="true"
                                         style="-fx-background: transparent; -fx-border-width: 0;"
-                                        prefHeight="650">  <!-- Hauteur augmentée de 500 à 650 -->
+                                        prefHeight="650">
                                 <content>
                                     <VBox fx:id="todoListContainer" spacing="20" style="-fx-padding: 10 0;"/>
                                 </content>
