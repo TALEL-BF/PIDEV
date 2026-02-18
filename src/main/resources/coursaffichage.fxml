@@ -45,7 +45,6 @@
                 <!-- ===== MENU DE NAVIGATION ===== -->
                 <VBox spacing="8" style="-fx-padding: 10 0 20 0;">
 
-
                     <Button text="📚 Nos cours" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 1; -fx-border-radius: 10;"/>
 
                     <!-- Emplois du temps -->
@@ -59,7 +58,6 @@
 
                     <!-- Jeux éducatifs -->
                     <Button text="🎮 Jeux éducatifs" style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"/>
-
 
                 </VBox>
 
@@ -120,6 +118,28 @@
                             </VBox>
 
                             <HBox spacing="15" alignment="CENTER_RIGHT">
+                                <!-- BOUTON IA (Génération de quiz) -->
+                                <Button text="🤖"
+                                        fx:id="iaGeneratorButton"
+                                        style="-fx-background-color: #FF6B6B;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(255,107,107,0.3), 10, 0, 0, 5);"/>
+
+                                <!-- BOUTON ÉVALUATIONS VISUELLES (pour enfants autistes) -->
+                                <Button text="🎨"
+                                        fx:id="evaluationVisuelleButton"
+                                        style="-fx-background-color: #FF9800;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(255,152,0,0.3), 10, 0, 0, 5);"/>
+
                                 <!-- BOUTON POUR AJOUTER UN COURS -->
                                 <Button text="+"
                                         fx:id="ajouterCoursButton"

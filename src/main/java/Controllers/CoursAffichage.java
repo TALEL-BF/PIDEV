@@ -4,6 +4,7 @@ import Entites.Cours;
 import Services.CoursServices;
 import Services.EvaluationServices;
 import Utils.Navigation;
+import Utils.TextToSpeechManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.fxml.Initializable;
@@ -20,9 +21,6 @@ import javafx.scene.shape.Rectangle;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
 
 public class CoursAffichage implements Initializable {
 
@@ -38,6 +36,12 @@ public class CoursAffichage implements Initializable {
     private Button ajouterCoursButton;
     @FXML
     private Button ajouterEvaluationButton;
+    @FXML
+    private Button iaGeneratorButton;
+    @FXML
+    private Button evaluationVisuelleButton;
+    @FXML
+    private Button ttsToggleButton; // Bouton TTS
 
     private CoursServices coursServices;
     private EvaluationServices evaluationServices;
@@ -51,6 +55,147 @@ public class CoursAffichage implements Initializable {
         setupSearch();
         setupFilters();
         setupNavigation();
+        setupIAButton();
+        setupEvaluationVisuelleButton();
+        setupTTSButton(); // Initialisation du bouton TTS
+
+        // Test TTS au démarrage (optionnel - à commenter après test)
+        // testTTS();
+    }
+
+    // Méthode de test TTS (optionnelle)
+    private void testTTS() {
+        javafx.application.Platform.runLater(() -> {
+            try {
+                System.out.println("🎤 Test TTS...");
+                TextToSpeechManager.speak("Bonjour");
+            } catch (Exception e) {
+                System.err.println("❌ Erreur test TTS: " + e.getMessage());
+            }
+        });
+    }
+
+    // Configuration du bouton TTS
+    private void setupTTSButton() {
+        if (ttsToggleButton != null) {
+            // État initial
+            updateTTSButtonStyle();
+
+            ttsToggleButton.setOnAction(event -> {
+                TextToSpeechManager.setEnabled(!TextToSpeechManager.isEnabled());
+                updateTTSButtonStyle();
+                String status = TextToSpeechManager.isEnabled() ? "activé" : "désactivé";
+                System.out.println("🔊 TTS " + status);
+            });
+
+            // Effet de survol
+            ttsToggleButton.setOnMouseEntered(e -> {
+                if (TextToSpeechManager.isEnabled()) {
+                    ttsToggleButton.setStyle("-fx-background-color: #00838F; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(0,131,143,0.4), 10, 0, 0, 5);");
+                } else {
+                    ttsToggleButton.setStyle("-fx-background-color: #9E9E9E; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(158,158,158,0.4), 10, 0, 0, 5);");
+                }
+            });
+
+            ttsToggleButton.setOnMouseExited(e -> updateTTSButtonStyle());
+        }
+    }
+
+    // Met à jour le style du bouton TTS selon l'état
+    private void updateTTSButtonStyle() {
+        if (ttsToggleButton == null) return;
+
+        if (TextToSpeechManager.isEnabled()) {
+            ttsToggleButton.setStyle("-fx-background-color: #00ACC1; " +
+                    "-fx-text-fill: white; " +
+                    "-fx-background-radius: 20; " +
+                    "-fx-padding: 12 25; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-cursor: hand; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,172,193,0.3), 10, 0, 0, 5);");
+            ttsToggleButton.setText("🔊 TTS Activé");
+        } else {
+            ttsToggleButton.setStyle("-fx-background-color: #B0BEC5; " +
+                    "-fx-text-fill: white; " +
+                    "-fx-background-radius: 20; " +
+                    "-fx-padding: 12 25; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-cursor: hand; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(176,190,197,0.3), 10, 0, 0, 5);");
+            ttsToggleButton.setText("🔇 TTS Désactivé");
+        }
+    }
+
+    // Configuration du bouton IA (génération de quiz)
+    private void setupIAButton() {
+        if (iaGeneratorButton != null) {
+            iaGeneratorButton.setOnAction(event -> {
+                System.out.println("🤖 Ouverture du générateur IA...");
+                // IACoursController.openWindow();
+            });
+
+            iaGeneratorButton.setOnMouseEntered(e ->
+                    iaGeneratorButton.setStyle("-fx-background-color: #FF5252; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(255,82,82,0.4), 10, 0, 0, 5);")
+            );
+
+            iaGeneratorButton.setOnMouseExited(e ->
+                    iaGeneratorButton.setStyle("-fx-background-color: #FF6B6B; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(255,107,107,0.3), 10, 0, 0, 5);")
+            );
+        }
+    }
+
+    // Configuration du bouton évaluations visuelles
+    private void setupEvaluationVisuelleButton() {
+        if (evaluationVisuelleButton != null) {
+            evaluationVisuelleButton.setOnAction(event -> {
+                System.out.println("🎨 Ouverture des évaluations visuelles...");
+                // EvaluationVisuelleController.openWindow();
+            });
+
+            evaluationVisuelleButton.setOnMouseEntered(e ->
+                    evaluationVisuelleButton.setStyle("-fx-background-color: #F57C00; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(245,124,0,0.4), 10, 0, 0, 5);")
+            );
+
+            evaluationVisuelleButton.setOnMouseExited(e ->
+                    evaluationVisuelleButton.setStyle("-fx-background-color: #FF9800; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(255,152,0,0.3), 10, 0, 0, 5);")
+            );
+        }
     }
 
     private void setupNavigation() {
@@ -59,15 +204,33 @@ public class CoursAffichage implements Initializable {
                 System.out.println("➕ Navigation vers l'ajout de cours...");
                 Navigation.navigateTo("coursajout.fxml", "Ajouter un cours");
             });
-        }
 
+            ajouterCoursButton.setOnMouseEntered(e ->
+                    ajouterCoursButton.setStyle("-fx-background-color: #6A1FF7; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(106,31,247,0.4), 10, 0, 0, 5);")
+            );
+
+            ajouterCoursButton.setOnMouseExited(e ->
+                    ajouterCoursButton.setStyle("-fx-background-color: #7B2FF7; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 12 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);")
+            );
+        }
 
         if (ajouterEvaluationButton != null) {
             ajouterEvaluationButton.setOnAction(event -> {
                 System.out.println("📝 Navigation vers l'ajout d'évaluation...");
                 Navigation.navigateTo("evaluationajout.fxml", "Ajouter des questions");
             });
-
 
             ajouterEvaluationButton.setOnMouseEntered(e ->
                     ajouterEvaluationButton.setStyle("-fx-background-color: #218838; " +
@@ -105,8 +268,8 @@ public class CoursAffichage implements Initializable {
             coursFlowPane.getChildren().add(courseCard);
         }
     }
-    private VBox createCourseCard(Cours cours) {
 
+    private VBox createCourseCard(Cours cours) {
         VBox card = new VBox(0);
         card.setPrefWidth(280);
         card.setPrefHeight(380);
@@ -117,7 +280,6 @@ public class CoursAffichage implements Initializable {
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" +
                         "-fx-transition: all 0.3s ease;"
         );
-
 
         card.setOnMouseEntered(e -> {
             card.setStyle(
@@ -141,7 +303,6 @@ public class CoursAffichage implements Initializable {
             );
         });
 
-
         StackPane imageContainer = new StackPane();
         imageContainer.setPrefHeight(160);
         imageContainer.setStyle(
@@ -149,12 +310,10 @@ public class CoursAffichage implements Initializable {
                         "-fx-background-color: linear-gradient(to bottom, #7B2FF7, #9F5FF7);"
         );
 
-
         ImageView courseImageView = new ImageView();
         courseImageView.setFitHeight(160);
         courseImageView.setFitWidth(280);
         courseImageView.setPreserveRatio(false);
-
 
         Rectangle clip = new Rectangle(300, 180);
         clip.setArcWidth(24);
@@ -178,7 +337,6 @@ public class CoursAffichage implements Initializable {
             setDefaultCourseImage(courseImageView, cours);
         }
 
-
         Region gradientOverlay = new Region();
         gradientOverlay.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);" +
@@ -187,7 +345,6 @@ public class CoursAffichage implements Initializable {
         gradientOverlay.setPrefHeight(70);
         gradientOverlay.setMaxHeight(70);
         StackPane.setAlignment(gradientOverlay, Pos.TOP_CENTER);
-
 
         Label typeBadge = new Label(cours.getType_cours());
         String typeColor = getTypeColor(cours.getType_cours());
@@ -207,7 +364,6 @@ public class CoursAffichage implements Initializable {
         StackPane.setMargin(typeBadge, new Insets(15, 15, 0, 0));
 
         imageContainer.getChildren().addAll(courseImageView, gradientOverlay, typeBadge);
-
 
         VBox contentContainer = new VBox(15);
         contentContainer.setStyle("-fx-padding: 20 20 15 20;");
@@ -230,7 +386,6 @@ public class CoursAffichage implements Initializable {
 
         titleBox.getChildren().addAll(titleIcon, titleLabel);
 
-
         String description = cours.getDescription();
         if (description.length() > 80) {
             description = description.substring(0, 77) + "...";
@@ -244,13 +399,11 @@ public class CoursAffichage implements Initializable {
                         "-fx-line-spacing: 2;"
         );
 
-
         GridPane infoGrid = new GridPane();
         infoGrid.setHgap(20);
         infoGrid.setVgap(10);
         infoGrid.setStyle("-fx-padding: 5 0;");
 
-        // Niveau avec couleur
         String niveauColor = getNiveauColor(cours.getNiveau());
         Label niveauIcon = new Label(getNiveauIcon(cours.getNiveau()));
         niveauIcon.setStyle("-fx-font-size: 16px;");
@@ -262,7 +415,6 @@ public class CoursAffichage implements Initializable {
         );
         HBox niveauBox = new HBox(5, niveauIcon, niveauLabel);
         niveauBox.setAlignment(Pos.CENTER_LEFT);
-
 
         Label dureeIcon = new Label("⏱️");
         dureeIcon.setStyle("-fx-font-size: 16px;");
@@ -278,7 +430,6 @@ public class CoursAffichage implements Initializable {
         infoGrid.add(niveauBox, 0, 0);
         infoGrid.add(dureeBox, 1, 0);
 
-        // Statistiques
         int motCount = cours.getMots() != null ? cours.getMots().split(";").length : 0;
         Label motsIcon = new Label("📝");
         motsIcon.setStyle("-fx-font-size: 14px;");
@@ -304,7 +455,6 @@ public class CoursAffichage implements Initializable {
         HBox statsBox = new HBox(20);
         statsBox.getChildren().addAll(motsBox, evalBox);
 
-        // ===== BOUTON COMMENCER MODERNE =====
         Button commencerBtn = new Button("Commencer l'apprentissage");
         commencerBtn.setMaxWidth(Double.MAX_VALUE);
         commencerBtn.setStyle(
@@ -321,7 +471,6 @@ public class CoursAffichage implements Initializable {
                         "-fx-border-radius: 30;"
         );
 
-        // Effet de survol pour le bouton
         commencerBtn.setOnMouseEntered(e -> {
             commencerBtn.setStyle(
                     "-fx-background-color: linear-gradient(to right, #6A1FF7, #8A4FF7);" +
@@ -361,7 +510,6 @@ public class CoursAffichage implements Initializable {
             afficherContenuSimplifie(cours);
         });
 
-        // Assemblage final
         contentContainer.getChildren().addAll(
                 titleBox,
                 descriptionLabel,
@@ -410,7 +558,6 @@ public class CoursAffichage implements Initializable {
         }
     }
 
-    // Styles pour les badges de type
     private String getTypeStyle(String type) {
         if (type == null) return getDefaultBadgeStyle();
 
@@ -428,7 +575,6 @@ public class CoursAffichage implements Initializable {
         }
     }
 
-    // Styles pour les badges de niveau
     private String getNiveauStyle(String niveau) {
         if (niveau == null) return getDefaultBadgeStyle();
 
@@ -448,7 +594,6 @@ public class CoursAffichage implements Initializable {
         return "-fx-background-color: #F5F5F5; -fx-text-fill: #666666; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
     }
 
-    // Méthode utilitaire pour définir une image par défaut
     private void setDefaultCourseImage(ImageView imageView, Cours cours) {
         String titre = cours.getTitre().toLowerCase();
         String defaultImage;
@@ -489,6 +634,7 @@ public class CoursAffichage implements Initializable {
             imageView.setImage(null);
         }
     }
+
     private void afficherContenuSimplifie(Cours cours) {
         Stage contentStage = new Stage();
         contentStage.setTitle(cours.getTitre());
@@ -559,30 +705,25 @@ public class CoursAffichage implements Initializable {
             String[] motsList = cours.getMots().split(";");
             String[] imagesList = cours.getImages_mots() != null ? cours.getImages_mots().split(";") : new String[0];
 
-            System.out.println("📝 Affichage - Mots (" + motsList.length + "): " + Arrays.toString(motsList));
-            System.out.println("🖼️ Affichage - Images (" + imagesList.length + "): " + Arrays.toString(imagesList));
+            System.out.println("📝 Affichage - Mots (" + motsList.length + "): " + java.util.Arrays.toString(motsList));
+            System.out.println("🖼️ Affichage - Images (" + imagesList.length + "): " + java.util.Arrays.toString(imagesList));
 
-            // Limiter le nombre d'images au nombre de mots
             int nbImages = Math.min(imagesList.length, motsList.length);
 
             for (int i = 0; i < motsList.length; i++) {
                 String mot = motsList[i].trim();
                 if (mot.isEmpty()) continue;
 
-                // Récupérer l'image au même index (si elle existe)
                 String image = (i < nbImages) ? imagesList[i].trim() : null;
 
-                // Ignorer les valeurs "null" ou vides
                 if (image != null && (image.equals("null") || image.isEmpty())) {
                     image = null;
                 }
 
                 System.out.println("   Index " + i + " - Mot: '" + mot + "' -> Image: " + image);
 
-                // Vérifier si l'image contient plusieurs fichiers (séparés par ;)
                 if (image != null && image.contains(";")) {
                     String[] multipleImages = image.split(";");
-                    // Pour l'affichage, on prend seulement la première image
                     String firstImage = multipleImages[0].trim();
                     VBox motCard = createMotCard(mot, firstImage);
                     motsPane.getChildren().add(motCard);
@@ -593,7 +734,6 @@ public class CoursAffichage implements Initializable {
                 }
             }
 
-            // Avertir s'il y a plus d'images que de mots
             if (imagesList.length > motsList.length) {
                 System.out.println("⚠️ Attention: " + (imagesList.length - motsList.length) + " images supplémentaires ignorées");
             }
@@ -616,10 +756,8 @@ public class CoursAffichage implements Initializable {
         Label evaluationTitle = new Label("📋 Évaluation du cours");
         evaluationTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
 
-        // Compter les questions disponibles
         int questionCount = evaluationServices.compterParCours(cours.getId_cours());
 
-        // Bouton Passer le quiz
         Button passerQuizBtn = new Button("🎯 Passer le quiz");
         passerQuizBtn.setStyle(
                 "-fx-background-color: #7B2FF7;" +
@@ -632,7 +770,6 @@ public class CoursAffichage implements Initializable {
                         "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"
         );
 
-        // Effet hover
         passerQuizBtn.setOnMouseEntered(e ->
                 passerQuizBtn.setStyle(
                         "-fx-background-color: #6A1FF7;" +
@@ -659,7 +796,6 @@ public class CoursAffichage implements Initializable {
                 )
         );
 
-        // Action pour le quiz
         passerQuizBtn.setOnAction(e -> {
             contentStage.close();
             System.out.println("🎯 Navigation vers le quiz pour le cours ID: " + cours.getId_cours());
@@ -667,7 +803,6 @@ public class CoursAffichage implements Initializable {
                     "Quiz - " + cours.getTitre());
         });
 
-        // Texte descriptif
         String questionText = questionCount + " question(s) disponible(s)";
         if (questionCount > 0) {
             int totalScore = evaluationServices.getScoreTotalParCours(cours.getId_cours());
@@ -685,121 +820,12 @@ public class CoursAffichage implements Initializable {
             evaluationSection.getChildren().addAll(evaluationTitle, passerQuizBtn, evaluationHint);
         }
 
-        // Ajouter toutes les sections au conteneur principal
         mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationSection);
         scrollPane.setContent(mainContainer);
 
         Scene scene = new Scene(scrollPane, 1300, 800);
         contentStage.setScene(scene);
         contentStage.show();
-    }
-    private VBox createMotCardAvecMultiImages(String mot, String[] imageUrls) {
-        VBox card = new VBox(15);
-        card.setAlignment(Pos.CENTER);
-        card.setPrefWidth(300);
-        card.setPrefHeight(350);
-        card.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 30;" +
-                        "-fx-border-radius: 30;" +
-                        "-fx-border-color: #7B2FF7;" +
-                        "-fx-border-width: 3;" +
-                        "-fx-padding: 20;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
-        );
-
-        card.setOnMouseEntered(e ->
-                card.setStyle(
-                        "-fx-background-color: #F0E6FF;" +
-                                "-fx-background-radius: 30;" +
-                                "-fx-border-radius: 30;" +
-                                "-fx-border-color: #7B2FF7;" +
-                                "-fx-border-width: 4;" +
-                                "-fx-padding: 20;" +
-                                "-fx-cursor: hand;" +
-                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.4), 20, 0, 0, 10);"
-                )
-        );
-
-        card.setOnMouseExited(e ->
-                card.setStyle(
-                        "-fx-background-color: white;" +
-                                "-fx-background-radius: 30;" +
-                                "-fx-border-radius: 30;" +
-                                "-fx-border-color: #7B2FF7;" +
-                                "-fx-border-width: 3;" +
-                                "-fx-padding: 20;" +
-                                "-fx-cursor: hand;" +
-                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
-                )
-        );
-
-        ScrollPane imagesScroll = new ScrollPane();
-        imagesScroll.setFitToHeight(true);
-        imagesScroll.setPrefHeight(150);
-        imagesScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-width: 0;");
-
-        HBox imagesContainer = new HBox(10);
-        imagesContainer.setAlignment(Pos.CENTER);
-        imagesContainer.setStyle("-fx-padding: 10;");
-
-        if (imageUrls != null && imageUrls.length > 0) {
-            for (String imageUrl : imageUrls) {
-                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                    try {
-                        String imagePath = "/images/" + imageUrl.trim();
-                        URL imageResource = getClass().getResource(imagePath);
-
-                        if (imageResource != null) {
-                            Image img = new Image(imageResource.toExternalForm());
-                            ImageView imageView = new ImageView(img);
-                            imageView.setFitHeight(100);
-                            imageView.setFitWidth(100);
-                            imageView.setPreserveRatio(true);
-
-                            imageView.setOnMouseEntered(ev ->
-                                    imageView.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.5), 10, 0, 0, 5);")
-                            );
-                            imageView.setOnMouseExited(ev ->
-                                    imageView.setStyle("")
-                            );
-
-                            imagesContainer.getChildren().add(imageView);
-                        }
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-        }
-
-        if (imagesContainer.getChildren().isEmpty()) {
-            Label emojiLabel = new Label(getEmojiForMot(mot));
-            emojiLabel.setStyle("-fx-font-size: 80px;");
-            imagesContainer.getChildren().add(emojiLabel);
-        }
-
-        imagesScroll.setContent(imagesContainer);
-
-        Label motLabel = new Label(mot);
-        motLabel.setWrapText(true);
-        motLabel.setStyle(
-                "-fx-font-size: 24px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #333333;" +
-                        "-fx-text-alignment: center;"
-        );
-
-        if (imageUrls != null && imageUrls.length > 1) {
-            Label countLabel = new Label("📸 " + imageUrls.length + " images");
-            countLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #7B2FF7; -fx-font-weight: bold;");
-            card.getChildren().addAll(imagesScroll, motLabel, countLabel);
-        } else {
-            card.getChildren().addAll(imagesScroll, motLabel);
-        }
-
-        return card;
     }
 
     private VBox createMotCard(String mot, String imageUrl) {
@@ -817,6 +843,12 @@ public class CoursAffichage implements Initializable {
                         "-fx-cursor: hand;" +
                         "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
         );
+
+        // ========== TTS : Lecture du mot au clic ==========
+        card.setOnMouseClicked(e -> {
+            System.out.println("🔊 Lecture TTS du mot: " + mot);
+            TextToSpeechManager.speak(mot);
+        });
 
         card.setOnMouseEntered(e ->
                 card.setStyle(
@@ -978,7 +1010,6 @@ public class CoursAffichage implements Initializable {
 
             updateFilterButtons(category);
         } else {
-            // Réinitialiser les boutons si pas de catégorie
             resetFilterButtons();
         }
 
@@ -987,9 +1018,7 @@ public class CoursAffichage implements Initializable {
     }
 
     private void updateFilterButtons(String activeCategory) {
-
         resetFilterButtons();
-
 
         switch (activeCategory) {
             case "Académique":
