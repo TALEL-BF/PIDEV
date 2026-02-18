@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<AnchorPane prefWidth="1300.0" prefHeight="800.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllers.TodoListController"
+            style="-fx-background-color: #F4F5F7;">
+
+    <children>
+        <HBox AnchorPane.topAnchor="0.0"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0">
+
+            <!-- ================= SIDEBAR (IDENTIQUE À COURSAJOUT) ================= -->
+            <VBox prefWidth="220.0"
+                  minWidth="220.0"
+                  maxWidth="220.0"
+                  spacing="15"
+                  style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding:20;">
+
+                <HBox alignment="CENTER_LEFT" spacing="5">
+                    <VBox alignment="CENTER">
+                        <ImageView fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
+                            <image>
+                                <Image url="@images/logo.png"/>
+                            </image>
+                        </ImageView>
+                    </VBox>
+                    <Label text="AutiCare"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;">
+                        <font>
+                            <Font size="20.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+
+                <Separator/>
+
+                <Button text="Gestion des utilisateurs"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des cours"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des emplois"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des événements"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des suivie consultation"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="Gestion des jeux"
+                        style="-fx-background-color: transparent; -fx-text-fill:white; -fx-cursor: hand;"/>
+
+                <Button text="📋 Todo List"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill:white; -fx-background-radius:10; -fx-cursor: hand;"/>
+
+                <VBox VBox.vgrow="ALWAYS" />
+
+                <Button text="Déconnexion"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill:white; -fx-cursor: hand; -fx-background-radius:10;"/>
+
+            </VBox>
+
+            <!-- ================= CONTENU PRINCIPAL ================= -->
+            <ScrollPane fitToWidth="true" fitToHeight="true"
+                        HBox.hgrow="ALWAYS"
+                        style="-fx-background: #F4F5F7; -fx-border-width: 0;">
+                <content>
+                    <VBox spacing="25" style="-fx-background-color: #F4F5F7; -fx-padding: 30;" prefWidth="1180">
+
+                        <!-- En-tête avec bouton retour -->
+                        <HBox alignment="CENTER_LEFT" spacing="20">
+                            <!-- BOUTON RETOUR -->
+                            <Button fx:id="backButton"
+                                    text="← Retour"
+                                    style="-fx-background-color: #7B2FF7;
+                                           -fx-text-fill: white;
+                                           -fx-background-radius: 20;
+                                           -fx-padding: 12 25;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;
+                                           -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
+
+                            <Label text="📋" style="-fx-font-size: 48px;"/>
+
+                            <VBox>
+                                <Label text="Todo List"
+                                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;"/>
+                                <Label text="Organisez vos tâches pédagogiques"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
+                            </VBox>
+
+                            <Region HBox.hgrow="ALWAYS" />
+
+                            <Button fx:id="clearCompletedButton"
+                                    text="Effacer terminées"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #FF4444;
+                                           -fx-text-fill: #FF4444;
+                                           -fx-border-radius: 20;
+                                           -fx-background-radius: 20;
+                                           -fx-padding: 12 25;
+                                           -fx-cursor: hand;
+                                           -fx-font-weight: bold;
+                                           -fx-border-width: 2;"/>
+                        </HBox>
+
+                        <!-- Barre d'ajout et filtre -->
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <HBox spacing="10" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white;
+                                         -fx-background-radius: 30;
+                                         -fx-padding: 5;
+                                         -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+                                <TextField fx:id="newTodoField"
+                                           promptText="Ajouter une nouvelle tâche..."
+                                           HBox.hgrow="ALWAYS"
+                                           style="-fx-background-radius: 25;
+                                                  -fx-padding: 15 20;
+                                                  -fx-font-size: 15px;
+                                                  -fx-border-width: 0;
+                                                  -fx-background-color: transparent;"/>
+                                <Button fx:id="addTodoButton"
+                                        text="Ajouter"
+                                        style="-fx-background-color: #7B2FF7;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 25;
+                                               -fx-padding: 15 35;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-font-size: 14px;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 5, 0, 0, 2);"/>
+                            </HBox>
+
+                            <ComboBox fx:id="filterComboBox"
+                                      prefWidth="150"
+                                      style="-fx-background-radius: 20;
+                                             -fx-padding: 8;
+                                             -fx-background-color: white;
+                                             -fx-border-color: #E0E0E0;
+                                             -fx-border-width: 1;
+                                             -fx-border-radius: 20;"/>
+                        </HBox>
+
+                        <!-- Statistiques avec couleurs mauves -->
+                        <HBox spacing="20" alignment="CENTER">
+                            <VBox spacing="8" alignment="CENTER"
+                                  style="-fx-background-color: #F8F0FF;
+                                         -fx-background-radius: 20;
+                                         -fx-padding: 20 30;
+                                         -fx-border-color: #7B2FF7;
+                                         -fx-border-width: 2;
+                                         -fx-border-radius: 20;
+                                         -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);">
+                                <Label text="⭕" style="-fx-font-size: 36px;"/>
+                                <Label text="À faire" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #666;"/>
+                                <Label fx:id="todoCountLabel" text="0" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;"/>
+                            </VBox>
+
+                            <VBox spacing="8" alignment="CENTER"
+                                  style="-fx-background-color: #F8F0FF;
+                                         -fx-background-radius: 20;
+                                         -fx-padding: 20 30;
+                                         -fx-border-color: #7B2FF7;
+                                         -fx-border-width: 2;
+                                         -fx-border-radius: 20;
+                                         -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);">
+                                <Label text="🔄" style="-fx-font-size: 36px;"/>
+                                <Label text="En cours" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #666;"/>
+                                <Label fx:id="inProgressCountLabel" text="0" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;"/>
+                            </VBox>
+
+                            <VBox spacing="8" alignment="CENTER"
+                                  style="-fx-background-color: #F8F0FF;
+                                         -fx-background-radius: 20;
+                                         -fx-padding: 20 30;
+                                         -fx-border-color: #7B2FF7;
+                                         -fx-border-width: 2;
+                                         -fx-border-radius: 20;
+                                         -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);">
+                                <Label text="✅" style="-fx-font-size: 36px;"/>
+                                <Label text="Terminé" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #666;"/>
+                                <Label fx:id="doneCountLabel" text="0" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;"/>
+                            </VBox>
+                        </HBox>
+
+                        <!-- Tableau Kanban avec ScrollPane PLUS LONG -->
+                        <VBox spacing="15"
+                              style="-fx-background-color: white;
+                                     -fx-background-radius: 20;
+                                     -fx-padding: 25;
+                                     -fx-border-color: #7B2FF7;
+                                     -fx-border-width: 2;
+                                     -fx-border-radius: 20;
+                                     -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 15, 0, 0, 5);">
+
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="📊" style="-fx-font-size: 24px; -fx-text-fill: #7B2FF7;"/>
+                                <Label text="Tableau des tâches"
+                                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="Total: " style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                                <Label fx:id="totalCountLabel" text="0" style="-fx-text-fill: #7B2FF7; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                            </HBox>
+
+                            <!-- ScrollPane pour le tableau des tâches - HAUTEUR AUGMENTÉE -->
+                            <ScrollPane fitToWidth="true"
+                                        style="-fx-background: transparent; -fx-border-width: 0;"
+                                        prefHeight="650">  <!-- Hauteur augmentée de 500 à 650 -->
+                                <content>
+                                    <VBox fx:id="todoListContainer" spacing="20" style="-fx-padding: 10 0;"/>
+                                </content>
+                            </ScrollPane>
+                        </VBox>
+
+                        <!-- Indicateur de sauvegarde -->
+                        <HBox alignment="CENTER" spacing="10">
+                            <Label text="💾" style="-fx-font-size: 14px; -fx-text-fill: #999;"/>
+                            <Label text="Sauvegarde automatique activée"
+                                   style="-fx-text-fill: #999; -fx-font-size: 12px;"/>
+                        </HBox>
+
+                        <!-- Espace supplémentaire en bas -->
+                        <Region prefHeight="20"/>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </HBox>
+    </children>
+</AnchorPane>

@@ -141,7 +141,6 @@
                             <VBox spacing="5">
                                 <Label text="Image du cours"
                                        style="-fx-font-weight:bold; -fx-text-fill:#555;"/>
-                                <!-- Dans la section Image du cours, modifiez le bouton comme ceci : -->
                                 <HBox spacing="10" alignment="CENTER_LEFT">
                                     <TextField fx:id="imageField"
                                                promptText="Nom du fichier image"
@@ -150,9 +149,9 @@
                                     <Button fx:id="parcourirImageButton"
                                             text="Parcourir..."
                                             style="-fx-background-color:#7B2FF7;
-                       -fx-text-fill:white;
-                       -fx-background-radius:10;
-                       -fx-cursor: hand;"/>
+                                                   -fx-text-fill:white;
+                                                   -fx-background-radius:10;
+                                                   -fx-cursor: hand;"/>
                                 </HBox>
                             </VBox>
 
@@ -204,6 +203,17 @@
                                                -fx-padding: 10 25;
                                                -fx-cursor: hand;
                                                -fx-font-weight: bold;"/>
+
+                                <!-- BOUTON TODO LIST (NOUVEAU) -->
+                                <Button text="📋 Todo List"
+                                        fx:id="todoButton"
+                                        style="-fx-background-color: #FF9800;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 10 25;
+                                               -fx-cursor: hand;
+                                               -fx-font-weight: bold;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(255,152,0,0.3), 10, 0, 0, 5);"/>
 
                                 <Region HBox.hgrow="ALWAYS" />
 

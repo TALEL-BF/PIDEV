@@ -70,6 +70,10 @@ public class CoursAjout implements Initializable {
     @FXML
     private Button voirCoursButton;
 
+    // NOUVEAU BOUTON TODO (AJOUTÉ SANS MODIFIER VOTRE CODE EXISTANT)
+    @FXML
+    private Button todoButton;
+
     private Map<Control, Label> errorLabels = new HashMap<>();
     private CoursServices coursServices;
     private ObservableList<Cours> coursList;
@@ -102,6 +106,39 @@ public class CoursAjout implements Initializable {
                 refreshTable();
             }
         });
+
+        // NOUVEAU : Initialisation du bouton Todo (AJOUTÉ SANS MODIFIER VOTRE CODE)
+        setupTodoButton();
+    }
+
+    // NOUVELLE MÉTHODE pour le bouton Todo (AJOUTÉE SANS MODIFIER VOTRE CODE)
+    private void setupTodoButton() {
+        if (todoButton != null) {
+            todoButton.setOnAction(event -> {
+                System.out.println("📋 Ouverture de la Todo List...");
+                Navigation.navigateTo("todo_list.fxml", "Todo List - Organisation des tâches");
+            });
+
+            todoButton.setOnMouseEntered(e ->
+                    todoButton.setStyle("-fx-background-color: #F57C00; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 10 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(245,124,0,0.4), 10, 0, 0, 5);")
+            );
+
+            todoButton.setOnMouseExited(e ->
+                    todoButton.setStyle("-fx-background-color: #FF9800; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-background-radius: 20; " +
+                            "-fx-padding: 10 25; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(three-pass-box, rgba(255,152,0,0.3), 10, 0, 0, 5);")
+            );
+        }
     }
 
     private void refreshTable() {

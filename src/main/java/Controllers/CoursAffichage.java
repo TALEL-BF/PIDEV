@@ -4,7 +4,6 @@ import Entites.Cours;
 import Services.CoursServices;
 import Services.EvaluationServices;
 import Utils.Navigation;
-import Utils.TextToSpeechManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.fxml.Initializable;
@@ -36,12 +35,6 @@ public class CoursAffichage implements Initializable {
     private Button ajouterCoursButton;
     @FXML
     private Button ajouterEvaluationButton;
-    @FXML
-    private Button iaGeneratorButton;
-    @FXML
-    private Button evaluationVisuelleButton;
-    @FXML
-    private Button ttsToggleButton; // Bouton TTS
 
     private CoursServices coursServices;
     private EvaluationServices evaluationServices;
@@ -55,147 +48,6 @@ public class CoursAffichage implements Initializable {
         setupSearch();
         setupFilters();
         setupNavigation();
-        setupIAButton();
-        setupEvaluationVisuelleButton();
-        setupTTSButton(); // Initialisation du bouton TTS
-
-        // Test TTS au démarrage (optionnel - à commenter après test)
-        // testTTS();
-    }
-
-    // Méthode de test TTS (optionnelle)
-    private void testTTS() {
-        javafx.application.Platform.runLater(() -> {
-            try {
-                System.out.println("🎤 Test TTS...");
-                TextToSpeechManager.speak("Bonjour");
-            } catch (Exception e) {
-                System.err.println("❌ Erreur test TTS: " + e.getMessage());
-            }
-        });
-    }
-
-    // Configuration du bouton TTS
-    private void setupTTSButton() {
-        if (ttsToggleButton != null) {
-            // État initial
-            updateTTSButtonStyle();
-
-            ttsToggleButton.setOnAction(event -> {
-                TextToSpeechManager.setEnabled(!TextToSpeechManager.isEnabled());
-                updateTTSButtonStyle();
-                String status = TextToSpeechManager.isEnabled() ? "activé" : "désactivé";
-                System.out.println("🔊 TTS " + status);
-            });
-
-            // Effet de survol
-            ttsToggleButton.setOnMouseEntered(e -> {
-                if (TextToSpeechManager.isEnabled()) {
-                    ttsToggleButton.setStyle("-fx-background-color: #00838F; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 20; " +
-                            "-fx-padding: 12 25; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(0,131,143,0.4), 10, 0, 0, 5);");
-                } else {
-                    ttsToggleButton.setStyle("-fx-background-color: #9E9E9E; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 20; " +
-                            "-fx-padding: 12 25; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(158,158,158,0.4), 10, 0, 0, 5);");
-                }
-            });
-
-            ttsToggleButton.setOnMouseExited(e -> updateTTSButtonStyle());
-        }
-    }
-
-    // Met à jour le style du bouton TTS selon l'état
-    private void updateTTSButtonStyle() {
-        if (ttsToggleButton == null) return;
-
-        if (TextToSpeechManager.isEnabled()) {
-            ttsToggleButton.setStyle("-fx-background-color: #00ACC1; " +
-                    "-fx-text-fill: white; " +
-                    "-fx-background-radius: 20; " +
-                    "-fx-padding: 12 25; " +
-                    "-fx-font-weight: bold; " +
-                    "-fx-cursor: hand; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,172,193,0.3), 10, 0, 0, 5);");
-            ttsToggleButton.setText("🔊 TTS Activé");
-        } else {
-            ttsToggleButton.setStyle("-fx-background-color: #B0BEC5; " +
-                    "-fx-text-fill: white; " +
-                    "-fx-background-radius: 20; " +
-                    "-fx-padding: 12 25; " +
-                    "-fx-font-weight: bold; " +
-                    "-fx-cursor: hand; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(176,190,197,0.3), 10, 0, 0, 5);");
-            ttsToggleButton.setText("🔇 TTS Désactivé");
-        }
-    }
-
-    // Configuration du bouton IA (génération de quiz)
-    private void setupIAButton() {
-        if (iaGeneratorButton != null) {
-            iaGeneratorButton.setOnAction(event -> {
-                System.out.println("🤖 Ouverture du générateur IA...");
-                // IACoursController.openWindow();
-            });
-
-            iaGeneratorButton.setOnMouseEntered(e ->
-                    iaGeneratorButton.setStyle("-fx-background-color: #FF5252; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 20; " +
-                            "-fx-padding: 12 25; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(255,82,82,0.4), 10, 0, 0, 5);")
-            );
-
-            iaGeneratorButton.setOnMouseExited(e ->
-                    iaGeneratorButton.setStyle("-fx-background-color: #FF6B6B; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 20; " +
-                            "-fx-padding: 12 25; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(255,107,107,0.3), 10, 0, 0, 5);")
-            );
-        }
-    }
-
-    // Configuration du bouton évaluations visuelles
-    private void setupEvaluationVisuelleButton() {
-        if (evaluationVisuelleButton != null) {
-            evaluationVisuelleButton.setOnAction(event -> {
-                System.out.println("🎨 Ouverture des évaluations visuelles...");
-                // EvaluationVisuelleController.openWindow();
-            });
-
-            evaluationVisuelleButton.setOnMouseEntered(e ->
-                    evaluationVisuelleButton.setStyle("-fx-background-color: #F57C00; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 20; " +
-                            "-fx-padding: 12 25; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(245,124,0,0.4), 10, 0, 0, 5);")
-            );
-
-            evaluationVisuelleButton.setOnMouseExited(e ->
-                    evaluationVisuelleButton.setStyle("-fx-background-color: #FF9800; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 20; " +
-                            "-fx-padding: 12 25; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(255,152,0,0.3), 10, 0, 0, 5);")
-            );
-        }
     }
 
     private void setupNavigation() {
@@ -558,42 +410,6 @@ public class CoursAffichage implements Initializable {
         }
     }
 
-    private String getTypeStyle(String type) {
-        if (type == null) return getDefaultBadgeStyle();
-
-        switch (type) {
-            case "Académique":
-                return "-fx-background-color: #E3F2FD; -fx-text-fill: #1976D2; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            case "Social":
-                return "-fx-background-color: #FCE4EC; -fx-text-fill: #C2185B; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            case "Autonomie":
-                return "-fx-background-color: #E8F5E8; -fx-text-fill: #2E7D32; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            case "Créativité":
-                return "-fx-background-color: #FFF3E0; -fx-text-fill: #F57C00; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            default:
-                return getDefaultBadgeStyle();
-        }
-    }
-
-    private String getNiveauStyle(String niveau) {
-        if (niveau == null) return getDefaultBadgeStyle();
-
-        switch (niveau) {
-            case "Débutant":
-                return "-fx-background-color: #E8F5E8; -fx-text-fill: #2E7D32; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            case "Intermédiaire":
-                return "-fx-background-color: #FFF8E1; -fx-text-fill: #F57C00; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            case "Avancé":
-                return "-fx-background-color: #FFEBEE; -fx-text-fill: #C62828; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-            default:
-                return getDefaultBadgeStyle();
-        }
-    }
-
-    private String getDefaultBadgeStyle() {
-        return "-fx-background-color: #F5F5F5; -fx-text-fill: #666666; -fx-background-radius: 15; -fx-font-size: 12px; -fx-font-weight: bold;";
-    }
-
     private void setDefaultCourseImage(ImageView imageView, Cours cours) {
         String titre = cours.getTitre().toLowerCase();
         String defaultImage;
@@ -705,9 +521,6 @@ public class CoursAffichage implements Initializable {
             String[] motsList = cours.getMots().split(";");
             String[] imagesList = cours.getImages_mots() != null ? cours.getImages_mots().split(";") : new String[0];
 
-            System.out.println("📝 Affichage - Mots (" + motsList.length + "): " + java.util.Arrays.toString(motsList));
-            System.out.println("🖼️ Affichage - Images (" + imagesList.length + "): " + java.util.Arrays.toString(imagesList));
-
             int nbImages = Math.min(imagesList.length, motsList.length);
 
             for (int i = 0; i < motsList.length; i++) {
@@ -720,22 +533,15 @@ public class CoursAffichage implements Initializable {
                     image = null;
                 }
 
-                System.out.println("   Index " + i + " - Mot: '" + mot + "' -> Image: " + image);
-
                 if (image != null && image.contains(";")) {
                     String[] multipleImages = image.split(";");
                     String firstImage = multipleImages[0].trim();
                     VBox motCard = createMotCard(mot, firstImage);
                     motsPane.getChildren().add(motCard);
-                    System.out.println("      ↳ Multiple images trouvées, utilisation de: " + firstImage);
                 } else {
                     VBox motCard = createMotCard(mot, image);
                     motsPane.getChildren().add(motCard);
                 }
-            }
-
-            if (imagesList.length > motsList.length) {
-                System.out.println("⚠️ Attention: " + (imagesList.length - motsList.length) + " images supplémentaires ignorées");
             }
         }
 
@@ -840,15 +646,8 @@ public class CoursAffichage implements Initializable {
                         "-fx-border-color: #7B2FF7;" +
                         "-fx-border-width: 3;" +
                         "-fx-padding: 20;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
+                        "-fx-cursor: hand;"
         );
-
-        // ========== TTS : Lecture du mot au clic ==========
-        card.setOnMouseClicked(e -> {
-            System.out.println("🔊 Lecture TTS du mot: " + mot);
-            TextToSpeechManager.speak(mot);
-        });
 
         card.setOnMouseEntered(e ->
                 card.setStyle(
@@ -858,8 +657,7 @@ public class CoursAffichage implements Initializable {
                                 "-fx-border-color: #7B2FF7;" +
                                 "-fx-border-width: 4;" +
                                 "-fx-padding: 20;" +
-                                "-fx-cursor: hand;" +
-                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.4), 20, 0, 0, 10);"
+                                "-fx-cursor: hand;"
                 )
         );
 
@@ -871,8 +669,7 @@ public class CoursAffichage implements Initializable {
                                 "-fx-border-color: #7B2FF7;" +
                                 "-fx-border-width: 3;" +
                                 "-fx-padding: 20;" +
-                                "-fx-cursor: hand;" +
-                                "-fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 10, 0, 0, 5);"
+                                "-fx-cursor: hand;"
                 )
         );
 

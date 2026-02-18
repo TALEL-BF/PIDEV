@@ -118,30 +118,8 @@
                             </VBox>
 
                             <HBox spacing="15" alignment="CENTER_RIGHT">
-                                <!-- BOUTON IA (Génération de quiz) -->
-                                <Button text="🤖"
-                                        fx:id="iaGeneratorButton"
-                                        style="-fx-background-color: #FF6B6B;
-                                               -fx-text-fill: white;
-                                               -fx-background-radius: 20;
-                                               -fx-padding: 12 25;
-                                               -fx-font-weight: bold;
-                                               -fx-cursor: hand;
-                                               -fx-effect: dropshadow(three-pass-box, rgba(255,107,107,0.3), 10, 0, 0, 5);"/>
-
-                                <!-- BOUTON ÉVALUATIONS VISUELLES (pour enfants autistes) -->
-                                <Button text="🎨"
-                                        fx:id="evaluationVisuelleButton"
-                                        style="-fx-background-color: #FF9800;
-                                               -fx-text-fill: white;
-                                               -fx-background-radius: 20;
-                                               -fx-padding: 12 25;
-                                               -fx-font-weight: bold;
-                                               -fx-cursor: hand;
-                                               -fx-effect: dropshadow(three-pass-box, rgba(255,152,0,0.3), 10, 0, 0, 5);"/>
-
                                 <!-- BOUTON POUR AJOUTER UN COURS -->
-                                <Button text="+"
+                                <Button text="+ Ajouter cours"
                                         fx:id="ajouterCoursButton"
                                         style="-fx-background-color: #7B2FF7;
                                                -fx-text-fill: white;
@@ -152,7 +130,7 @@
                                                -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
 
                                 <!-- BOUTON POUR AJOUTER UNE ÉVALUATION -->
-                                <Button text="📝"
+                                <Button text="📝 Ajouter évaluation"
                                         fx:id="ajouterEvaluationButton"
                                         style="-fx-background-color: #28A745;
                                                -fx-text-fill: white;
