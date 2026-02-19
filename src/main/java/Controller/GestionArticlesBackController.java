@@ -35,6 +35,13 @@ public class GestionArticlesBackController {
     @FXML private ToggleButton tbConsultations;
     @FXML private VBox consultationsSubMenu;
     @FXML private Button btnGestionConsultations;
+    @FXML private Button btnAjouterFab;
+    @FXML private Button btnFrontOfficeFab;
+    @FXML private VBox fabGroup;
+    @FXML private StackPane pageBg; // si ton StackPane a ce styleClass, donne-lui fx:id="pageBg" dans FXML
+
+    @FXML
+    private void openFrontOffice() { switchTo("/MainArticles.fxml"); }
 
 
     @FXML private Button btnSubSuivie;
@@ -48,6 +55,8 @@ public class GestionArticlesBackController {
 
     @FXML private Button btnFrontOffice;
 
+
+
     private final ObservableList<Conseil> master = FXCollections.observableArrayList();
     private ConseilServices conseilService;
 
@@ -55,54 +64,41 @@ public class GestionArticlesBackController {
 
     @FXML
     public void initialize() {
-        initSidebarDropdown();
-        initNavigation();
-        initUiListeners();
 
         conseilService = new ConseilServices();
 
-        // ✅ On est dans Gestion Consultations -> Suivie au démarrage
+        // Sidebar dropdown (فتح submenu لأننا في Articles)
+        initSidebarDropdownOpenByDefault(true);
+
         setParentConsultationsActive(true);
-        setSubActive(btnSubSuivie);
+        setSubActive(btnSubArticles);
 
-// Clicks
-        btnSubSuivie.setOnAction(e -> {
-            setSubActive(btnSubSuivie);
-            switchTo("/AjouterSuivie.fxml");   // ou la page Suivie
-        });
+        // Navigation submenu
+        if (btnSubSuivie != null) btnSubSuivie.setOnAction(e -> { setSubActive(btnSubSuivie); switchTo("/AjouterSuivie.fxml"); });
+        if (btnSubTherapie != null) btnSubTherapie.setOnAction(e -> { setSubActive(btnSubTherapie); switchTo("/AjouterTherapie.fxml"); });
+        if (btnSubArticles != null) btnSubArticles.setOnAction(e -> { setSubActive(btnSubArticles); switchTo("/GestionArticlesBack.fxml"); });
 
-        btnSubTherapie.setOnAction(e -> {
-            setSubActive(btnSubTherapie);
-            switchTo("/AjouterTherapie.fxml"); // ou la page Thérapie
-        });
+        // Actions FAB
+        if (btnAjouterFab != null) btnAjouterFab.setOnAction(e -> onAjouter());
+        if (btnFrontOfficeFab != null) btnFrontOfficeFab.setOnAction(e -> switchTo("/MainArticles.fxml"));
 
-        btnSubArticles.setOnAction(e -> {
-            setSubActive(btnSubArticles);
-            switchTo("/GestionArticlesBack.fxml"); // ou ta page Articles
-        });
+        // Search
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, o, n) -> refreshCards());
+        }
+
+        // Wrap responsive
+        if (cardsPane != null) {
+            cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
+                double w = newV.doubleValue();
+                cardsPane.setPrefWrapLength(Math.max(500, w - 40));
+            });
+        }
 
         reloadFromDb();
     }
 
-    private void initSidebarDropdown() {
-        if (tbConsultations == null || consultationsSubMenu == null) return;
 
-        tbConsultations.setSelected(true);
-        tbConsultations.setText("▾");
-        consultationsSubMenu.setVisible(true);
-        consultationsSubMenu.setManaged(true);
-
-        tbConsultations.setOnAction(e -> {
-            boolean open = tbConsultations.isSelected();
-            consultationsSubMenu.setVisible(open);
-            consultationsSubMenu.setManaged(open);
-            tbConsultations.setText(open ? "▾" : "▸");
-        });
-
-        if (btnGestionConsultations != null) {
-            btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
-        }
-    }
 
     private void initNavigation() {
         if (btnMenuSuivie != null) btnMenuSuivie.setOnAction(e -> switchTo("/AjouterSuivie.fxml"));
@@ -252,6 +248,7 @@ public class GestionArticlesBackController {
         stage.showAndWait();
     }
 
+    @FXML
     private void onAjouter() {
         Optional<Conseil> res = showConseilWindow(null, "Ajouter un article");
         res.ifPresent(c -> {
@@ -576,6 +573,47 @@ public class GestionArticlesBackController {
 
         // parent stays active as long as we are in this module
         setParentConsultationsActive(true);
+    }
+
+    private void initSidebarDropdown(boolean openByDefault) {
+        if (tbConsultations == null || consultationsSubMenu == null) return;
+
+        tbConsultations.setSelected(openByDefault);
+        tbConsultations.setText(openByDefault ? "▾" : "▸");
+
+        consultationsSubMenu.setVisible(openByDefault);
+        consultationsSubMenu.setManaged(openByDefault);
+
+        tbConsultations.setOnAction(e -> {
+            boolean open = tbConsultations.isSelected();
+            consultationsSubMenu.setVisible(open);
+            consultationsSubMenu.setManaged(open);
+            tbConsultations.setText(open ? "▾" : "▸");
+        });
+
+        if (btnGestionConsultations != null) {
+            btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
+        }
+    }
+    private void initSidebarDropdownOpenByDefault(boolean open) {
+        if (tbConsultations == null || consultationsSubMenu == null) return;
+
+        tbConsultations.setSelected(open);
+        tbConsultations.setText(open ? "▾" : "▸");
+
+        consultationsSubMenu.setVisible(open);
+        consultationsSubMenu.setManaged(open);
+
+        tbConsultations.setOnAction(e -> {
+            boolean isOpen = tbConsultations.isSelected();
+            consultationsSubMenu.setVisible(isOpen);
+            consultationsSubMenu.setManaged(isOpen);
+            tbConsultations.setText(isOpen ? "▾" : "▸");
+        });
+
+        if (btnGestionConsultations != null) {
+            btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
+        }
     }
 
 }

@@ -58,6 +58,7 @@ public class AjouterSuivie {
     @FXML private Label lblToggleStats;
     @FXML private Button btnMenuArticles;
 
+    @FXML private Button btnAjouterFab;
 
     private SuivieServices suivieService;
     private Services.StatsServices statsService;
@@ -126,6 +127,10 @@ public class AjouterSuivie {
                 cardsPane.setPrefWrapLength(Math.max(360, w - 40));
             });
         }
+        if (btnAjouterFab != null) {
+            btnAjouterFab.setOnAction(e -> onAjouter());
+        }
+
     }
 
     private void initSidebarDropdown() {
@@ -337,18 +342,29 @@ public class AjouterSuivie {
     }
 
     private void onVoir(Suivie s) {
-        Stage stage = createCustomStage("Détails du suivi", 740, 520);
+        Stage stage = createCustomStage("Détails du suivi", 780, 560);
 
         VBox content = new VBox(14);
         content.getStyleClass().add("custom-content");
 
         String date = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalDate().toString();
-        String heure = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalTime().toString();
+        String heure = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalTime().withSecond(0).withNano(0).toString();
 
         GridPane grid = new GridPane();
-        grid.setHgap(16);
-        grid.setVgap(10);
+        grid.setHgap(18);
+        grid.setVgap(12);
         grid.getStyleClass().add("details-grid");
+
+        // ✅ colonnes propres (clé 180px, valeur prend le reste)
+        ColumnConstraints c1 = new ColumnConstraints();
+        c1.setMinWidth(180);
+        c1.setPrefWidth(180);
+
+        ColumnConstraints c2 = new ColumnConstraints();
+        c2.setHgrow(Priority.ALWAYS);
+        c2.setFillWidth(true);
+
+        grid.getColumnConstraints().setAll(c1, c2);
 
         int r = 0;
         addRow(grid, r++, "Enfant", safe(s.getNomEnfant()));
@@ -360,33 +376,33 @@ public class AjouterSuivie {
         addRow(grid, r++, "Date", date);
         addRow(grid, r++, "Heure", heure);
         addRow(grid, r++, "Scores (H/S/A)", s.getScoreHumeur()+" / "+s.getScoreStress()+" / "+s.getScoreAttention());
-        // ✅ Affichage de l’exercice recommandé
-        String exerciceNom = "Aucun exercice choisi";
 
+        // ✅ Exercice recommandé (1 seule fois)
+        String exerciceNom = "Aucun exercice choisi";
         try {
             TherapieServices ts = new TherapieServices();
             Therapie t = ts.getTherapieById(s.getIdTherapieReco());
-
-            if (t != null && t.getNomExercice() != null) {
-                exerciceNom = t.getNomExercice();
-            }
+            if (t != null && t.getNomExercice() != null) exerciceNom = t.getNomExercice();
         } catch (Exception ex) {
             exerciceNom = "Erreur chargement exercice";
         }
 
-        addRow(grid, r++, "Exercice recommandé", exerciceNom);
+        Label lblExercice = addRow(grid, r++, "Exercice recommandé", exerciceNom);
 
         addRow(grid, r++, "Comportement", safe(s.getComportement()));
         addRow(grid, r++, "Interaction", safe(s.getInteractionSociale()));
 
-        Label obsLabel = new Label("Observation");
-        obsLabel.getStyleClass().add("details-label");
+        Label obsTitle = new Label("Observation");
+        obsTitle.getStyleClass().add("details-key");
 
         Label obs = new Label(safe(s.getObservation()));
         obs.setWrapText(true);
         obs.getStyleClass().add("details-box");
+        obs.setMaxWidth(Double.MAX_VALUE);
 
+        // ✅ Footer buttons bien alignés
         HBox actions = new HBox(12);
+        actions.getStyleClass().add("dialog-footer");
         actions.setAlignment(Pos.CENTER_RIGHT);
 
         Button btnExercices = new Button("Exercices adaptés");
@@ -394,7 +410,16 @@ public class AjouterSuivie {
 
         btnExercices.setOnAction(e -> {
             try {
-                showExercicesAdaptesWindow(s);
+                Optional<Therapie> chosen = showExercicesAdaptesWindow(s);
+                chosen.ifPresent(t -> {
+                    lblExercice.setText(t.getNomExercice());
+                    for (Suivie x : master) {
+                        if (x.getIdSuivie() == s.getIdSuivie()) {
+                            x.setIdTherapieReco(t.getIdTherapie());
+                            break;
+                        }
+                    }
+                });
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Alert a = new Alert(Alert.AlertType.ERROR);
@@ -405,19 +430,28 @@ public class AjouterSuivie {
             }
         });
 
-        actions.getChildren().add(0, btnExercices);
-
-
         Button close = new Button("Fermer");
         close.getStyleClass().addAll("btn-solid-dark", "btn-hover");
         close.setOnAction(e -> stage.close());
 
-        actions.getChildren().add(close);
+        actions.getChildren().addAll(btnExercices, close);
 
-        content.getChildren().addAll(grid, obsLabel, obs, actions);
+        // ✅ si contenu طويل: نخليه scroll داخل modal
+        VBox inner = new VBox(14, grid, obsTitle, obs, actions);
+        inner.setFillWidth(true);
+
+        ScrollPane sp = new ScrollPane(inner);
+        sp.setFitToWidth(true);
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        sp.setStyle("-fx-background-color: transparent;");
+        sp.setPadding(new Insets(0));
+
+        content.getChildren().add(sp);
         setCenter(stage, content);
         stage.showAndWait();
     }
+
 
     // ==========================================================
     // Fenêtre Ajouter / Modifier (PRO: rouge/vert + erreurs + date future)
@@ -964,12 +998,20 @@ public class AjouterSuivie {
         return l;
     }
 
-    private void addRow(GridPane g, int row, String k, String v) {
-        Label lk = new Label(k); lk.getStyleClass().add("details-key");
-        Label lv = new Label(v); lv.getStyleClass().add("details-val"); lv.setWrapText(true);
+    private Label addRow(GridPane g, int row, String k, String v) {
+        Label lk = new Label(k);
+        lk.getStyleClass().add("details-key");
+
+        Label lv = new Label(v);
+        lv.getStyleClass().add("details-val");
+        lv.setWrapText(true);
+
         g.add(lk, 0, row);
         g.add(lv, 1, row);
+
+        return lv; // ✅ important
     }
+
 
     private Timestamp buildTimestamp(LocalDate d, String hhmm) {
         LocalTime t;
@@ -1033,7 +1075,7 @@ public class AjouterSuivie {
     }
 
 
-    private void showExercicesAdaptesWindow(Suivie s) {
+    private Optional<Therapie> showExercicesAdaptesWindow(Suivie s) {
 
         String nivH = niveauFromScore(s.getScoreHumeur());
         String nivA = niveauFromScore(s.getScoreAttention());
@@ -1043,6 +1085,8 @@ public class AjouterSuivie {
         List<Therapie> adaptees = ts.chercherTherapiesAdaptees(nivH, nivA, nivS);
 
         Stage st = createCustomStage("Exercices adaptés", 700, 500);
+
+        final Therapie[] chosen = {null};
 
         ListView<Therapie> listView = new ListView<>();
         listView.getItems().addAll(adaptees);
@@ -1054,9 +1098,9 @@ public class AjouterSuivie {
                 if (empty || t == null) {
                     setText(null);
                 } else {
-                    setText(t.getNomExercice() +
-                            " | Durée: " + t.getDureeMin() + " min" +
-                            " | Objectif: " + t.getObjectif());
+                    setText(t.getNomExercice()
+                            + " | Durée: " + t.getDureeMin() + " min"
+                            + " | Objectif: " + t.getObjectif());
                 }
             }
         });
@@ -1068,12 +1112,25 @@ public class AjouterSuivie {
             Therapie selected = listView.getSelectionModel().getSelectedItem();
             if (selected == null) return;
 
-            s.setIdTherapieReco(selected.getIdTherapie());
+            try {
+                // ✅ update objet en mémoire
+                s.setIdTherapieReco(selected.getIdTherapie());
 
-            SuivieServices ss = new SuivieServices();
-            ss.modifierSuivie(s);
+                // ✅ update DB
+                if (suivieService == null) suivieService = new SuivieServices();
+                suivieService.modifierSuivie(s);
 
-            st.close();
+                chosen[0] = selected;
+                st.close();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Erreur");
+                a.setHeaderText("Erreur lors du choix");
+                a.setContentText(ex.getMessage());
+                a.showAndWait();
+            }
         });
 
         VBox root = new VBox(15,
@@ -1088,7 +1145,10 @@ public class AjouterSuivie {
 
         setCenter(st, root);
         st.showAndWait();
+
+        return Optional.ofNullable(chosen[0]);
     }
+
 
     private void setParentConsultationsActive(boolean active){
         btnGestionConsultations.getStyleClass().remove("sideBtnActive");

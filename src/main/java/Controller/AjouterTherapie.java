@@ -38,6 +38,7 @@ public class AjouterTherapie {
     @FXML private Button btnSubSuivie;
     @FXML private Button btnSubTherapie;
     @FXML private Button btnSubArticles;
+    @FXML private Button btnAjouterFab;
 
 
     // Submenu navigation
@@ -87,6 +88,10 @@ public class AjouterTherapie {
             if (btnGestionConsultations != null) {
                 btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
             }
+            if (btnAjouterFab != null) {
+                btnAjouterFab.setOnAction(e -> onAjouter());
+            }
+
         }
 
         // navigation
@@ -95,7 +100,8 @@ public class AjouterTherapie {
         if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
 // ✅ On est dans Gestion Consultations -> Suivie au démarrage
         setParentConsultationsActive(true);
-        setSubActive(btnSubSuivie);
+        setSubActive(btnSubTherapie);
+
 
 // Clicks
         btnSubSuivie.setOnAction(e -> {

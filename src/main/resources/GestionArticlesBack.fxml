@@ -1,119 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane stylesheets="@styles/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.GestionArticlesBackController">
+<BorderPane fx:id="root"
+            stylesheets="@styles/app.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.GestionArticlesBackController">
 
-    <!-- ===================== SIDEBAR (مثل AjouterTherapie) ===================== -->
+    <!-- ✅ SIDEBAR -->
     <left>
-        <VBox spacing="14" styleClass="sidebar">
-            <padding>
-                <Insets bottom="18" left="18" right="18" top="18" />
-            </padding>
+        <VBox styleClass="sb" spacing="14" prefWidth="250">
 
-            <!-- Header : logo + titres -->
-            <HBox spacing="10" styleClass="sidebar-header">
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
                 <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
-                    <image>
-                        <Image url="@assets/logo.png" />
-                    </image>
+                    <image><Image url="@assets/logo.png"/></image>
                 </ImageView>
-
                 <VBox spacing="2">
-                    <Label styleClass="app-title" text="AutiCare" />
-                    <Label styleClass="app-subtitle" text="Plateforme éducative" />
+                    <Label text="AutiCare" styleClass="sbTitle"/>
+                    <Label text="Plateforme éducative" styleClass="sbSub"/>
                 </VBox>
             </HBox>
 
-            <!-- User -->
-            <VBox spacing="6">
-                <Label styleClass="muted" text="Connecté en tant que" />
-                <Label styleClass="badge" text="Admin" />
+            <VBox styleClass="sbUser" spacing="6">
+                <Label text="Connecté en tant que" styleClass="sbMuted"/>
+                <Label text="Admin" styleClass="sbBadge"/>
             </VBox>
 
-            <!-- Menu -->
-            <VBox spacing="8" styleClass="menu">
+            <VBox styleClass="sbMenu" spacing="6">
+                <Button text="Gestion Utilisateur" styleClass="sbItem"/>
+                <Button text="Gestion Cours &amp; Evaluations" styleClass="sbItem"/>
+                <Button text="Gestion Emploi" styleClass="sbItem"/>
 
-                <Button maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Utilisateur" />
-
-                <Button maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Cours &amp; Evaluations" />
-
-                <Button maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Emploi" />
-
-                <!-- Consultations row + chevron -->
-                <HBox alignment="CENTER_LEFT" spacing="10" styleClass="menu-row">
-                    <Button fx:id="btnGestionConsultations" maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Consultations" HBox.hgrow="ALWAYS" />
-                    <ToggleButton fx:id="tbConsultations" styleClass="chevron-btn" text="▸" />
+                <HBox spacing="8" alignment="CENTER_LEFT" styleClass="sbRow">
+                    <Button fx:id="btnGestionConsultations"
+                            text="Gestion Consultations"
+                            styleClass="sbItem"
+                            HBox.hgrow="ALWAYS"
+                            maxWidth="1.7976931348623157E308"/>
+                    <ToggleButton fx:id="tbConsultations" text="▸" styleClass="sbChevron"/>
                 </HBox>
 
-                <!-- Submenu -->
-                <VBox fx:id="consultationsSubMenu" managed="true" spacing="8" styleClass="submenu" visible="true">
-                    <Button fx:id="btnSubSuivie" styleClass="subBtn" text="Suivie" />
-                    <Button fx:id="btnSubTherapie" styleClass="subBtn" text="Thérapie" />
-                    <Button fx:id="btnSubArticles" styleClass="subBtn" text="Articles" />
+                <VBox fx:id="consultationsSubMenu"
+                      managed="false"
+                      visible="false"
+                      spacing="6"
+                      styleClass="sbSubMenu">
+                    <Button fx:id="btnSubSuivie" text="Suivie" styleClass="sbSubItem"/>
+                    <Button fx:id="btnSubTherapie" text="Thérapie" styleClass="sbSubItem"/>
+                    <Button fx:id="btnSubArticles" text="Articles" styleClass="sbSubItem"/>
                 </VBox>
 
-                <Button maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Evenements" />
-
-                <Button maxWidth="1.7976931348623157E308" styleClass="menu-item" text="Gestion Jeux" />
+                <Button text="Gestion Evenements" styleClass="sbItem"/>
+                <Button text="Gestion Jeux" styleClass="sbItem"/>
             </VBox>
 
-            <Region VBox.vgrow="ALWAYS" />
-
-            <Button styleClass="logoutBtn" text="⎋ Déconnexion" />
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button text="⎋ Déconnexion" styleClass="sbLogout"/>
         </VBox>
     </left>
 
-    <!-- ===================== CONTENT ===================== -->
+    <!-- ✅ CONTENT -->
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="main-scroll" vbarPolicy="AS_NEEDED">
+        <StackPane styleClass="pageBg">
 
-            <content>
-                <VBox spacing="16" styleClass="page">
-                    <padding>
-                        <Insets bottom="28" left="28" right="28" top="22" />
-                    </padding>
+            <!-- SCROLL -->
+            <ScrollPane fx:id="mainScroll"
+                        fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        pannable="true"
+                        styleClass="pageScroll">
+                <content>
+                    <VBox spacing="16" styleClass="page" maxWidth="1200">
 
-                    <!-- Top header -->
-                    <HBox alignment="CENTER_LEFT" styleClass="page-top">
-                        <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label styleClass="page-title" text="Gestion des Articles" />
-                            <Label styleClass="page-subtitle" text="Ajoutez / modifiez / supprimez les articles &amp; conseils." />
+                        <!-- TopBar -->
+                        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="topbarBox">
+                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                <Label text="Gestion des Articles" styleClass="h1"/>
+                                <Label text="Ajoutez / modifiez / supprimez les articles &amp; conseils." styleClass="sub"/>
+                            </VBox>
+
+                            <TextField fx:id="searchField"
+                                       promptText="Rechercher un article..."
+                                       styleClass="searchField"/>
+                        </HBox>
+
+                        <!-- Count -->
+                        <HBox alignment="CENTER_LEFT">
+                            <Label fx:id="countLabel" text="0 Articles" styleClass="count"/>
+                        </HBox>
+
+                        <!-- ✅ Empty séparé (IMPORTANT) -->
+                        <VBox fx:id="emptyBox"
+                              managed="false"
+                              visible="false"
+                              spacing="6"
+                              styleClass="emptyCard">
+                            <Label text="Aucun article trouvé" styleClass="emptyTitle"/>
+                            <Label text="Essayez une autre recherche ou ajoutez un article." styleClass="emptySub"/>
                         </VBox>
 
-                        <Button fx:id="btnFrontOffice" styleClass="btn-outline" text="Voir FrontOffice" />
-                        <Button fx:id="btnAjouter" styleClass="btn-primary" text="+ Ajouter" />
-                    </HBox>
+                        <!-- Cards -->
+                        <VBox styleClass="cardsFrame">
+                            <FlowPane fx:id="cardsPane"
+                                      alignment="TOP_CENTER"
+                                      hgap="20"
+                                      vgap="20"
+                                      prefWrapLength="1100"
+                                      styleClass="cardsWrap"/>
+                        </VBox>
 
-                    <!-- Search -->
-                    <TextField fx:id="searchField" promptText="Rechercher par titre, contenu ou auteur..." styleClass="search-lg" />
-
-                    <!-- Count -->
-                    <Label fx:id="countLabel" styleClass="counter-label" text="0 Articles" />
-
-                    <!-- Empty -->
-                    <VBox fx:id="emptyBox" managed="false" spacing="6" styleClass="empty-box" visible="false">
-                        <Label styleClass="empty-title" text="Aucun article trouvé" />
-                        <Label styleClass="empty-sub" text="Essayez un autre mot-clé, ou ajoutez un nouvel article." />
                     </VBox>
+                </content>
+            </ScrollPane>
 
-                    <!-- Cards -->
-                    <FlowPane fx:id="cardsPane" hgap="22" prefWrapLength="980" styleClass="cards-wrap" vgap="22" />
-                </VBox>
-            </content>
-        </ScrollPane>
+            <!-- ✅ FABs bottom-right (UNE SEULE ZONE) -->
+            <VBox spacing="14"
+                  alignment="CENTER_RIGHT"
+                  StackPane.alignment="CENTER_RIGHT"
+                  pickOnBounds="false">
+                <StackPane.margin>
+                    <Insets top="0" right="26" bottom="26" left="0"/>
+                </StackPane.margin>
+
+                <Button fx:id="btnAjouterFab" text="＋" styleClass="fabAdd"/>
+                <Button fx:id="btnFrontOfficeFab" text="🌐" styleClass="fabFront"/>
+            </VBox>
+
+        </StackPane>
     </center>
 
 </BorderPane>
