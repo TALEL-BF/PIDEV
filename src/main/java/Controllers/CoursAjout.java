@@ -69,10 +69,16 @@ public class CoursAjout implements Initializable {
     private Button annulerButton;
     @FXML
     private Button voirCoursButton;
-
-    // NOUVEAU BOUTON TODO (AJOUTÉ SANS MODIFIER VOTRE CODE EXISTANT)
     @FXML
     private Button todoButton;
+
+    // NOUVEAUX ÉLÉMENTS POUR LE DESIGN
+    @FXML
+    private ProgressBar completionProgress;
+    @FXML
+    private Label completionLabel;
+    @FXML
+    private Label coursCountLabel;
 
     private Map<Control, Label> errorLabels = new HashMap<>();
     private CoursServices coursServices;
@@ -107,11 +113,36 @@ public class CoursAjout implements Initializable {
             }
         });
 
-        // NOUVEAU : Initialisation du bouton Todo (AJOUTÉ SANS MODIFIER VOTRE CODE)
+        // Initialisation du bouton Todo
         setupTodoButton();
+
+        // Initialiser la barre de progression
+        updateCompletionProgress();
     }
 
-    // NOUVELLE MÉTHODE pour le bouton Todo (AJOUTÉE SANS MODIFIER VOTRE CODE)
+    // NOUVELLE MÉTHODE pour mettre à jour la progression
+    private void updateCompletionProgress() {
+        int totalFields = 7; // titre, type, niveau, duree, description, image, mots
+        int completed = 0;
+
+        if (titreField.getText() != null && !titreField.getText().trim().isEmpty()) completed++;
+        if (typeCoursCombo.getValue() != null && !typeCoursCombo.getValue().isEmpty()) completed++;
+        if (niveauCombo.getValue() != null && !niveauCombo.getValue().isEmpty()) completed++;
+        if (dureeField.getText() != null && !dureeField.getText().trim().isEmpty()) completed++;
+        if (descriptionArea.getText() != null && !descriptionArea.getText().trim().isEmpty()) completed++;
+        if (imageField.getText() != null && !imageField.getText().trim().isEmpty()) completed++;
+        if (motsField.getText() != null && !motsField.getText().trim().isEmpty()) completed++;
+
+        double progress = (double) completed / totalFields;
+        if (completionProgress != null) {
+            completionProgress.setProgress(progress);
+        }
+        if (completionLabel != null) {
+            completionLabel.setText((int)(progress * 100) + "%");
+        }
+    }
+
+    // NOUVELLE MÉTHODE pour le bouton Todo
     private void setupTodoButton() {
         if (todoButton != null) {
             todoButton.setOnAction(event -> {
@@ -148,6 +179,9 @@ public class CoursAjout implements Initializable {
                 coursList = FXCollections.observableArrayList(cours);
                 coursTable.setItems(coursList);
                 coursTable.refresh();
+                if (coursCountLabel != null) {
+                    coursCountLabel.setText(cours.size() + " cours");
+                }
                 System.out.println("✅ Table rafraîchie avec " + cours.size() + " cours");
             }
         } catch (Exception e) {
@@ -527,6 +561,7 @@ public class CoursAjout implements Initializable {
         if (selectedFile != null) {
             imageField.setText(selectedFile.getName());
             validerImage();
+            updateCompletionProgress();
         }
     }
 
@@ -610,6 +645,9 @@ public class CoursAjout implements Initializable {
             if (cours != null) {
                 coursList = FXCollections.observableArrayList(cours);
                 coursTable.setItems(coursList);
+                if (coursCountLabel != null) {
+                    coursCountLabel.setText(cours.size() + " cours");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -639,13 +677,34 @@ public class CoursAjout implements Initializable {
     }
 
     private void setupValidation() {
-        titreField.textProperty().addListener((obs, old, newValue) -> validerTitre());
-        typeCoursCombo.valueProperty().addListener((obs, old, newValue) -> validerTypeCours());
-        niveauCombo.valueProperty().addListener((obs, old, newValue) -> validerNiveau());
-        dureeField.textProperty().addListener((obs, old, newValue) -> validerDuree());
-        descriptionArea.textProperty().addListener((obs, old, newValue) -> validerDescription());
-        imageField.textProperty().addListener((obs, old, newValue) -> validerImage());
-        motsField.textProperty().addListener((obs, old, newValue) -> validerMots());
+        titreField.textProperty().addListener((obs, old, newValue) -> {
+            validerTitre();
+            updateCompletionProgress();
+        });
+        typeCoursCombo.valueProperty().addListener((obs, old, newValue) -> {
+            validerTypeCours();
+            updateCompletionProgress();
+        });
+        niveauCombo.valueProperty().addListener((obs, old, newValue) -> {
+            validerNiveau();
+            updateCompletionProgress();
+        });
+        dureeField.textProperty().addListener((obs, old, newValue) -> {
+            validerDuree();
+            updateCompletionProgress();
+        });
+        descriptionArea.textProperty().addListener((obs, old, newValue) -> {
+            validerDescription();
+            updateCompletionProgress();
+        });
+        imageField.textProperty().addListener((obs, old, newValue) -> {
+            validerImage();
+            updateCompletionProgress();
+        });
+        motsField.textProperty().addListener((obs, old, newValue) -> {
+            validerMots();
+            updateCompletionProgress();
+        });
     }
 
     private boolean validerTitre() {
@@ -831,6 +890,7 @@ public class CoursAjout implements Initializable {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Cours ajouté avec succès!");
                 clearFields();
                 refreshTable();
+                updateCompletionProgress();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de l'ajout du cours.");
             }
@@ -868,6 +928,7 @@ public class CoursAjout implements Initializable {
                 ajouterButton.setText("Ajouter le cours");
                 clearFields();
                 refreshTable();
+                updateCompletionProgress();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la modification du cours.");
             }
@@ -917,9 +978,11 @@ public class CoursAjout implements Initializable {
                 clearFields();
                 coursEnModification = null;
                 ajouterButton.setText("Ajouter le cours");
+                updateCompletionProgress();
             }
         } else {
             clearFields();
+            updateCompletionProgress();
         }
     }
 
@@ -960,6 +1023,7 @@ public class CoursAjout implements Initializable {
         remplirFormulairePourModification(cours);
         ajouterButton.setText("Modifier le cours");
         coursEnModification = cours;
+        updateCompletionProgress();
     }
 
     /**
@@ -1048,6 +1112,7 @@ public class CoursAjout implements Initializable {
                         clearFields();
                         coursEnModification = null;
                         ajouterButton.setText("Ajouter le cours");
+                        updateCompletionProgress();
                     }
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Erreur", "Échec de la suppression du cours.");

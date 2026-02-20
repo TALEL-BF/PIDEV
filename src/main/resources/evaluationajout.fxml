@@ -144,6 +144,7 @@
                                 </VBox>
                             </HBox>
 
+                            <!-- Boutons d'action avec le nouveau bouton IA -->
                             <HBox spacing="15" alignment="CENTER" style="-fx-padding: 15 0 5 0;">
                                 <Button fx:id="ajouterQuestionBtn" text="➕ Ajouter"
                                         style="-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"/>
@@ -151,6 +152,18 @@
                                         style="-fx-background-color: #FFA500; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" visible="false" managed="false"/>
                                 <Button fx:id="annulerModificationBtn" text="❌ Annuler"
                                         style="-fx-background-color: transparent; -fx-border-color: #666666; -fx-text-fill: #666666; -fx-border-radius: 20; -fx-padding: 10 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" visible="false" managed="false"/>
+
+                                <!-- NOUVEAU BOUTON IA -->
+                                <Button fx:id="genererIAButton"
+                                        text="🤖 Générer par IA"
+                                        style="-fx-background-color: #9B59B6;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 10 30;
+                                               -fx-font-size: 14px;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(gaussian, rgba(155,89,182,0.3), 8, 0, 0, 2);"/>
                             </HBox>
                         </VBox>
 
@@ -161,7 +174,6 @@
 
                             <TableView fx:id="questionsTable" prefHeight="300">
                                 <columns>
-                                    <!-- Colonne ID supprimée -->
                                     <TableColumn fx:id="questionColumn" text="Question" prefWidth="250"/>
                                     <TableColumn fx:id="coursColumn" text="Cours" prefWidth="150"/>
                                     <TableColumn fx:id="choix1Column" text="Choix 1" prefWidth="100"/>
@@ -185,5 +197,4 @@
             </ScrollPane>
         </HBox>
     </children>
-
 </AnchorPane>

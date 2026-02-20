@@ -1,46 +1,29 @@
 package Utils;
 
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import java.io.File;
-import java.util.concurrent.CompletableFuture;
-
 public class TextToSpeechManager {
 
     private static boolean isEnabled = true;
-    private static boolean isLoading = false;
+
+    // 1 = Kevin (vraie voix)
+    // 2 = Simple (bip)
+    private static final int TTS_METHOD = 1;
 
     public static void speak(String text) {
         if (!isEnabled || text == null || text.trim().isEmpty()) {
             return;
         }
 
-        if (isLoading) {
-            System.out.println("⏳ Génération audio déjà en cours...");
-            return;
+        String textToSpeak = text.trim();
+
+        switch (TTS_METHOD) {
+            case 1:
+                FreeTTSService.speak(textToSpeak);
+                break;
+            case 2:
+            default:
+                SimpleTTS.speak(textToSpeak);
+                break;
         }
-
-        isLoading = true;
-        final String textToSpeak = text.trim();
-
-        CompletableFuture.supplyAsync(() -> {
-            try {
-                return OpenAITTS.generateSpeech(textToSpeak);
-            } catch (Exception e) {
-                System.err.println("❌ Erreur génération TTS: " + e.getMessage());
-                e.printStackTrace();
-                return null;
-            }
-        }).thenAccept(audioFile -> {
-            Platform.runLater(() -> {
-                isLoading = false;
-                if (audioFile != null) {
-                    AudioPlayer.play(audioFile);
-                } else {
-                    showError("Impossible de générer l'audio pour: " + textToSpeak);
-                }
-            });
-        });
     }
 
     public static void setEnabled(boolean enabled) {
@@ -50,15 +33,5 @@ public class TextToSpeechManager {
 
     public static boolean isEnabled() {
         return isEnabled;
-    }
-
-    private static void showError(String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("TTS - Erreur");
-            alert.setHeaderText(null);
-            alert.setContentText(message + "\n\nVérifiez votre clé API OpenAI dans config.properties");
-            alert.showAndWait();
-        });
     }
 }

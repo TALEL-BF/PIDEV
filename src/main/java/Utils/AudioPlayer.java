@@ -32,7 +32,7 @@ public class AudioPlayer {
             }
         });
 
-        playerThread.setDaemon(true); // Permet à l'application de se fermer même si le thread tourne
+        playerThread.setDaemon(true);
         playerThread.start();
     }
 

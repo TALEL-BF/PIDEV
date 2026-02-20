@@ -3,7 +3,9 @@ package Controllers;
 import Entites.Cours;
 import Services.CoursServices;
 import Services.EvaluationServices;
+import Services.FalImageService;
 import Utils.Navigation;
+import Utils.TextToSpeechManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.fxml.Initializable;
@@ -16,7 +18,23 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
-
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.stage.FileChooser;
+import javafx.scene.image.WritableImage;
+import javafx.scene.SnapshotParameters;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javafx.animation.ScaleTransition;
+import javafx.util.Duration;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -35,19 +53,250 @@ public class CoursAffichage implements Initializable {
     private Button ajouterCoursButton;
     @FXML
     private Button ajouterEvaluationButton;
+    @FXML
+    private Button drawingSpaceButton;
+    @FXML
+    private Button iaImageButton;
 
     private CoursServices coursServices;
     private EvaluationServices evaluationServices;
+    private FalImageService falImageService;
     private List<Cours> allCours;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         coursServices = new CoursServices();
         evaluationServices = new EvaluationServices();
+
+        // Initialisation de Fal.ai avec votre clé API
+        // À remplacer par votre vraie clé API Fal.ai (inscription gratuite sur fal.ai)
+
+        falImageService = new FalImageService(falApiKey);
+
+
+
         loadCours();
         setupSearch();
         setupFilters();
         setupNavigation();
+        setupDrawingSpace();
+        setupIAImageButton();
+    }
+
+    private void setupIAImageButton() {
+        if (iaImageButton != null) {
+            iaImageButton.setOnAction(event -> {
+                System.out.println("🤖 Ouverture du générateur d'images IA...");
+                ouvrirGenerateurImageIA();
+            });
+
+            ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(200), iaImageButton);
+
+            iaImageButton.setOnMouseEntered(e -> {
+                scaleTransition.setToX(1.1);
+                scaleTransition.setToY(1.1);
+                scaleTransition.play();
+                iaImageButton.setStyle("-fx-background-color: #FF6B6B; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 12 25; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(255,107,107,0.4), 10, 0, 0, 5);");
+            });
+
+            iaImageButton.setOnMouseExited(e -> {
+                scaleTransition.setToX(1.0);
+                scaleTransition.setToY(1.0);
+                scaleTransition.play();
+                iaImageButton.setStyle("-fx-background-color: #FF4444; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 12 25; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(255,68,68,0.3), 10, 0, 0, 5);");
+            });
+        }
+    }
+
+    private void ouvrirGenerateurImageIA() {
+        Stage imageStage = new Stage();
+        imageStage.setTitle("🤖 Générateur d'images par IA");
+        imageStage.initModality(Modality.APPLICATION_MODAL);
+
+        VBox mainContainer = new VBox(20);
+        mainContainer.setStyle("-fx-background-color: linear-gradient(to bottom, #F0F8FF, #E8F0FE); -fx-padding: 30;");
+        mainContainer.setAlignment(Pos.TOP_CENTER);
+        mainContainer.setPrefWidth(1000);
+        mainContainer.setPrefHeight(700);
+
+        Label titleLabel = new Label("🎨 Générateur d'images magique");
+        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
+
+        Label subtitleLabel = new Label("Décris ce que tu veux voir, l'IA va le créer pour toi !");
+        subtitleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666;");
+
+        VBox promptBox = new VBox(10);
+        promptBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-border-radius: 15;");
+
+        Label promptLabel = new Label("📝 Décris l'image à générer :");
+        promptLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
+
+        TextArea promptArea = new TextArea();
+        promptArea.setPromptText("Exemple: un oiseau bleu qui vole dans le ciel, style dessin animé pour enfants");
+        promptArea.setWrapText(true);
+        promptArea.setPrefRowCount(3);
+        promptArea.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 14px;");
+
+        promptBox.getChildren().addAll(promptLabel, promptArea);
+
+        Button genererButton = new Button("✨ Générer l'image");
+        genererButton.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 15 30; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;");
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setVisible(false);
+        progressIndicator.setPrefSize(50, 50);
+
+        VBox imageBox = new VBox(15);
+        imageBox.setAlignment(Pos.CENTER);
+        imageBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-border-radius: 15;");
+        imageBox.setPrefHeight(400);
+
+        ImageView imageView = new ImageView();
+        imageView.setFitHeight(300);
+        imageView.setFitWidth(400);
+        imageView.setPreserveRatio(true);
+        imageView.setVisible(false);
+
+        Label placeholderLabel = new Label("L'image générée apparaîtra ici");
+        placeholderLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #999999;");
+
+        imageBox.getChildren().addAll(placeholderLabel, imageView);
+
+        HBox actionButtons = new HBox(15);
+        actionButtons.setAlignment(Pos.CENTER);
+        actionButtons.setVisible(false);
+
+        Button saveButton = new Button("💾 Sauvegarder l'image");
+        saveButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;");
+
+        Button newButton = new Button("🔄 Nouvelle image");
+        newButton.setStyle("-fx-background-color: #FFA500; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;");
+
+        actionButtons.getChildren().addAll(saveButton, newButton);
+
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: #FF4444; -fx-font-size: 14px;");
+        errorLabel.setVisible(false);
+
+        genererButton.setOnAction(e -> {
+            String prompt = promptArea.getText().trim();
+            if (prompt.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez décrire l'image à générer");
+                return;
+            }
+
+            genererButton.setDisable(true);
+            progressIndicator.setVisible(true);
+            placeholderLabel.setVisible(false);
+            imageView.setVisible(false);
+            actionButtons.setVisible(false);
+            errorLabel.setVisible(false);
+
+            new Thread(() -> {
+                try {
+                    System.out.println("🤖 Génération d'image Fal.ai pour: " + prompt);
+
+                    // Appel à Fal.ai
+                    String imageUrl = falImageService.genererImage(prompt);
+
+                    javafx.application.Platform.runLater(() -> {
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            // Charger l'image depuis l'URL
+                            Image image = new Image(imageUrl, true);
+                            imageView.setImage(image);
+                            imageView.setVisible(true);
+                            actionButtons.setVisible(true);
+
+                            // Sauvegarde de l'image
+                            saveButton.setOnAction(saveEvent -> {
+                                FileChooser fileChooser = new FileChooser();
+                                fileChooser.setTitle("Sauvegarder l'image");
+                                fileChooser.getExtensionFilters().add(
+                                        new FileChooser.ExtensionFilter("Images PNG", "*.png")
+                                );
+                                File file = fileChooser.showSaveDialog(imageStage);
+
+                                if (file != null) {
+                                    // Télécharger l'image depuis l'URL et la sauvegarder
+                                    new Thread(() -> {
+                                        try {
+                                            java.net.URL url = new java.net.URL(imageUrl);
+                                            try (java.io.InputStream in = url.openStream();
+                                                 java.io.FileOutputStream out = new java.io.FileOutputStream(file)) {
+                                                byte[] buffer = new byte[4096];
+                                                int bytesRead;
+                                                while ((bytesRead = in.read(buffer)) != -1) {
+                                                    out.write(buffer, 0, bytesRead);
+                                                }
+                                            }
+                                            javafx.application.Platform.runLater(() ->
+                                                    showAlert(Alert.AlertType.INFORMATION, "Succès", "Image sauvegardée avec succès !")
+                                            );
+                                        } catch (IOException ex) {
+                                            javafx.application.Platform.runLater(() ->
+                                                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la sauvegarde: " + ex.getMessage())
+                                            );
+                                        }
+                                    }).start();
+                                }
+                            });
+
+                            newButton.setOnAction(newEvent -> {
+                                promptArea.clear();
+                                imageView.setImage(null);
+                                imageView.setVisible(false);
+                                placeholderLabel.setVisible(true);
+                                actionButtons.setVisible(false);
+                            });
+
+                        } else {
+                            errorLabel.setText("❌ Échec de la génération. Veuillez réessayer.");
+                            errorLabel.setVisible(true);
+                            placeholderLabel.setVisible(true);
+                        }
+
+                        genererButton.setDisable(false);
+                        progressIndicator.setVisible(false);
+                    });
+
+                } catch (Exception ex) {
+                    javafx.application.Platform.runLater(() -> {
+                        errorLabel.setText("❌ Erreur: " + ex.getMessage());
+                        errorLabel.setVisible(true);
+                        genererButton.setDisable(false);
+                        progressIndicator.setVisible(false);
+                        placeholderLabel.setVisible(true);
+                    });
+                }
+            }).start();
+        });
+
+        VBox centerBox = new VBox(20, promptBox, genererButton, progressIndicator, imageBox, actionButtons, errorLabel);
+        centerBox.setAlignment(Pos.CENTER);
+
+        mainContainer.getChildren().addAll(titleLabel, subtitleLabel, centerBox);
+
+        Button closeButton = new Button("❌ Fermer");
+        closeButton.setStyle("-fx-background-color: transparent; -fx-border-color: #7B2FF7; -fx-text-fill: #7B2FF7; -fx-border-radius: 20; -fx-padding: 10 30; -fx-font-size: 14px; -fx-cursor: hand;");
+        closeButton.setOnAction(e -> imageStage.close());
+
+        mainContainer.getChildren().add(closeButton);
+
+        Scene scene = new Scene(mainContainer);
+        imageStage.setScene(scene);
+        imageStage.show();
     }
 
     private void setupNavigation() {
@@ -104,6 +353,642 @@ public class CoursAffichage implements Initializable {
                             "-fx-effect: dropshadow(three-pass-box, rgba(40,167,69,0.3), 10, 0, 0, 5);")
             );
         }
+    }
+
+    private void setupDrawingSpace() {
+        if (drawingSpaceButton != null) {
+            drawingSpaceButton.setOnAction(event -> {
+                System.out.println("🎨 Ouverture de l'espace de dessin...");
+                ouvrirEspaceDessinAmeliore();
+            });
+
+            ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(200), drawingSpaceButton);
+            drawingSpaceButton.setOnMouseEntered(e -> {
+                scaleTransition.setToX(1.1);
+                scaleTransition.setToY(1.1);
+                scaleTransition.play();
+                drawingSpaceButton.setStyle("-fx-background-color: #9B59B6; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 12 25; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(155,89,182,0.4), 10, 0, 0, 5);");
+            });
+
+            drawingSpaceButton.setOnMouseExited(e -> {
+                scaleTransition.setToX(1.0);
+                scaleTransition.setToY(1.0);
+                scaleTransition.play();
+                drawingSpaceButton.setStyle("-fx-background-color: #8E44AD; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 12 25; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(142,68,173,0.3), 10, 0, 0, 5);");
+            });
+        }
+    }
+
+    private void ouvrirEspaceDessinAmeliore() {
+        Stage drawingStage = new Stage();
+        drawingStage.setTitle("🎨 Espace de dessin magique pour enfants");
+        drawingStage.initModality(Modality.APPLICATION_MODAL);
+
+        HBox mainContainer = new HBox();
+        mainContainer.setPrefWidth(1400);
+        mainContainer.setPrefHeight(850);
+
+        VBox sidebar = new VBox(10);
+        sidebar.setPrefWidth(260.0);
+        sidebar.setMinWidth(260.0);
+        sidebar.setMaxWidth(260.0);
+        sidebar.setStyle("-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 25 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);");
+
+        HBox logoBox = new HBox(12);
+        logoBox.setAlignment(Pos.CENTER_LEFT);
+        logoBox.setStyle("-fx-padding: 0 0 15 5;");
+
+        ImageView logoImage = new ImageView();
+        logoImage.setFitHeight(40.0);
+        logoImage.setFitWidth(40.0);
+        logoImage.setPreserveRatio(true);
+        try {
+            Image img = new Image(getClass().getResource("/images/logo.png").toExternalForm());
+            logoImage.setImage(img);
+        } catch (Exception e) {
+            Label logoEmoji = new Label("🎨");
+            logoEmoji.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
+            logoBox.getChildren().add(logoEmoji);
+        }
+
+        VBox logoText = new VBox(2);
+        Label autiCareLabel = new Label("AutiCare");
+        autiCareLabel.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");
+        Label espaceLabel = new Label("Espace éducatif");
+        espaceLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;");
+        logoText.getChildren().addAll(autiCareLabel, espaceLabel);
+
+        logoBox.getChildren().addAll(logoImage, logoText);
+
+        Separator separator = new Separator();
+        separator.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;");
+
+        VBox menuBox = new VBox(8);
+        menuBox.setStyle("-fx-padding: 10 0 20 0;");
+
+        Button coursButton = new Button("📚 Nos cours");
+        coursButton.setMaxWidth(Double.MAX_VALUE);
+        coursButton.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 1; -fx-border-radius: 10;");
+        coursButton.setOnAction(e -> {
+            System.out.println("📚 Retour à l'affichage des cours");
+            drawingStage.close();
+        });
+
+        Button emploisButton = new Button("📅 Emplois du temps");
+        emploisButton.setMaxWidth(Double.MAX_VALUE);
+        emploisButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+        emploisButton.setOnMouseEntered(e ->
+                emploisButton.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;")
+        );
+        emploisButton.setOnMouseExited(e ->
+                emploisButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;")
+        );
+
+        Button evenementsButton = new Button("🎉 Événements");
+        evenementsButton.setMaxWidth(Double.MAX_VALUE);
+        evenementsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+        evenementsButton.setOnMouseEntered(e ->
+                evenementsButton.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;")
+        );
+        evenementsButton.setOnMouseExited(e ->
+                evenementsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;")
+        );
+
+        Button suiviButton = new Button("📞 Suivi consultation");
+        suiviButton.setMaxWidth(Double.MAX_VALUE);
+        suiviButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10; -fx-wrap-text: true;");
+        suiviButton.setOnMouseEntered(e ->
+                suiviButton.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10; -fx-wrap-text: true;")
+        );
+        suiviButton.setOnMouseExited(e ->
+                suiviButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10; -fx-wrap-text: true;")
+        );
+
+        Button jeuxButton = new Button("🎮 Jeux éducatifs");
+        jeuxButton.setMaxWidth(Double.MAX_VALUE);
+        jeuxButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+        jeuxButton.setOnMouseEntered(e ->
+                jeuxButton.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;")
+        );
+        jeuxButton.setOnMouseExited(e ->
+                jeuxButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;")
+        );
+
+        menuBox.getChildren().addAll(coursButton, emploisButton, evenementsButton, suiviButton, jeuxButton);
+
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        Button deconnexionButton = new Button("🚪 Déconnexion");
+        deconnexionButton.setMaxWidth(Double.MAX_VALUE);
+        deconnexionButton.setStyle("-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;");
+
+        sidebar.getChildren().addAll(logoBox, separator, menuBox, spacer, deconnexionButton);
+
+        BorderPane drawingContent = new BorderPane();
+        drawingContent.setStyle("-fx-background-color: linear-gradient(to bottom, #D5B8FF, #E8D5FF);");
+
+        ScrollPane mainScrollPane = new ScrollPane();
+        mainScrollPane.setFitToWidth(true);
+        mainScrollPane.setFitToHeight(true);
+        mainScrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-width: 0;");
+
+        VBox scrollContent = new VBox(15);
+        scrollContent.setStyle("-fx-background-color: transparent; -fx-padding: 20;");
+
+        HBox headerBox = new HBox(20);
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setStyle("-fx-padding: 10 20; -fx-background-color: rgba(255,255,255,0.9); -fx-background-radius: 30; -fx-border-color: #8E44AD; -fx-border-width: 2; -fx-border-radius: 30;");
+
+        Button backToCoursesButton = new Button("← Retour aux cours");
+        backToCoursesButton.setStyle("-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
+        backToCoursesButton.setOnAction(e -> {
+            System.out.println("📚 Retour à l'affichage des cours");
+            drawingStage.close();
+        });
+
+        HBox logoTitleBox = new HBox(15);
+        logoTitleBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label paintEmoji = new Label("🎨");
+        paintEmoji.setStyle("-fx-font-size: 50px; -fx-text-fill: #000000;");
+
+        VBox titleBox = new VBox(5);
+        Label mainTitle = new Label("Espace de dessin magique");
+        mainTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+        Label subTitle = new Label("Laisse libre cours à ton imagination !");
+        subTitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #666666;");
+
+        titleBox.getChildren().addAll(mainTitle, subTitle);
+        logoTitleBox.getChildren().addAll(paintEmoji, titleBox);
+
+        Region headerSpacer = new Region();
+        HBox.setHgrow(headerSpacer, Priority.ALWAYS);
+
+        headerBox.getChildren().addAll(backToCoursesButton, headerSpacer, logoTitleBox);
+
+        VBox topPanel = new VBox(15);
+        topPanel.setStyle("-fx-padding: 20; -fx-background-color: rgba(255,255,255,0.9); -fx-background-radius: 30; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.3), 10, 0, 0, 5); -fx-border-color: #8E44AD; -fx-border-width: 2; -fx-border-radius: 30;");
+
+        FlowPane toolBar = new FlowPane();
+        toolBar.setHgap(15);
+        toolBar.setVgap(15);
+        toolBar.setAlignment(Pos.CENTER);
+        toolBar.setPadding(new Insets(15));
+
+        ColorPicker colorPicker = new ColorPicker(Color.web("#8E44AD"));
+        colorPicker.setStyle("-fx-font-size: 14px; -fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #8E44AD; -fx-border-width: 2;");
+
+        VBox brushBox = new VBox(5);
+        brushBox.setAlignment(Pos.CENTER);
+        Label brushLabel = new Label("🖌️ Taille du pinceau");
+        brushLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8E44AD;");
+
+        Slider brushSizeSlider = new Slider(1, 50, 10);
+        brushSizeSlider.setShowTickLabels(true);
+        brushSizeSlider.setShowTickMarks(true);
+        brushSizeSlider.setPrefWidth(200);
+        brushSizeSlider.setStyle("-fx-control-inner-background: #D5B8FF;");
+
+        Label brushSizeLabel = new Label("10");
+        brushSizeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8E44AD;");
+
+        brushSizeSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                brushSizeLabel.setText(String.valueOf(newVal.intValue()))
+        );
+
+        brushBox.getChildren().addAll(brushLabel, brushSizeSlider, brushSizeLabel);
+
+        ToggleGroup toolsGroup = new ToggleGroup();
+
+        ToggleButton pencilButton = createToolButton("✏️", "Crayon", "#E1BEE7", toolsGroup, "pencil");
+        ToggleButton eraserButton = createToolButton("🧽", "Gomme", "#FFCDD2", toolsGroup, "eraser");
+        ToggleButton starButton = createToolButton("⭐", "Étoile", "#FFF9C4", toolsGroup, "star");
+        ToggleButton heartButton = createToolButton("❤️", "Cœur", "#F8BBD0", toolsGroup, "heart");
+        ToggleButton rainbowButton = createToolButton("🌈", "Arc-en-ciel", "#B2EBF2", toolsGroup, "rainbow");
+
+        pencilButton.setSelected(true);
+
+        FlowPane actionFlowPane = new FlowPane();
+        actionFlowPane.setHgap(15);
+        actionFlowPane.setVgap(15);
+        actionFlowPane.setAlignment(Pos.CENTER);
+
+        Button clearButton = createActionButton("🗑️", "Effacer tout", "#FF6B6B");
+        Button saveButton = createActionButton("💾", "Sauvegarder", "#4CAF50");
+        Button printButton = createActionButton("🖨️", "Imprimer", "#FFA726");
+        Button closeButton = createActionButton("❌", "Fermer", "#95A5A6");
+        closeButton.setOnAction(e -> drawingStage.close());
+
+        actionFlowPane.getChildren().addAll(clearButton, saveButton, printButton, closeButton);
+
+        FlowPane shapeFlowPane = new FlowPane();
+        shapeFlowPane.setHgap(15);
+        shapeFlowPane.setVgap(15);
+        shapeFlowPane.setAlignment(Pos.CENTER);
+        shapeFlowPane.setStyle("-fx-padding: 15; -fx-background-color: #F5E6FF; -fx-background-radius: 30; -fx-border-color: #8E44AD; -fx-border-width: 2; -fx-border-radius: 30;");
+
+        Label shapeLabel = new Label("✨ Formes magiques:");
+        shapeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8E44AD;");
+
+        Button circleButton = createShapeButton("⭕", "Cercle", "#FFA726");
+        Button squareButton = createShapeButton("⬛", "Carré", "#66BB6A");
+        Button triangleButton = createShapeButton("🔺", "Triangle", "#42A5F5");
+        Button sunButton = createShapeButton("☀️", "Soleil", "#FFD54F");
+        Button cloudButton = createShapeButton("☁️", "Nuage", "#90CAF9");
+        Button flowerButton = createShapeButton("🌸", "Fleur", "#F06292");
+        Button star2Button = createShapeButton("⭐", "Étoile", "#FFB74D");
+        Button heart2Button = createShapeButton("❤️", "Cœur", "#F06292");
+        Button moonButton = createShapeButton("🌙", "Lune", "#9575CD");
+        Button treeButton = createShapeButton("🌲", "Arbre", "#66BB6A");
+
+        shapeFlowPane.getChildren().addAll(
+                shapeLabel, circleButton, squareButton, triangleButton,
+                sunButton, cloudButton, flowerButton, star2Button,
+                heart2Button, moonButton, treeButton
+        );
+
+        toolBar.getChildren().addAll(
+                createToolLabel("🎨 Couleur:"), colorPicker,
+                brushBox
+        );
+
+        toolBar.getChildren().add(createToolLabel("🖌️ Outils:"));
+        toolBar.getChildren().addAll(pencilButton, eraserButton, starButton, heartButton, rainbowButton);
+
+        topPanel.getChildren().addAll(toolBar, actionFlowPane, shapeFlowPane);
+
+        StackPane canvasContainer = new StackPane();
+        canvasContainer.setStyle("-fx-padding: 20;");
+
+        VBox canvasBackground = new VBox();
+        canvasBackground.setStyle("-fx-background-color: white; -fx-background-radius: 30; -fx-border-radius: 30; -fx-border-color: #8E44AD; -fx-border-width: 5; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.3), 15, 0, 0, 5);");
+
+        Canvas canvas = new Canvas(1000, 600);
+        canvas.setStyle("-fx-background-color: white; -fx-background-radius: 25;");
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setLineWidth(10);
+        gc.setStroke(Color.web("#8E44AD"));
+        gc.setLineCap(StrokeLineCap.ROUND);
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        final double[] lastX = {0};
+        final double[] lastY = {0};
+        final Color[] currentColor = {Color.web("#8E44AD")};
+        final double[] currentSize = {10};
+        final String[] currentTool = {"pencil"};
+
+        canvas.setOnMousePressed(e -> {
+            lastX[0] = e.getX();
+            lastY[0] = e.getY();
+            gc.beginPath();
+            gc.moveTo(lastX[0], lastY[0]);
+
+            if (currentTool[0].equals("star")) {
+                dessinerEtoile(gc, e.getX(), e.getY(), currentSize[0] * 2);
+            } else if (currentTool[0].equals("heart")) {
+                dessinerCoeur(gc, e.getX(), e.getY(), currentSize[0]);
+            } else if (currentTool[0].equals("rainbow")) {
+                currentColor[0] = Color.color(Math.random(), Math.random(), Math.random());
+                gc.setStroke(currentColor[0]);
+                gc.setLineWidth(currentSize[0]);
+                gc.stroke();
+            } else {
+                gc.setStroke(currentColor[0]);
+                gc.setLineWidth(currentSize[0]);
+                gc.stroke();
+            }
+        });
+
+        canvas.setOnMouseDragged(e -> {
+            double currentX = e.getX();
+            double currentY = e.getY();
+
+            if (toolsGroup.getSelectedToggle() != null) {
+                String tool = (String) toolsGroup.getSelectedToggle().getUserData();
+                currentTool[0] = tool;
+
+                if ("eraser".equals(tool)) {
+                    gc.setStroke(Color.WHITE);
+                    gc.setLineWidth(currentSize[0]);
+                } else if ("pencil".equals(tool)) {
+                    gc.setStroke(currentColor[0]);
+                    gc.setLineWidth(currentSize[0]);
+                } else if ("star".equals(tool)) {
+                    dessinerEtoile(gc, currentX, currentY, currentSize[0] * 2);
+                    lastX[0] = currentX;
+                    lastY[0] = currentY;
+                    return;
+                } else if ("heart".equals(tool)) {
+                    dessinerCoeur(gc, currentX, currentY, currentSize[0]);
+                    lastX[0] = currentX;
+                    lastY[0] = currentY;
+                    return;
+                } else if ("rainbow".equals(tool)) {
+                    gc.setStroke(Color.color(Math.random(), Math.random(), Math.random()));
+                    gc.setLineWidth(currentSize[0]);
+                }
+            }
+
+            gc.strokeLine(lastX[0], lastY[0], currentX, currentY);
+            lastX[0] = currentX;
+            lastY[0] = currentY;
+        });
+
+        colorPicker.setOnAction(e -> {
+            currentColor[0] = colorPicker.getValue();
+        });
+
+        brushSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            currentSize[0] = newVal.doubleValue();
+        });
+
+        clearButton.setOnAction(e -> {
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            gc.setFill(Color.WHITE);
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            showHappyMessage("✨ Bravo ! Tu as effacé ton dessin !");
+        });
+
+        saveButton.setOnAction(e -> {
+            try {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Sauvegarder ton chef-d'œuvre");
+                fileChooser.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Images PNG", "*.png")
+                );
+                File file = fileChooser.showSaveDialog(drawingStage);
+
+                if (file != null) {
+                    SnapshotParameters params = new SnapshotParameters();
+                    params.setFill(Color.TRANSPARENT);
+                    WritableImage image = canvas.snapshot(params, null);
+
+                    BufferedImage bufferedImage = new BufferedImage(
+                            (int) canvas.getWidth(),
+                            (int) canvas.getHeight(),
+                            BufferedImage.TYPE_INT_ARGB
+                    );
+
+                    for (int x = 0; x < canvas.getWidth(); x++) {
+                        for (int y = 0; y < canvas.getHeight(); y++) {
+                            int argb = image.getPixelReader().getArgb(x, y);
+                            bufferedImage.setRGB(x, y, argb);
+                        }
+                    }
+
+                    ImageIO.write(bufferedImage, "png", file);
+                    showHappyMessage("🎉 Super ! Ton dessin est sauvegardé !");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert("Oups!", "Erreur: " + ex.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+
+        printButton.setOnAction(e -> {
+            showHappyMessage("🖨️ Ton dessin est prêt à être imprimé !");
+        });
+
+        circleButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            gc.strokeOval(400, 200, 100, 100);
+            showHappyMessage("⭕ Joli cercle !");
+        });
+
+        squareButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            gc.strokeRect(400, 200, 100, 100);
+            showHappyMessage("⬛ Beau carré !");
+        });
+
+        triangleButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            double[] xPoints = {450, 350, 550};
+            double[] yPoints = {150, 350, 350};
+            gc.strokePolygon(xPoints, yPoints, 3);
+            showHappyMessage("🔺 Super triangle !");
+        });
+
+        sunButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            gc.strokeOval(450, 200, 80, 80);
+            for (int i = 0; i < 8; i++) {
+                double angle = i * Math.PI / 4;
+                double x1 = 490 + 50 * Math.cos(angle);
+                double y1 = 240 + 50 * Math.sin(angle);
+                double x2 = 490 + 70 * Math.cos(angle);
+                double y2 = 240 + 70 * Math.sin(angle);
+                gc.strokeLine(x1, y1, x2, y2);
+            }
+            showHappyMessage("☀️ Il fait soleil !");
+        });
+
+        cloudButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            gc.strokeOval(350, 200, 60, 40);
+            gc.strokeOval(390, 190, 70, 50);
+            gc.strokeOval(440, 200, 60, 40);
+            showHappyMessage("☁️ Un joli nuage !");
+        });
+
+        flowerButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            for (int i = 0; i < 5; i++) {
+                double angle = i * 2 * Math.PI / 5;
+                double x = 450 + 40 * Math.cos(angle);
+                double y = 250 + 40 * Math.sin(angle);
+                gc.strokeOval(x-15, y-15, 30, 30);
+            }
+            gc.strokeOval(435, 235, 30, 30);
+            showHappyMessage("🌸 Une belle fleur !");
+        });
+
+        star2Button.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            dessinerEtoile(gc, 450, 250, 50);
+            showHappyMessage("⭐ Une jolie étoile !");
+        });
+
+        heart2Button.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            dessinerCoeur(gc, 450, 250, 30);
+            showHappyMessage("❤️ Un beau cœur !");
+        });
+
+        moonButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            gc.strokeOval(450, 200, 70, 70);
+            gc.setFill(Color.WHITE);
+            gc.fillOval(470, 190, 40, 40);
+            showHappyMessage("🌙 Une jolie lune !");
+        });
+
+        treeButton.setOnAction(e -> {
+            gc.setStroke(currentColor[0]);
+            gc.setLineWidth(currentSize[0]);
+            gc.strokeRect(440, 250, 20, 80);
+            gc.strokeOval(430, 200, 40, 40);
+            gc.strokeOval(450, 180, 30, 30);
+            gc.strokeOval(410, 220, 30, 30);
+            showHappyMessage("🌲 Un bel arbre !");
+        });
+
+        canvasBackground.getChildren().add(canvas);
+        canvasContainer.getChildren().add(canvasBackground);
+
+        HBox messageBox = new HBox(10);
+        messageBox.setAlignment(Pos.CENTER);
+        messageBox.setStyle("-fx-padding: 15; -fx-background-color: #F5E6FF; -fx-background-radius: 30; -fx-border-color: #8E44AD; -fx-border-width: 3; -fx-border-radius: 30;");
+
+        Label messageIcon = new Label("🎉");
+        messageIcon.setStyle("-fx-font-size: 30px;");
+
+        Label messageLabel = new Label("Amuse-toi bien ! Dessine ce que tu veux avec de belles couleurs !");
+        messageLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8E44AD;");
+
+        messageBox.getChildren().addAll(messageIcon, messageLabel);
+
+        scrollContent.getChildren().addAll(headerBox, topPanel, canvasContainer, messageBox);
+        mainScrollPane.setContent(scrollContent);
+
+        drawingContent.setCenter(mainScrollPane);
+
+        mainContainer.getChildren().addAll(sidebar, drawingContent);
+        HBox.setHgrow(drawingContent, Priority.ALWAYS);
+
+        Scene scene = new Scene(mainContainer, 1400, 850);
+        drawingStage.setScene(scene);
+        drawingStage.show();
+    }
+
+    private ToggleButton createToolButton(String emoji, String tooltip, String color, ToggleGroup group, String userData) {
+        ToggleButton button = new ToggleButton(emoji);
+        button.setToggleGroup(group);
+        button.setUserData(userData);
+        button.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 25; -fx-padding: 12; -fx-font-size: 20px; -fx-min-width: 60; -fx-min-height: 60; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.2), 5, 0, 0, 2);");
+
+        Tooltip tp = new Tooltip(tooltip);
+        tp.setStyle("-fx-font-size: 14px; -fx-background-color: #8E44AD; -fx-text-fill: white;");
+        button.setTooltip(tp);
+
+        button.setOnMouseEntered(e -> {
+            button.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 25; -fx-padding: 12; -fx-font-size: 24px; -fx-min-width: 60; -fx-min-height: 60; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #8E44AD, 10, 0, 0, 5);");
+        });
+
+        button.setOnMouseExited(e -> {
+            button.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 25; -fx-padding: 12; -fx-font-size: 20px; -fx-min-width: 60; -fx-min-height: 60; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.2), 5, 0, 0, 2);");
+        });
+
+        return button;
+    }
+
+    private Button createActionButton(String emoji, String tooltip, String color) {
+        Button button = new Button(emoji + " " + tooltip);
+        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.2), 5, 0, 0, 2);");
+
+        button.setOnMouseEntered(e -> {
+            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #8E44AD, 10, 0, 0, 5);");
+        });
+
+        button.setOnMouseExited(e -> {
+            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.2), 5, 0, 0, 2);");
+        });
+
+        return button;
+    }
+
+    private Button createShapeButton(String emoji, String tooltip, String color) {
+        Button button = new Button(emoji);
+        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12; -fx-font-size: 20px; -fx-min-width: 50; -fx-min-height: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.2), 5, 0, 0, 2);");
+
+        Tooltip tp = new Tooltip(tooltip);
+        tp.setStyle("-fx-font-size: 14px; -fx-background-color: #8E44AD; -fx-text-fill: white;");
+        button.setTooltip(tp);
+
+        button.setOnMouseEntered(e -> {
+            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12; -fx-font-size: 24px; -fx-min-width: 50; -fx-min-height: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #8E44AD, 10, 0, 0, 5);");
+        });
+
+        button.setOnMouseExited(e -> {
+            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 12; -fx-font-size: 20px; -fx-min-width: 50; -fx-min-height: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(142,68,173,0.2), 5, 0, 0, 2);");
+        });
+
+        return button;
+    }
+
+    private Label createToolLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8E44AD;");
+        return label;
+    }
+
+    private void dessinerEtoile(GraphicsContext gc, double x, double y, double taille) {
+        gc.setStroke(Color.GOLD);
+        gc.setLineWidth(3);
+        double[] xPoints = new double[10];
+        double[] yPoints = new double[10];
+
+        for (int i = 0; i < 10; i++) {
+            double angle = Math.PI / 2 + i * Math.PI / 5;
+            double rayon = (i % 2 == 0) ? taille : taille / 2;
+            xPoints[i] = x + rayon * Math.cos(angle);
+            yPoints[i] = y - rayon * Math.sin(angle);
+        }
+
+        gc.strokePolygon(xPoints, yPoints, 10);
+    }
+
+    private void dessinerCoeur(GraphicsContext gc, double x, double y, double taille) {
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(3);
+        gc.strokeOval(x - taille, y - taille/2, taille, taille);
+        gc.strokeOval(x, y - taille/2, taille, taille);
+        gc.strokeLine(x - taille, y, x, y + taille);
+        gc.strokeLine(x + taille, y, x, y + taille);
+    }
+
+    private void showHappyMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("🎉 Bravo !");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #F5E6FF; -fx-background-radius: 20; -fx-border-color: #8E44AD; -fx-border-width: 3; -fx-border-radius: 20;");
+
+        alert.showAndWait();
+    }
+
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void loadCours() {
@@ -375,7 +1260,6 @@ public class CoursAffichage implements Initializable {
         return card;
     }
 
-    // Méthodes d'aide pour les couleurs et icônes
     private String getTypeColor(String type) {
         if (type == null) return "#7B2FF7";
 
@@ -464,7 +1348,6 @@ public class CoursAffichage implements Initializable {
         mainContainer.setStyle("-fx-background-color: #F0F8FF; -fx-padding: 40;");
         mainContainer.setAlignment(Pos.TOP_CENTER);
 
-        // En-tête avec bouton retour
         HBox headerBox = new HBox(20);
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setMaxWidth(1200);
@@ -481,7 +1364,6 @@ public class CoursAffichage implements Initializable {
 
         headerBox.getChildren().addAll(backButton, spacer, titleLabel);
 
-        // Carte de description
         VBox descriptionCard = new VBox(15);
         descriptionCard.setMaxWidth(1200);
         descriptionCard.setStyle(
@@ -503,7 +1385,6 @@ public class CoursAffichage implements Initializable {
 
         descriptionCard.getChildren().addAll(descriptionTitle, descriptionContent);
 
-        // Section des mots
         VBox motsSection = new VBox(15);
         motsSection.setMaxWidth(1200);
 
@@ -553,7 +1434,6 @@ public class CoursAffichage implements Initializable {
 
         motsSection.getChildren().add(motsPane);
 
-        // SECTION ÉVALUATION
         VBox evaluationSection = new VBox(15);
         evaluationSection.setMaxWidth(1200);
         evaluationSection.setAlignment(Pos.CENTER);
@@ -638,7 +1518,7 @@ public class CoursAffichage implements Initializable {
         VBox card = new VBox(15);
         card.setAlignment(Pos.CENTER);
         card.setPrefWidth(250);
-        card.setPrefHeight(250);
+        card.setPrefHeight(280);
         card.setStyle(
                 "-fx-background-color: white;" +
                         "-fx-background-radius: 30;" +
@@ -713,7 +1593,29 @@ public class CoursAffichage implements Initializable {
                         "-fx-text-alignment: center;"
         );
 
-        card.getChildren().addAll(imageContainer, motLabel);
+        Button speakerButton = new Button("🔊");
+        speakerButton.setStyle(
+                "-fx-background-color: #7B2FF7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-padding: 8 15;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-cursor: hand;"
+        );
+
+        speakerButton.setOnAction(e -> {
+            TextToSpeechManager.speak(mot);
+        });
+
+        card.setOnMouseClicked(e -> {
+            TextToSpeechManager.speak(mot);
+        });
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().add(speakerButton);
+
+        card.getChildren().addAll(imageContainer, motLabel, buttonBox);
         return card;
     }
 
@@ -864,5 +1766,13 @@ public class CoursAffichage implements Initializable {
         coursCountLabel.setText(allCours.size() + " Cours disponibles");
         searchField.clear();
         resetFilterButtons();
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

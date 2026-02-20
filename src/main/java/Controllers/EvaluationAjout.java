@@ -4,19 +4,22 @@ import Entites.Cours;
 import Entites.Evaluation;
 import Services.CoursServices;
 import Services.EvaluationServices;
+import Services.DeepSeekService;
 import Utils.Navigation;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.*;
@@ -37,6 +40,7 @@ public class EvaluationAjout implements Initializable {
     @FXML private Button ajouterQuestionBtn;
     @FXML private Button modifierQuestionBtn;
     @FXML private Button annulerModificationBtn;
+    @FXML private Button genererIAButton;
     @FXML private Button retourButton;
 
     @FXML private TableView<Evaluation> questionsTable;
@@ -49,19 +53,17 @@ public class EvaluationAjout implements Initializable {
     @FXML private TableColumn<Evaluation, Integer> scoreColumn;
     @FXML private TableColumn<Evaluation, Void> actionsColumn;
 
-
     private Map<Control, Label> errorLabels = new HashMap<>();
-
 
     private static final String STYLE_VALIDE = "-fx-border-color: #00C853; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
     private static final String STYLE_INVALIDE = "-fx-border-color: #D32F2F; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
-
 
     private static final Pattern CARACTERES_AUTORISES = Pattern.compile("^[a-zA-Z0-9\\s\\-',.!?()]+$");
     private static final Pattern PONCTUATION_EXCESSIVE = Pattern.compile(".*[!?.,]{2,}.*");
 
     private EvaluationServices evaluationServices;
     private CoursServices coursServices;
+    private DeepSeekService deepSeekService;
     private ObservableList<Evaluation> questionsList;
     private ObservableList<Cours> coursList;
     private Integer coursFiltreId = null;
@@ -72,6 +74,7 @@ public class EvaluationAjout implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         evaluationServices = new EvaluationServices();
         coursServices = new CoursServices();
+        deepSeekService = new DeepSeekService();
 
         Map<String, String> params = Navigation.getParameters();
         if (params.containsKey("coursId")) {
@@ -88,8 +91,301 @@ public class EvaluationAjout implements Initializable {
         loadQuestions();
         setupValidation();
         setupListeners();
+        setupGenererIAButton();
 
         javafx.application.Platform.runLater(this::addErrorLabels);
+    }
+
+    private void setupGenererIAButton() {
+        if (genererIAButton != null) {
+            genererIAButton.setOnAction(e -> genererQuestionsParIA());
+
+            genererIAButton.setOnMouseEntered(e -> {
+                genererIAButton.setStyle("-fx-background-color: #8E44AD; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 10 30; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(142,68,173,0.5), 10, 0, 0, 3);");
+            });
+
+            genererIAButton.setOnMouseExited(e -> {
+                genererIAButton.setStyle("-fx-background-color: #9B59B6; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 10 30; " +
+                        "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(155,89,182,0.3), 8, 0, 0, 2);");
+            });
+        }
+    }
+
+    private void genererQuestionsParIA() {
+        Cours coursSelectionne = coursCombo.getValue();
+        if (coursSelectionne == null) {
+            showAlert(Alert.AlertType.WARNING, "Attention",
+                    "Veuillez d'abord sélectionner un cours pour générer des questions");
+            return;
+        }
+
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Génération par IA");
+        confirmDialog.setHeaderText("Générer des questions pour : " + coursSelectionne.getTitre());
+        confirmDialog.setContentText("L'IA va générer automatiquement 5 questions adaptées. Voulez-vous continuer ?");
+
+        DialogPane dialogPane = confirmDialog.getDialogPane();
+        dialogPane.setStyle("-fx-border-color: #9B59B6; -fx-border-width: 3; -fx-border-radius: 15;");
+
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        okButton.setText("✅ Oui, générer");
+
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setText("❌ Non, annuler");
+
+        confirmDialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                lancerGenerationIA(coursSelectionne);
+            }
+        });
+    }
+
+    private void lancerGenerationIA(Cours cours) {
+        genererIAButton.setDisable(true);
+        genererIAButton.setText("🤖 Génération en cours...");
+
+        ProgressIndicator indicator = new ProgressIndicator();
+        indicator.setPrefSize(30, 30);
+
+        HBox parentBox = (HBox) genererIAButton.getParent();
+        parentBox.getChildren().add(parentBox.getChildren().indexOf(genererIAButton) + 1, indicator);
+
+        Task<List<DeepSeekService.GeneratedQuestion>> task = new Task<>() {
+            @Override
+            protected List<DeepSeekService.GeneratedQuestion> call() throws Exception {
+                updateMessage("Génération des questions...");
+                return deepSeekService.genererQuestions(cours.getTitre());
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            List<DeepSeekService.GeneratedQuestion> questions = task.getValue();
+
+            parentBox.getChildren().remove(indicator);
+            genererIAButton.setDisable(false);
+            genererIAButton.setText("🤖 Générer par IA");
+
+            if (questions != null && !questions.isEmpty()) {
+                afficherQuestionsGenerees(questions, cours);
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Attention",
+                        "Aucune question n'a pu être générée par l'IA.");
+            }
+        });
+
+        task.setOnFailed(event -> {
+            parentBox.getChildren().remove(indicator);
+            genererIAButton.setDisable(false);
+            genererIAButton.setText("🤖 Générer par IA");
+
+            Throwable error = task.getException();
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Échec de la génération: " + error.getMessage());
+            error.printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
+    private void afficherQuestionsGenerees(List<DeepSeekService.GeneratedQuestion> questions, Cours cours) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Questions générées par IA");
+        dialog.setHeaderText("🤖 " + questions.size() + " questions pour : " + cours.getTitre());
+
+        VBox mainContent = new VBox(20);
+        mainContent.setStyle("-fx-padding: 20; -fx-background-color: #F8F0FF;");
+        mainContent.setPrefWidth(800);
+
+        ScrollPane scrollPane = new ScrollPane(mainContent);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefHeight(600);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-width: 0;");
+
+        List<DeepSeekService.GeneratedQuestion> questionsModifiables = new ArrayList<>(questions);
+
+        // Premier affichage
+        miseAJourAffichage(mainContent, questionsModifiables, cours, dialog);
+
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().getButtonTypes().add(new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE));
+        dialog.getDialogPane().setPrefSize(900, 700);
+        dialog.getDialogPane().setStyle("-fx-background-color: white; -fx-border-color: #9B59B6; -fx-border-width: 3; -fx-border-radius: 15;");
+
+        dialog.showAndWait();
+    }
+
+    private void miseAJourAffichage(VBox mainContent,
+                                    List<DeepSeekService.GeneratedQuestion> questionsModifiables,
+                                    Cours cours,
+                                    Dialog<ButtonType> dialog) {
+        mainContent.getChildren().clear();
+
+        for (int i = 0; i < questionsModifiables.size(); i++) {
+            DeepSeekService.GeneratedQuestion q = questionsModifiables.get(i);
+            int index = i;
+
+            VBox questionBox = new VBox(10);
+            questionBox.setStyle("-fx-background-color: white; -fx-padding: 20; " +
+                    "-fx-background-radius: 15; -fx-border-color: #9B59B6; -fx-border-width: 2;");
+
+            // En-tête
+            HBox header = new HBox(10);
+            header.setAlignment(Pos.CENTER_LEFT);
+            Label numeroLabel = new Label("Question " + (i + 1));
+            numeroLabel.setStyle("-fx-background-color: #9B59B6; -fx-text-fill: white; " +
+                    "-fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold;");
+
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            Label scoreLabel = new Label(q.getScore() + " point(s)");
+            scoreLabel.setStyle("-fx-text-fill: #FFA500; -fx-font-weight: bold;");
+
+            header.getChildren().addAll(numeroLabel, spacer, scoreLabel);
+
+            // Question
+            Label questionLabel = new Label(q.getQuestion());
+            questionLabel.setWrapText(true);
+            questionLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+            // Choix
+            VBox choixBox = new VBox(8);
+            choixBox.setStyle("-fx-padding: 10; -fx-background-color: #F5F5F5; -fx-background-radius: 10;");
+
+            Label choix1Label = new Label("A. " + q.getChoix1());
+            choix1Label.setStyle("-fx-font-size: 16px; -fx-text-fill: #333;");
+
+            Label choix2Label = new Label("B. " + q.getChoix2());
+            choix2Label.setStyle("-fx-font-size: 16px; -fx-text-fill: #333;");
+
+            Label choix3Label = new Label("C. " + q.getChoix3());
+            choix3Label.setStyle("-fx-font-size: 16px; -fx-text-fill: #333;");
+
+            choixBox.getChildren().addAll(choix1Label, choix2Label, choix3Label);
+
+            // Bonne réponse
+            HBox bonneReponseBox = new HBox(10);
+            bonneReponseBox.setStyle("-fx-padding: 10; -fx-background-color: #E8F5E9; " +
+                    "-fx-background-radius: 10; -fx-border-color: #4CAF50; -fx-border-width: 2;");
+            Label correctIcon = new Label("✅");
+            Label bonneReponseLabel = new Label("Bonne réponse: " + q.getBonneReponse());
+            bonneReponseLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;");
+            bonneReponseBox.getChildren().addAll(correctIcon, bonneReponseLabel);
+
+            // Boutons
+            HBox boutonsBox = new HBox(10);
+            boutonsBox.setAlignment(Pos.CENTER);
+
+            Button ajouterBtn = new Button("➕ Ajouter cette question");
+            ajouterBtn.setStyle("-fx-background-color: #9B59B6; -fx-text-fill: white; " +
+                    "-fx-background-radius: 20; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;");
+            ajouterBtn.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(ajouterBtn, Priority.ALWAYS);
+
+            Button supprimerBtn = new Button("🗑️ Supprimer");
+            supprimerBtn.setStyle("-fx-background-color: #FF4444; -fx-text-fill: white; " +
+                    "-fx-background-radius: 20; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;");
+            supprimerBtn.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(supprimerBtn, Priority.ALWAYS);
+
+            boutonsBox.getChildren().addAll(ajouterBtn, supprimerBtn);
+
+            // Actions
+            ajouterBtn.setOnAction(e -> {
+                if (ajouterQuestionGeneree(q, cours)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Succès", "Question ajoutée avec succès !");
+                    questionsModifiables.remove(index);
+                    miseAJourAffichage(mainContent, questionsModifiables, cours, dialog);
+                    loadQuestions();
+                }
+            });
+
+            supprimerBtn.setOnAction(e -> {
+                questionsModifiables.remove(index);
+                miseAJourAffichage(mainContent, questionsModifiables, cours, dialog);
+            });
+
+            questionBox.getChildren().addAll(header, questionLabel, choixBox, bonneReponseBox, boutonsBox);
+            mainContent.getChildren().add(questionBox);
+        }
+
+        // Bouton pour tout ajouter
+        if (!questionsModifiables.isEmpty()) {
+            Button toutAjouterBtn = new Button("✅ Ajouter toutes les questions (" + questionsModifiables.size() + ")");
+            toutAjouterBtn.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; " +
+                    "-fx-background-radius: 20; -fx-padding: 15; -fx-font-size: 16px; " +
+                    "-fx-font-weight: bold; -fx-cursor: hand;");
+            toutAjouterBtn.setMaxWidth(Double.MAX_VALUE);
+
+            toutAjouterBtn.setOnAction(e -> {
+                int ajoutees = 0;
+                Iterator<DeepSeekService.GeneratedQuestion> iterator = questionsModifiables.iterator();
+                while (iterator.hasNext()) {
+                    DeepSeekService.GeneratedQuestion q = iterator.next();
+                    if (ajouterQuestionGeneree(q, cours)) {
+                        ajoutees++;
+                        iterator.remove();
+                    }
+                }
+                showAlert(Alert.AlertType.INFORMATION, "Succès", ajoutees + " questions ajoutées avec succès !");
+                if (questionsModifiables.isEmpty()) {
+                    dialog.close();
+                } else {
+                    miseAJourAffichage(mainContent, questionsModifiables, cours, dialog);
+                }
+                loadQuestions();
+            });
+
+            mainContent.getChildren().add(toutAjouterBtn);
+        }
+
+        // Message quand il n'y a plus de questions
+        if (questionsModifiables.isEmpty()) {
+            VBox emptyBox = new VBox(20);
+            emptyBox.setAlignment(Pos.CENTER);
+            emptyBox.setStyle("-fx-padding: 50;");
+
+            Label emptyIcon = new Label("🎉");
+            emptyIcon.setStyle("-fx-font-size: 80px;");
+
+            Label emptyText = new Label("Toutes les questions ont été traitées !");
+            emptyText.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #9B59B6;");
+
+            emptyBox.getChildren().addAll(emptyIcon, emptyText);
+            mainContent.getChildren().add(emptyBox);
+        }
+    }
+
+    private boolean ajouterQuestionGeneree(DeepSeekService.GeneratedQuestion q, Cours cours) {
+        try {
+            Evaluation question = new Evaluation();
+            question.setId_cours(cours.getId_cours());
+            question.setCours(cours);
+            question.setQuestion(q.getQuestion());
+            question.setChoix1(q.getChoix1());
+            question.setChoix2(q.getChoix2());
+            question.setChoix3(q.getChoix3());
+            question.setBonne_reponse(q.getBonneReponse());
+            question.setScore(q.getScore());
+
+            return evaluationServices.ajouter(question);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void addErrorLabels() {
@@ -151,7 +447,6 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void setupValidation() {
-
         questionArea.textProperty().addListener((obs, old, newValue) -> {
             validerQuestion();
         });
@@ -161,16 +456,13 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-
         setupChoixValidation(choix1Field, "Choix 1");
         setupChoixValidation(choix2Field, "Choix 2");
         setupChoixValidation(choix3Field, "Choix 3");
 
-
         bonneReponseCombo.valueProperty().addListener((obs, old, newValue) -> {
             validerBonneReponse();
         });
-
 
         scoreField.textProperty().addListener((obs, old, newValue) -> {
             validerScore();
@@ -181,18 +473,14 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-
         coursCombo.valueProperty().addListener((obs, old, newValue) -> {
             validerCours();
         });
     }
 
-
     private void setupChoixValidation(TextField field, String nomChamp) {
-        // Validation à chaque frappe
         field.textProperty().addListener((obs, old, newValue) -> {
             if (field.isFocused()) {
-
                 javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(300));
                 pause.setOnFinished(e -> {
                     validerChoix(field, nomChamp);
@@ -202,7 +490,6 @@ public class EvaluationAjout implements Initializable {
             }
         });
 
-
         field.focusedProperty().addListener((obs, old, newValue) -> {
             if (!newValue) {
                 validerChoix(field, nomChamp);
@@ -210,7 +497,6 @@ public class EvaluationAjout implements Initializable {
             }
         });
     }
-
 
     private boolean validerQuestion() {
         String question = questionArea.getText();
@@ -222,7 +508,6 @@ public class EvaluationAjout implements Initializable {
         }
 
         String trimmed = question.trim();
-
 
         String[] mots = trimmed.split("\\s+");
         if (mots.length < 3) {
@@ -237,7 +522,6 @@ public class EvaluationAjout implements Initializable {
             return false;
         }
 
-
         if (!trimmed.endsWith("?")) {
             questionArea.setStyle(STYLE_INVALIDE);
             showError(questionArea, "La question doit se terminer par un point d'interrogation (?)");
@@ -249,26 +533,21 @@ public class EvaluationAjout implements Initializable {
         return true;
     }
 
-
     private boolean validerChoix1() {
         return validerChoix(choix1Field, "Choix 1");
     }
-
 
     private boolean validerChoix2() {
         return validerChoix(choix2Field, "Choix 2");
     }
 
-
     private boolean validerChoix3() {
         return validerChoix(choix3Field, "Choix 3");
     }
 
-
     private boolean validerChoix(TextField field, String nomChamp) {
         String choix = field.getText();
         List<String> erreurs = new ArrayList<>();
-
 
         if (choix == null || choix.trim().isEmpty()) {
             field.setStyle(STYLE_INVALIDE);
@@ -278,26 +557,21 @@ public class EvaluationAjout implements Initializable {
 
         String trimmed = choix.trim();
 
-
         if (trimmed.length() < 2) {
             erreurs.add(nomChamp + " doit contenir au moins 2 caractères (actuellement: " + trimmed.length() + ")");
         }
-
 
         if (trimmed.length() > 100) {
             erreurs.add(nomChamp + " ne doit pas dépasser 100 caractères (actuellement: " + trimmed.length() + ")");
         }
 
-
         if (!CARACTERES_AUTORISES.matcher(trimmed).matches()) {
             erreurs.add(nomChamp + " ne doit contenir que des lettres, chiffres et ponctuation de base (.,!?()'-)");
         }
 
-
         if (PONCTUATION_EXCESSIVE.matcher(trimmed).matches()) {
             erreurs.add(nomChamp + " ne doit pas contenir de ponctuation répétée (ex: '!!', '..', '??')");
         }
-
 
         List<String> erreursDoublons = verifierDoublonsChoix(trimmed, field);
         erreurs.addAll(erreursDoublons);
@@ -313,7 +587,6 @@ public class EvaluationAjout implements Initializable {
         return true;
     }
 
-
     private List<String> verifierDoublonsChoix(String valeur, TextField fieldActuel) {
         List<String> erreurs = new ArrayList<>();
 
@@ -321,16 +594,13 @@ public class EvaluationAjout implements Initializable {
         String choix2 = choix2Field.getText() != null ? choix2Field.getText().trim() : "";
         String choix3 = choix3Field.getText() != null ? choix3Field.getText().trim() : "";
 
-
         int occurrences = 0;
 
         if (!choix1.isEmpty() && valeur.equalsIgnoreCase(choix1)) occurrences++;
         if (!choix2.isEmpty() && valeur.equalsIgnoreCase(choix2)) occurrences++;
         if (!choix3.isEmpty() && valeur.equalsIgnoreCase(choix3)) occurrences++;
 
-
         if (occurrences > 1) {
-            // Déterminer quels choix sont en conflit
             List<String> conflits = new ArrayList<>();
             if (!choix1.isEmpty() && valeur.equalsIgnoreCase(choix1) && fieldActuel != choix1Field) {
                 conflits.add("Choix 1");
@@ -356,7 +626,6 @@ public class EvaluationAjout implements Initializable {
         return erreurs;
     }
 
-
     private boolean validerBonneReponse() {
         String bonneReponse = bonneReponseCombo.getValue();
 
@@ -365,7 +634,6 @@ public class EvaluationAjout implements Initializable {
             showError(bonneReponseCombo, "Veuillez sélectionner la bonne réponse");
             return false;
         }
-
 
         String choix1 = choix1Field.getText().trim();
         String choix2 = choix2Field.getText().trim();
@@ -381,7 +649,6 @@ public class EvaluationAjout implements Initializable {
         hideError(bonneReponseCombo);
         return true;
     }
-
 
     private boolean validerScore() {
         String scoreText = scoreField.getText();
@@ -414,7 +681,6 @@ public class EvaluationAjout implements Initializable {
         }
     }
 
-
     private boolean validerCours() {
         Cours cours = coursCombo.getValue();
         if (cours == null) {
@@ -427,7 +693,6 @@ public class EvaluationAjout implements Initializable {
             return true;
         }
     }
-
 
     private boolean validateAllFields() {
         boolean questionValide = validerQuestion();
@@ -443,7 +708,7 @@ public class EvaluationAjout implements Initializable {
     }
 
     private void initializeComboBoxes() {
-        coursCombo.setConverter(new StringConverter<Cours>() {
+        coursCombo.setConverter(new javafx.util.StringConverter<Cours>() {
             @Override
             public String toString(Cours cours) {
                 return cours == null ? "" : cours.getTitre() + " (" + cours.getNiveau() + ")";
