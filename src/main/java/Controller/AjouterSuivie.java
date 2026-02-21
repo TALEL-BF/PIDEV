@@ -1,7 +1,12 @@
 package Controller;
 
 import Entites.Suivie;
+import Entites.Therapie;
+import IServices.ISuivieServices;
+import Services.CompteRenduPdfService;
+import Services.MailService;
 import Services.SuivieServices;
+import Services.TherapieServices;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,30 +17,39 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import Entites.Therapie;
-import Services.TherapieServices;
+
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.util.StringConverter;
+import java.time.format.DateTimeFormatter;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class AjouterSuivie {
 
+    // ====== UI (FXML) ======
     @FXML private FlowPane cardsPane;
     @FXML private Label countLabel;
     @FXML private TextField searchField;
     @FXML private Button btnAjouter;
     @FXML private VBox emptyBox;
-    @FXML
-    private BorderPane root;
+    @FXML private BorderPane root;
 
     @FXML private ToggleButton tbConsultations;
     @FXML private VBox consultationsSubMenu;
@@ -45,25 +59,45 @@ public class AjouterSuivie {
     @FXML private Button btnSubTherapie;
     @FXML private Button btnSubArticles;
 
-
     @FXML private Button btnMenuSuivie;
     @FXML private Button btnMenuTherapie;
+    @FXML private Button btnMenuArticles;
 
-    // Stats UI
+    // Stats UI (dans ton FXML)
     @FXML private ComboBox<String> cbEnfantStats;
     @FXML private Button btnRefreshStats;
     @FXML private Label lblDeltaHumeur, lblDeltaStress, lblDeltaAttention;
-    @FXML private javafx.scene.chart.LineChart<String, Number> monthlyChart;
     @FXML private VBox statsBox;
     @FXML private Label lblToggleStats;
-    @FXML private Button btnMenuArticles;
+    @FXML private NumberAxis xAxisStats;
+    @FXML private NumberAxis yAxisStats;
+    @FXML private LineChart<Number, Number> lineConsultations;
 
+    // Champs qui existent peut-être dans ton projet (si pas dans ton FXML -> restent null, OK)
+    @FXML private StackedBarChart<String, Number> stackedMonthly;
+    @FXML private LineChart<String, Number> monthlyLine;
+    @FXML private LineChart<String, Number> monthlyChart;
+    @FXML private BarChart<String, Number> barMonthly;
     @FXML private Button btnAjouterFab;
 
-    private SuivieServices suivieService;
-    private Services.StatsServices statsService;
 
+    // ====== DATA / SERVICE ======
     private final ObservableList<Suivie> master = FXCollections.observableArrayList();
+    private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/yyyy");
+    // ✅ UN SEUL SERVICE : interface + impl (BONNE PRATIQUE)
+    private final ISuivieServices suivieService = new SuivieServices();
+    // Affichage date sur l'axe X
+    private static final DateTimeFormatter AXIS_FMT = DateTimeFormatter.ofPattern("dd/MM");
+
+    // Optionnel: date + heure si tu veux
+    private static final DateTimeFormatter AXIS_FMT_DT = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+
+    private String labelDateForAxis(Suivie s) {
+        if (s == null || s.getDateSuivie() == null) return "";
+        // choisis 1 des 2 :
+        return s.getDateSuivie().toLocalDateTime().format(AXIS_FMT);     // juste date
+        // return s.getDateSuivie().toLocalDateTime().format(AXIS_FMT_DT); // date+heure
+    }
 
     // Styles bordures
     private static final String STYLE_OK   = "-fx-border-color: #22c55e; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
@@ -77,42 +111,29 @@ public class AjouterSuivie {
         initUiListeners();
         initStatsToggle();
 
-        try {
-            suivieService = new SuivieServices();
-            reloadFromDb();
-        } catch (Exception ex) {
-            showDbError(ex);
-        }
+        // Chargement DB (catch ici => plus de "Unhandled SQLException")
+        reloadFromDb();
 
-        try {
-            statsService = new Services.StatsServices();
-            loadStatsUI();
-        } catch (Exception ex) {
-            disableStatsUI();
-        }
-
-        // ✅ On est dans Gestion Consultations -> Suivie au démarrage
+        // sidebar active
         setParentConsultationsActive(true);
-        setSubActive(btnSubSuivie);
+        if (btnSubSuivie != null) setSubActive(btnSubSuivie);
 
-// Clicks
-        btnSubSuivie.setOnAction(e -> {
-            setSubActive(btnSubSuivie);
-            switchTo("/AjouterSuivie.fxml");   // ou la page Suivie
-        });
+        if (btnSubSuivie != null) {
+            btnSubSuivie.setOnAction(e -> { setSubActive(btnSubSuivie); switchTo("/AjouterSuivie.fxml"); });
+        }
+        if (btnSubTherapie != null) {
+            btnSubTherapie.setOnAction(e -> { setSubActive(btnSubTherapie); switchTo("/AjouterTherapie.fxml"); });
+        }
+        if (btnSubArticles != null) {
+            btnSubArticles.setOnAction(e -> { setSubActive(btnSubArticles); switchTo("/GestionArticlesBack.fxml"); });
+        }
 
-        btnSubTherapie.setOnAction(e -> {
-            setSubActive(btnSubTherapie);
-            switchTo("/AjouterTherapie.fxml"); // ou la page Thérapie
-        });
-
-        btnSubArticles.setOnAction(e -> {
-            setSubActive(btnSubArticles);
-            switchTo("/GestionArticlesBack.fxml"); // ou ta page Articles
-        });
-
+        initStatsUI();
     }
 
+    // -----------------------------
+    // UI listeners
+    // -----------------------------
     private void initUiListeners() {
         if (searchField != null) {
             ChangeListener<Object> refreshListener = (obs, o, n) -> refreshCards();
@@ -130,7 +151,9 @@ public class AjouterSuivie {
         if (btnAjouterFab != null) {
             btnAjouterFab.setOnAction(e -> onAjouter());
         }
-
+        if (btnMenuArticles != null) {
+            btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
+        }
     }
 
     private void initSidebarDropdown() {
@@ -163,10 +186,13 @@ public class AjouterSuivie {
     // DB load + cards
     // -----------------------------
     private void reloadFromDb() {
-        if (suivieService == null) return;
-        List<Suivie> list = suivieService.afficherSuivie();
-        master.setAll(list);
-        refreshCards();
+        try {
+            List<Suivie> list = suivieService.afficherSuivie();
+            master.setAll(list);
+            refreshCards();
+        } catch (Exception ex) {
+            showDbError(ex);
+        }
     }
 
     private void refreshCards() {
@@ -188,8 +214,6 @@ public class AjouterSuivie {
             emptyBox.setVisible(empty);
             emptyBox.setManaged(empty);
         }
-        if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
-
     }
 
     private boolean matchesSearch(Suivie s, String q) {
@@ -275,31 +299,31 @@ public class AjouterSuivie {
     // CRUD
     // -----------------------------
     private void onAjouter() {
-        if (!ensureDbReady()) return;
-
         Optional<Suivie> res = showSuivieWindow(null, "Ajouter un suivi");
         res.ifPresent(s -> {
-            suivieService.ajouterSuivie(s);
-            reloadFromDb();
-            loadStatsUI();
+            try {
+                suivieService.ajouterSuivie(s);
+                reloadFromDb();
+            } catch (Exception ex) {
+                showDbError(ex);
+            }
         });
     }
 
     private void onEdit(Suivie exist) {
-        if (!ensureDbReady()) return;
-
         Optional<Suivie> res = showSuivieWindow(exist, "Modifier le suivi");
         res.ifPresent(updated -> {
-            updated.setIdSuivie(exist.getIdSuivie());
-            suivieService.modifierSuivie(updated);
-            reloadFromDb();
-            loadStatsUI();
+            try {
+                updated.setIdSuivie(exist.getIdSuivie());
+                suivieService.modifierSuivie(updated);
+                reloadFromDb();
+            } catch (Exception ex) {
+                showDbError(ex);
+            }
         });
     }
 
     private void onSupprimer(Suivie s) {
-        if (!ensureDbReady()) return;
-
         Stage stage = createCustomStage("Suppression", 640, 320);
 
         VBox content = new VBox(12);
@@ -327,10 +351,13 @@ public class AjouterSuivie {
         Button del = new Button("Supprimer");
         del.getStyleClass().addAll("btn-danger", "btn-hover");
         del.setOnAction(e -> {
-            suivieService.supprimerSuivie(s.getIdSuivie());
-            stage.close();
-            reloadFromDb();
-            loadStatsUI();
+            try {
+                suivieService.supprimerSuivie(s.getIdSuivie());
+                stage.close();
+                reloadFromDb();
+            } catch (Exception ex) {
+                showDbError(ex);
+            }
         });
 
         actions.getChildren().addAll(cancel, del);
@@ -347,15 +374,17 @@ public class AjouterSuivie {
         VBox content = new VBox(14);
         content.getStyleClass().add("custom-content");
 
-        String date = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalDate().toString();
-        String heure = (s.getDateSuivie() == null) ? "-" : s.getDateSuivie().toLocalDateTime().toLocalTime().withSecond(0).withNano(0).toString();
+        String date = (s.getDateSuivie() == null) ? "-" :
+                s.getDateSuivie().toLocalDateTime().toLocalDate().toString();
+
+        String heure = (s.getDateSuivie() == null) ? "-" :
+                s.getDateSuivie().toLocalDateTime().toLocalTime().withSecond(0).withNano(0).toString();
 
         GridPane grid = new GridPane();
         grid.setHgap(18);
         grid.setVgap(12);
         grid.getStyleClass().add("details-grid");
 
-        // ✅ colonnes propres (clé 180px, valeur prend le reste)
         ColumnConstraints c1 = new ColumnConstraints();
         c1.setMinWidth(180);
         c1.setPrefWidth(180);
@@ -377,12 +406,14 @@ public class AjouterSuivie {
         addRow(grid, r++, "Heure", heure);
         addRow(grid, r++, "Scores (H/S/A)", s.getScoreHumeur()+" / "+s.getScoreStress()+" / "+s.getScoreAttention());
 
-        // ✅ Exercice recommandé (1 seule fois)
+        // Charger nom exercice si déjà présent
         String exerciceNom = "Aucun exercice choisi";
         try {
-            TherapieServices ts = new TherapieServices();
-            Therapie t = ts.getTherapieById(s.getIdTherapieReco());
-            if (t != null && t.getNomExercice() != null) exerciceNom = t.getNomExercice();
+            if (s.getIdTherapieReco() != null) {
+                TherapieServices ts = new TherapieServices();
+                Therapie t0 = ts.getTherapieById(s.getIdTherapieReco());
+                if (t0 != null && t0.getNomExercice() != null) exerciceNom = t0.getNomExercice();
+            }
         } catch (Exception ex) {
             exerciceNom = "Erreur chargement exercice";
         }
@@ -400,7 +431,7 @@ public class AjouterSuivie {
         obs.getStyleClass().add("details-box");
         obs.setMaxWidth(Double.MAX_VALUE);
 
-        // ✅ Footer buttons bien alignés
+        // ===== Actions =====
         HBox actions = new HBox(12);
         actions.getStyleClass().add("dialog-footer");
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -408,35 +439,93 @@ public class AjouterSuivie {
         Button btnExercices = new Button("Exercices adaptés");
         btnExercices.getStyleClass().addAll("btn-solid-dark","btn-hover");
 
+        Button btnEnvoyerPdf = new Button("Envoyer PDF au parent");
+        btnEnvoyerPdf.getStyleClass().addAll("btn-solid-dark","btn-hover");
+        btnEnvoyerPdf.setDisable(s.getIdTherapieReco() == null);
+
+        // 1) Choisir exercice
         btnExercices.setOnAction(e -> {
             try {
                 Optional<Therapie> chosen = showExercicesAdaptesWindow(s);
                 chosen.ifPresent(t -> {
                     lblExercice.setText(t.getNomExercice());
+
+                    // Important : mettre à jour l'objet sélectionné
+                    s.setIdTherapieReco(t.getIdTherapie());
+
+                    // Mettre à jour la liste master (pour refresh UI ailleurs)
                     for (Suivie x : master) {
                         if (x.getIdSuivie() == s.getIdSuivie()) {
                             x.setIdTherapieReco(t.getIdTherapie());
                             break;
                         }
                     }
+
+                    // activer le bouton PDF
+                    btnEnvoyerPdf.setDisable(false);
                 });
             } catch (Exception ex) {
-                ex.printStackTrace();
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setTitle("Erreur");
-                a.setHeaderText("Exercices adaptés - erreur");
-                a.setContentText(ex.getMessage());
-                a.showAndWait();
+                showDbError(ex);
             }
+        });
+
+        // 2) Générer PDF + envoyer au parent
+        btnEnvoyerPdf.setOnAction(e -> {
+            if (s.getEmailParent() == null || s.getEmailParent().isBlank()) {
+                showAlert("Email parent manquant", "Impossible d’envoyer : EMAIL_PARENT est vide.");
+                return;
+            }
+            if (s.getIdTherapieReco() == null) {
+                showAlert("Exercice manquant", "Choisis un exercice adapté avant l’envoi.");
+                return;
+            }
+
+            javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+
+                    // a) charger thérapie complète
+                    TherapieServices ts = new TherapieServices();
+                    Therapie therapie = ts.getTherapieById(s.getIdTherapieReco());
+
+                    // b) générer PDF pro (suivi + exercice complet)
+                    CompteRenduPdfService pdfService = new CompteRenduPdfService();
+                    java.io.File pdfFile = pdfService.generate(s, therapie);
+
+                    // c) sauver en base (ID_THERAPIE_RECO + CR_PDF_PATH si tu le gères)
+                    s.setCrPdfPath(pdfFile.getAbsolutePath()); // si ton Entité a ce champ
+                    SuivieServices ss = new SuivieServices();
+                    ss.modifierSuivie(s);
+
+                    // d) envoyer mail + PDF
+                    MailService mail = new MailService(
+                            System.getenv("GMAIL_USER"),
+                            System.getenv("GMAIL_APP_PASSWORD")
+                    );
+
+                    mail.sendWithAttachment(
+                            s.getEmailParent(),
+                            "Compte rendu (PDF) - " + safe(s.getNomEnfant()),
+                            "Bonjour,\nVeuillez trouver en pièce jointe le compte rendu du suivi et l'exercice recommandé.\nCordialement.",
+                            pdfFile
+                    );
+
+                    return null;
+                }
+            };
+
+            task.setOnSucceeded(ev -> showAlert("Succès", "📧 PDF envoyé au parent : " + s.getEmailParent()));
+            task.setOnFailed(ev -> showAlert("Erreur", "❌ Envoi échoué : " + task.getException().getMessage()));
+
+            new Thread(task).start();
         });
 
         Button close = new Button("Fermer");
         close.getStyleClass().addAll("btn-solid-dark", "btn-hover");
         close.setOnAction(e -> stage.close());
 
-        actions.getChildren().addAll(btnExercices, close);
+        actions.getChildren().addAll(btnExercices, btnEnvoyerPdf, close);
 
-        // ✅ si contenu طويل: نخليه scroll داخل modal
         VBox inner = new VBox(14, grid, obsTitle, obs, actions);
         inner.setFillWidth(true);
 
@@ -451,11 +540,16 @@ public class AjouterSuivie {
         setCenter(stage, content);
         stage.showAndWait();
     }
-
+    private void showAlert(String title, String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle(title);
+        a.setHeaderText(null);
+        a.setContentText(msg);
+        a.showAndWait();
+    }
 
     // ==========================================================
-    // Fenêtre Ajouter / Modifier (PRO: rouge/vert + erreurs + date future)
-    // Niveau séance + scores: 0 rouge, >=1 vert, retour à 0 rouge
+    // Fenêtre Ajouter / Modifier
     // ==========================================================
     private Optional<Suivie> showSuivieWindow(Suivie s, String title) {
 
@@ -464,7 +558,6 @@ public class AjouterSuivie {
         VBox content = new VBox(12);
         content.getStyleClass().add("custom-content");
 
-        // Message erreurs global
         Label lblErrors = new Label("");
         lblErrors.setWrapText(true);
         lblErrors.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: 800;");
@@ -482,7 +575,6 @@ public class AjouterSuivie {
                         : s.getDateSuivie().toLocalDateTime().toLocalDate()
         );
 
-        // ✅ BLOQUER dates passées
         dpDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate item, boolean empty) {
@@ -502,7 +594,6 @@ public class AjouterSuivie {
         );
         tfHeure.setPromptText("HH:mm (ex: 11:00)");
 
-        // ✅ Spinners : 0 au départ => ROUGE ; >=1 => VERT ; retour à 0 => ROUGE
         Spinner<Integer> spH = new Spinner<>();
         Spinner<Integer> spS = new Spinner<>();
         Spinner<Integer> spA = new Spinner<>();
@@ -530,7 +621,6 @@ public class AjouterSuivie {
             spA.getValueFactory().setValue(s.getScoreAttention());
         }
 
-        // ✅ État (+ Normal)
         ComboBox<String> cbEtat = new ComboBox<>();
         cbEtat.getItems().addAll("Normal", "Immobile", "Il ne bouge pas", "Il n'entend pas", "Il ne voit pas");
         String etatInit = (s == null) ? "" : safe(s.getStatut());
@@ -549,7 +639,6 @@ public class AjouterSuivie {
         TextArea taObs = new TextArea(s == null ? "" : safe(s.getObservation()));
         taObs.setPrefRowCount(5);
 
-        // -------- Filtrage strict
         tfNom.textProperty().addListener((obs, oldV, newV) -> {
             if (newV == null) return;
             String cleaned = newV.replaceAll("[^a-zA-ZÀ-ÿ\\s]", "");
@@ -589,7 +678,6 @@ public class AjouterSuivie {
             if (newV != null && newV.length() > 500) taObs.setText(newV.substring(0, 500));
         });
 
-        // -------- Layout
         GridPane gp = new GridPane();
         gp.setHgap(18);
         gp.setVgap(14);
@@ -636,30 +724,26 @@ public class AjouterSuivie {
 
         final Suivie[] result = {null};
 
-        // =====================
-        // VALIDATION PRO TOTALE
-        // =====================
         save.setDisable(true);
 
         Runnable validateAll = () -> {
             List<String> errors = new ArrayList<>();
 
-            boolean okNom   = validateNom(tfNom, errors);
-            boolean okAge   = validateAge(tfAge, errors);
-            boolean okEmail = validateEmail(tfEmail, errors);
-            boolean okPsy   = validatePsy(tfPsy, errors);
-            boolean okDate  = validateDateNotPast(dpDate, errors);
-            boolean okHeure = validateHeure(tfHeure, errors);
+            validateNom(tfNom, errors);
+            validateAge(tfAge, errors);
+            validateEmail(tfEmail, errors);
+            validatePsy(tfPsy, errors);
+            validateDateNotPast(dpDate, errors);
+            validateHeure(tfHeure, errors);
 
-            boolean okEtat  = validateCombo(cbEtat, "État", errors);
-            boolean okComp  = validateCombo(cbComportement, "Comportement", errors);
-            boolean okInter = validateCombo(cbInteraction, "Interaction sociale", errors);
+            validateCombo(cbEtat, "État", errors);
+            validateCombo(cbComportement, "Comportement", errors);
+            validateCombo(cbInteraction, "Interaction sociale", errors);
 
-            // ✅ Niveau + Scores : 0 = ROUGE, >=1 = VERT, retour 0 = ROUGE
-            boolean okNiv = validateSpinnerMin1(spNiveau, "Niveau séance", errors);
-            boolean okSH  = validateSpinnerMin1(spH, "Score humeur", errors);
-            boolean okSS  = validateSpinnerMin1(spS, "Score stress", errors);
-            boolean okSA  = validateSpinnerMin1(spA, "Score attention", errors);
+            validateSpinnerMin1(spNiveau, "Niveau séance", errors);
+            validateSpinnerMin1(spH, "Score humeur", errors);
+            validateSpinnerMin1(spS, "Score stress", errors);
+            validateSpinnerMin1(spA, "Score attention", errors);
 
             if (errors.isEmpty()) {
                 lblErrors.setText("");
@@ -672,7 +756,6 @@ public class AjouterSuivie {
             taObs.setStyle(STYLE_NONE);
         };
 
-        // listeners
         tfNom.textProperty().addListener((o, a, b) -> validateAll.run());
         tfAge.textProperty().addListener((o, a, b) -> validateAll.run());
         tfEmail.textProperty().addListener((o, a, b) -> validateAll.run());
@@ -683,7 +766,6 @@ public class AjouterSuivie {
         cbComportement.valueProperty().addListener((o, a, b) -> validateAll.run());
         cbInteraction.valueProperty().addListener((o, a, b) -> validateAll.run());
 
-        // ✅ important: écouter les flèches + saisie dans les spinners
         spNiveau.valueProperty().addListener((o,a,b) -> validateAll.run());
         spH.valueProperty().addListener((o,a,b) -> validateAll.run());
         spS.valueProperty().addListener((o,a,b) -> validateAll.run());
@@ -694,10 +776,8 @@ public class AjouterSuivie {
         spS.getEditor().textProperty().addListener((o,a,b) -> validateAll.run());
         spA.getEditor().textProperty().addListener((o,a,b) -> validateAll.run());
 
-        // ✅ Au démarrage : 0 => rouges
         validateAll.run();
 
-        // -------- Save
         save.setOnAction(e -> {
             validateAll.run();
             if (save.isDisable()) return;
@@ -730,7 +810,6 @@ public class AjouterSuivie {
                         null
                 );
 
-                // sécurité setters
                 created.setEmailParent(tfEmail.getText().trim());
                 created.setNiveauSeance(niveau);
                 created.setStatut(cbEtat.getValue());
@@ -750,7 +829,7 @@ public class AjouterSuivie {
     }
 
     // -----------------------------
-    // VALIDATORS (avec bordure)
+    // VALIDATORS
     // -----------------------------
     private boolean validateNom(TextField tf, List<String> errors) {
         String v = tf.getText() == null ? "" : tf.getText().trim();
@@ -819,17 +898,14 @@ public class AjouterSuivie {
         return ok;
     }
 
-    // ✅ appliquer style sur le spinner (éditeur)
     private void applySpinnerBorder(Spinner<Integer> sp, boolean ok) {
         if (sp == null) return;
         sp.getEditor().setStyle(ok ? STYLE_OK : STYLE_BAD);
     }
 
-    // ✅ 0 => ROUGE ; 1..10 => VERT ; retour 0 => ROUGE ; texte => ROUGE
     private boolean validateSpinnerMin1(Spinner<Integer> sp, String label, List<String> errors) {
         String txt = sp.getEditor().getText() == null ? "" : sp.getEditor().getText().trim();
-        boolean ok = false;
-
+        boolean ok;
         try {
             int v = Integer.parseInt(txt);
             ok = (v >= 1 && v <= 10);
@@ -852,10 +928,10 @@ public class AjouterSuivie {
         Stage stage = new Stage(StageStyle.TRANSPARENT);
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        StackPane root = new StackPane();
-        root.setPadding(new Insets(18));
-        root.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
-        root.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
+        StackPane rootPane = new StackPane();
+        rootPane.setPadding(new Insets(18));
+        rootPane.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
+        rootPane.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
 
         BorderPane shell = new BorderPane();
         shell.getStyleClass().add("custom-window-shell");
@@ -879,14 +955,14 @@ public class AjouterSuivie {
         shell.setTop(header);
         shell.setCenter(new Pane());
 
-        root.getChildren().add(shell);
+        rootPane.getChildren().add(shell);
 
         final double[] dx = {0};
         final double[] dy = {0};
         header.setOnMousePressed(e -> { dx[0] = e.getSceneX(); dy[0] = e.getSceneY(); });
         header.setOnMouseDragged(e -> { stage.setX(e.getScreenX() - dx[0]); stage.setY(e.getScreenY() - dy[0]); });
 
-        Scene scene = new Scene(root, w, h);
+        Scene scene = new Scene(rootPane, w, h);
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
 
@@ -903,16 +979,8 @@ public class AjouterSuivie {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent newRoot = loader.load();
 
-            // ✅ toujours safe (root موجود في نفس الصفحة)
-            Scene scene = root.getScene();
-            if (scene == null) {
-                // fallback (au cas où)
-                Stage stage = (Stage) root.getScene().getWindow();
-                stage.getScene().setRoot(newRoot);
-                return;
-            }
-
-            scene.setRoot(newRoot);
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.getScene().setRoot(newRoot);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -924,60 +992,25 @@ public class AjouterSuivie {
         }
     }
 
-
-
     // -----------------------------
-    // Stats
+    // Stats (toggle + UI)
     // -----------------------------
-    private void loadStatsUI() {
-        if (statsService == null) return;
-        if (cbEnfantStats == null || btnRefreshStats == null || monthlyChart == null
-                || lblDeltaHumeur == null || lblDeltaStress == null || lblDeltaAttention == null) return;
-
-        cbEnfantStats.getItems().setAll(statsService.getAllEnfants());
-
-        btnRefreshStats.setOnAction(e -> refreshStats());
-        cbEnfantStats.setOnAction(e -> refreshStats());
-
-        if (!cbEnfantStats.getItems().isEmpty()) {
-            cbEnfantStats.getSelectionModel().select(0);
-            refreshStats();
+    private void initStatsToggle() {
+        if (statsBox == null) return;
+        setStatsVisible(false);
+        if (lblToggleStats != null) {
+            lblToggleStats.setOnMouseClicked(e -> setStatsVisible(!statsBox.isVisible()));
         }
     }
 
-    private void refreshStats() {
-        if (statsService == null) return;
+    private void setStatsVisible(boolean show) {
+        if (statsBox == null) return;
+        statsBox.setVisible(show);
+        statsBox.setManaged(show);
 
-        String enfant = cbEnfantStats.getValue();
-        if (enfant == null || enfant.isBlank()) return;
-
-        Entites.StatsSeanceDelta d = statsService.getLastDelta(enfant);
-
-        if (d == null || d.prevHumeur == null) {
-            lblDeltaHumeur.setText("-");
-            lblDeltaStress.setText("-");
-            lblDeltaAttention.setText("-");
-        } else {
-            lblDeltaHumeur.setText(String.valueOf(d.deltaH()));
-            lblDeltaStress.setText(String.valueOf(d.progressStress()));
-            lblDeltaAttention.setText(String.valueOf(d.deltaA()));
+        if (lblToggleStats != null) {
+            lblToggleStats.setText(show ? "▾ Statistiques" : "▸ Statistiques");
         }
-
-        monthlyChart.getData().clear();
-
-        var sH = new javafx.scene.chart.XYChart.Series<String, Number>(); sH.setName("Humeur");
-        var sS = new javafx.scene.chart.XYChart.Series<String, Number>(); sS.setName("Stress");
-        var sA = new javafx.scene.chart.XYChart.Series<String, Number>(); sA.setName("Attention");
-
-        List<Entites.StatsMensuelle> list = statsService.getMonthlyStats(enfant);
-        for (Entites.StatsMensuelle m : list) {
-            String label = String.format("%02d/%d", m.month, m.year);
-            sH.getData().add(new javafx.scene.chart.XYChart.Data<>(label, m.avgHumeur));
-            sS.getData().add(new javafx.scene.chart.XYChart.Data<>(label, m.avgStress));
-            sA.getData().add(new javafx.scene.chart.XYChart.Data<>(label, m.avgAttention));
-        }
-
-        monthlyChart.getData().addAll(sH, sS, sA);
     }
 
     private void disableStatsUI() {
@@ -989,91 +1022,141 @@ public class AjouterSuivie {
         if (monthlyChart != null) monthlyChart.setVisible(false);
     }
 
-    // -----------------------------
-    // Helpers
-    // -----------------------------
-    private Label label(String t) {
-        Label l = new Label(t);
-        l.getStyleClass().add("details-key");
-        return l;
-    }
-
-    private Label addRow(GridPane g, int row, String k, String v) {
-        Label lk = new Label(k);
-        lk.getStyleClass().add("details-key");
-
-        Label lv = new Label(v);
-        lv.getStyleClass().add("details-val");
-        lv.setWrapText(true);
-
-        g.add(lk, 0, row);
-        g.add(lv, 1, row);
-
-        return lv; // ✅ important
-    }
-
-
-    private Timestamp buildTimestamp(LocalDate d, String hhmm) {
-        LocalTime t;
+    private void initStatsUI() {
         try {
-            t = LocalTime.parse(hhmm.length() == 5 ? hhmm : "10:00");
-        } catch (Exception e) {
-            t = LocalTime.of(10, 0);
-        }
-        return Timestamp.valueOf(d.atTime(t));
-    }
+            if (cbEnfantStats != null) {
+                cbEnfantStats.getItems().setAll(suivieService.listerNomsEnfants());
+            }
+            if (btnRefreshStats != null) {
+                btnRefreshStats.setOnAction(e -> refreshStats());
+            }
+            if (lblToggleStats != null) {
+                lblToggleStats.setOnMouseClicked(e -> toggleStats());
+            }
+            if (lineConsultations != null) {
+                lineConsultations.setAnimated(false);
+                lineConsultations.setCreateSymbols(true);
+                lineConsultations.getData().clear();
+            }
+            cbEnfantStats.getItems().setAll(suivieService.listerNomsEnfants());
+            btnRefreshStats.setOnAction(e -> refreshStats());
+            lblToggleStats.setOnMouseClicked(e -> toggleStats());
 
-    private String safe(String s) { return s == null ? "" : s; }
-
-    private void showDbError(Exception ex) {
-        Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle("Erreur");
-        a.setHeaderText("Problème lors de l'opération");
-        a.setContentText(ex == null ? "" : ex.getMessage());
-        a.showAndWait();
-    }
-
-    private boolean ensureDbReady() {
-        try {
-            if (suivieService == null) suivieService = new SuivieServices();
-            if (statsService == null)  statsService = new Services.StatsServices();
-            return true;
+            configureLineChartReadable(lineConsultations);
+            lineConsultations.getData().clear();
+            configureCartesianChart();
         } catch (Exception ex) {
             showDbError(ex);
-            return false;
+            disableStatsUI();
         }
     }
 
-    private void initStatsToggle() {
+    private void toggleStats() {
         if (statsBox == null) return;
-        setStatsVisible(false);
-        if (lblToggleStats != null) {
-            lblToggleStats.setOnMouseClicked(e -> setStatsVisible(!statsBox.isVisible()));
-        }
-    }
-
-    private void setStatsVisible(boolean show) {
+        boolean show = !statsBox.isVisible();
         statsBox.setVisible(show);
         statsBox.setManaged(show);
-
         if (lblToggleStats != null) {
             lblToggleStats.setText(show ? "▾ Statistiques" : "▸ Statistiques");
         }
-
-        if (show && ensureDbReady()) {
-            loadStatsUI();
-            refreshStats();
-        }
     }
-    private String niveauFromScore(int score) {
-        // sécurité si data ancienne contient 0
-        if (score <= 0) return "faible";
 
+    private void refreshStats() {
+
+        String enfant = (cbEnfantStats == null) ? null : cbEnfantStats.getValue();
+        if (enfant == null || enfant.isBlank()) return;
+
+        List<Suivie> rows = suivieService.statsParEnfant(enfant);
+
+        if (lineConsultations == null || xAxisStats == null || yAxisStats == null) return;
+
+        lineConsultations.getData().clear();
+
+        if (lblDeltaHumeur != null) lblDeltaHumeur.setText("-");
+        if (lblDeltaStress != null) lblDeltaStress.setText("-");
+        if (lblDeltaAttention != null) lblDeltaAttention.setText("-");
+
+        if (rows == null || rows.isEmpty()) return;
+
+        // ✅ labels X (date) dans le même ordre que rows
+        final List<String> labelsX = new ArrayList<>();
+        for (Suivie s : rows) labelsX.add(labelDateForAxis(s));
+
+        // ✅ Formatter: afficher date au lieu de 1..N
+        xAxisStats.setTickLabelFormatter(new StringConverter<Number>() {
+            @Override
+            public String toString(Number value) {
+                int i = value.intValue(); // 1..N
+                if (i >= 1 && i <= labelsX.size()) return labelsX.get(i - 1);
+                return "";
+            }
+            @Override
+            public Number fromString(String string) {
+                return 0; // pas utilisé
+            }
+        });
+
+        XYChart.Series<Number, Number> serH = new XYChart.Series<>();
+        serH.setName("Humeur");
+
+        XYChart.Series<Number, Number> serS = new XYChart.Series<>();
+        serS.setName("Stress");
+
+        XYChart.Series<Number, Number> serA = new XYChart.Series<>();
+        serA.setName("Attention");
+
+        int index = 1;
+        for (Suivie s : rows) {
+            serH.getData().add(new XYChart.Data<>(index, s.getScoreHumeur()));
+            serS.getData().add(new XYChart.Data<>(index, s.getScoreStress()));
+            serA.getData().add(new XYChart.Data<>(index, s.getScoreAttention()));
+            index++;
+        }
+
+        // ✅ bornes X propres et stables
+        xAxisStats.setAutoRanging(false);
+        xAxisStats.setLowerBound(0.5);
+        xAxisStats.setUpperBound(rows.size() + 0.5);
+        xAxisStats.setTickUnit(1);
+
+
+        // ✅ Y reste 0..10 (déjà fixé), on le re-force au cas où
+        yAxisStats.setAutoRanging(false);
+        yAxisStats.setLowerBound(0);
+        yAxisStats.setUpperBound(15.5);
+        yAxisStats.setTickUnit(1);
+
+        lineConsultations.getData().setAll(serH, serS, serA);
+
+        // Δ : dernière - précédente
+        if (rows.size() >= 2) {
+            Suivie prev = rows.get(rows.size() - 2);
+            Suivie last = rows.get(rows.size() - 1);
+
+            if (lblDeltaHumeur != null) lblDeltaHumeur.setText(formatDelta(last.getScoreHumeur() - prev.getScoreHumeur()));
+            if (lblDeltaStress != null) lblDeltaStress.setText(formatDelta(last.getScoreStress() - prev.getScoreStress()));
+            if (lblDeltaAttention != null) lblDeltaAttention.setText(formatDelta(last.getScoreAttention() - prev.getScoreAttention()));
+        } else {
+            if (lblDeltaHumeur != null) lblDeltaHumeur.setText("0");
+            if (lblDeltaStress != null) lblDeltaStress.setText("0");
+            if (lblDeltaAttention != null) lblDeltaAttention.setText("0");
+        }
+
+        addValueLabelsSafe(lineConsultations);
+    }
+    private String formatDelta(int d) {
+        return (d > 0 ? "+" : "") + d;
+    }
+
+    // -----------------------------
+    // Exercices adaptés
+    // -----------------------------
+    private String niveauFromScore(int score) {
+        if (score <= 0) return "faible";
         if (score <= 3) return "faible";
         if (score <= 6) return "moyenne";
-        return "elevee"; // 7..10
+        return "elevee";
     }
-
 
     private Optional<Therapie> showExercicesAdaptesWindow(Suivie s) {
 
@@ -1113,27 +1196,18 @@ public class AjouterSuivie {
             if (selected == null) return;
 
             try {
-                // ✅ update objet en mémoire
                 s.setIdTherapieReco(selected.getIdTherapie());
-
-                // ✅ update DB
-                if (suivieService == null) suivieService = new SuivieServices();
-                suivieService.modifierSuivie(s);
+                suivieService.modifierSuivie(s); // ✅ plus de "if (suivieService == null)" car final
 
                 chosen[0] = selected;
                 st.close();
 
             } catch (Exception ex) {
-                ex.printStackTrace();
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setTitle("Erreur");
-                a.setHeaderText("Erreur lors du choix");
-                a.setContentText(ex.getMessage());
-                a.showAndWait();
+                showDbError(ex);
             }
         });
 
-        VBox root = new VBox(15,
+        VBox r = new VBox(15,
                 new Label("Niveaux détectés : "
                         + "Humeur=" + nivH
                         + ", Attention=" + nivA
@@ -1141,32 +1215,257 @@ public class AjouterSuivie {
                 listView,
                 choisir);
 
-        root.setPadding(new Insets(20));
+        r.setPadding(new Insets(20));
 
-        setCenter(st, root);
+        setCenter(st, r);
         st.showAndWait();
 
         return Optional.ofNullable(chosen[0]);
     }
 
-
+    // -----------------------------
+    // Sidebar active styles
+    // -----------------------------
     private void setParentConsultationsActive(boolean active){
+        if (btnGestionConsultations == null) return;
         btnGestionConsultations.getStyleClass().remove("sideBtnActive");
         if(active) btnGestionConsultations.getStyleClass().add("sideBtnActive");
     }
 
     private void setSubActive(Button selected){
-        // reset
-        btnSubSuivie.getStyleClass().remove("subBtnActive");
-        btnSubTherapie.getStyleClass().remove("subBtnActive");
-        btnSubArticles.getStyleClass().remove("subBtnActive");
+        if (btnSubSuivie != null) btnSubSuivie.getStyleClass().remove("subBtnActive");
+        if (btnSubTherapie != null) btnSubTherapie.getStyleClass().remove("subBtnActive");
+        if (btnSubArticles != null) btnSubArticles.getStyleClass().remove("subBtnActive");
 
-        // active only the clicked one
-        selected.getStyleClass().add("subBtnActive");
-
-        // parent stays active as long as we are in this module
+        if (selected != null) selected.getStyleClass().add("subBtnActive");
         setParentConsultationsActive(true);
     }
 
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    private Label label(String t) {
+        Label l = new Label(t);
+        l.getStyleClass().add("details-key");
+        return l;
+    }
+
+    private Label addRow(GridPane g, int row, String k, String v) {
+        Label lk = new Label(k);
+        lk.getStyleClass().add("details-key");
+
+        Label lv = new Label(v);
+        lv.getStyleClass().add("details-val");
+        lv.setWrapText(true);
+
+        g.add(lk, 0, row);
+        g.add(lv, 1, row);
+
+        return lv;
+    }
+
+    private Timestamp buildTimestamp(LocalDate d, String hhmm) {
+        LocalTime t;
+        try {
+            t = LocalTime.parse(hhmm.length() == 5 ? hhmm : "10:00");
+        } catch (Exception e) {
+            t = LocalTime.of(10, 0);
+        }
+        return Timestamp.valueOf(d.atTime(t));
+    }
+
+    private String safe(String s) { return s == null ? "" : s; }
+
+    private void showDbError(Exception ex) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Erreur");
+        a.setHeaderText("Problème lors de l'opération");
+        a.setContentText(ex == null ? "" : ex.getMessage());
+        a.showAndWait();
+    }
+    private void applyValueLabels(LineChart<String, Number> chart) {
+        // attendre que JavaFX crée les nodes des points
+        javafx.application.Platform.runLater(() -> {
+            for (XYChart.Series<String, Number> s : chart.getData()) {
+                for (XYChart.Data<String, Number> d : s.getData()) {
+                    Node node = d.getNode();
+                    if (node == null) continue;
+
+                    // évite double ajout si refresh
+                    if (node.lookup(".value-label") != null) continue;
+
+                    Label lbl = new Label(String.valueOf(d.getYValue()));
+                    lbl.getStyleClass().add("value-label");
+                    lbl.setMouseTransparent(true);
+
+                    StackPane wrapper = (StackPane) node;
+                    wrapper.getChildren().add(lbl);
+
+                    // position au-dessus du point
+                    StackPane.setAlignment(lbl, Pos.TOP_CENTER);
+                    lbl.setTranslateY(-12);
+                }
+            }
+        });
+    }
+
+    private void configureLineChartReadable(LineChart<Number, Number> chart) {
+
+        if (chart == null) return;
+
+        chart.setAnimated(false);
+        chart.setCreateSymbols(true);
+        chart.setLegendVisible(true);
+
+        // ✅ X axis = NumberAxis
+        if (chart.getXAxis() instanceof NumberAxis x) {
+            x.setAutoRanging(true);      // ou false si tu fixes bounds
+            x.setForceZeroInRange(false);
+            x.setTickUnit(1);            // 1 consultation, 2 consultation...
+            x.setMinorTickVisible(false);
+            x.setTickLabelRotation(0);
+            x.setLabel("Consultation");
+        }
+
+        // ✅ Y axis = NumberAxis
+        if (chart.getYAxis() instanceof NumberAxis y) {
+            y.setAutoRanging(false);
+            y.setLowerBound(0);
+            y.setUpperBound(10);
+            y.setTickUnit(1);
+            y.setMinorTickVisible(true);
+            y.setLabel("Score (0-10)");
+        }
+
+        chart.setHorizontalGridLinesVisible(true);
+        chart.setVerticalGridLinesVisible(true);
+
+        chart.applyCss();
+        chart.layout();
+    }
+    private void applyPointLabelsAndTooltips(LineChart<String, Number> chart,
+                                             List<String> tooltipTexts) {
+
+        javafx.application.Platform.runLater(() -> {
+            int index = 0;
+
+            for (XYChart.Series<String, Number> series : chart.getData()) {
+                for (XYChart.Data<String, Number> d : series.getData()) {
+                    Node node = d.getNode();
+                    if (node == null) continue;
+
+                    // Tooltip (date/heure)
+                    String tip = (tooltipTexts != null && index < tooltipTexts.size())
+                            ? tooltipTexts.get(index)
+                            : d.getXValue();
+                    Tooltip.install(node, new Tooltip(series.getName() + " = " + d.getYValue() + "\n" + tip));
+
+                    // Label valeur
+                    if (node.lookup(".value-label") == null) {
+                        Label lbl = new Label(String.valueOf(d.getYValue()));
+                        lbl.getStyleClass().add("value-label");
+                        lbl.setMouseTransparent(true);
+
+                        StackPane sp = (StackPane) node;
+                        sp.getChildren().add(lbl);
+                        StackPane.setAlignment(lbl, Pos.TOP_CENTER);
+                        lbl.setTranslateY(-16);
+                    }
+                    index++;
+                }
+                // reset index par série ? non : car tooltips list est par consultation
+                index = 0;
+            }
+        });
+    }
+    private void configureCartesianChart() {
+
+        if (lineConsultations == null || xAxisStats == null || yAxisStats == null) return;
+
+        lineConsultations.setAnimated(false);
+        lineConsultations.setCreateSymbols(true);
+        lineConsultations.setLegendVisible(true);
+
+        // X (index des consultations) -> labels seront remplacés par date via formatter
+        // X: consultations 1..N (on laisse une marge)
+        xAxisStats.setAutoRanging(false);
+        xAxisStats.setLowerBound(0);     // ✅ marge à gauche
+        xAxisStats.setUpperBound(5);     // ✅ marge à droite (sera recalculé)
+        xAxisStats.setTickUnit(1);
+        xAxisStats.setMinorTickVisible(false);
+        xAxisStats.setForceZeroInRange(false);
+
+// Y: score 0..10 (marge haut pour les labels)
+        yAxisStats.setAutoRanging(false);
+        yAxisStats.setLowerBound(0);
+        yAxisStats.setUpperBound(0);    // ✅ marge en haut
+        yAxisStats.setTickUnit(1);
+        yAxisStats.setMinorTickVisible(false);
+
+        lineConsultations.setHorizontalGridLinesVisible(true);
+        lineConsultations.setVerticalGridLinesVisible(true);
+        lineConsultations.setPadding(new Insets(10, 10, 10, 10));
+    }
+    private void addValueLabels(LineChart<Number, Number> chart) {
+
+        javafx.application.Platform.runLater(() -> {
+
+            for (XYChart.Series<Number, Number> s : chart.getData()) {
+                for (XYChart.Data<Number, Number> d : s.getData()) {
+
+                    Node node = d.getNode();
+                    if (node == null) continue;
+
+                    Label lbl = new Label(String.valueOf(d.getYValue()));
+                    lbl.setStyle(
+                            "-fx-background-color: white;" +
+                                    "-fx-padding: 1 1 1 1;" +
+                                    "-fx-background-radius: 1;" +
+                                    "-fx-font-size: 50px;" +   // plus petit
+                                    "-fx-font-weight: bold;" +
+                                    "-fx-border-color: #e5e7eb;" +
+                                    "-fx-border-radius: 1;"
+                    );
+
+                    StackPane sp = (StackPane) node;
+                    sp.getChildren().add(lbl);
+                    StackPane.setAlignment(lbl, Pos.TOP_CENTER);
+                    lbl.setTranslateY(-12);
+                }
+            }
+        });
+    }
+    private void addValueLabelsSafe(LineChart<Number, Number> chart) {
+
+        javafx.application.Platform.runLater(() -> {
+            for (XYChart.Series<Number, Number> s : chart.getData()) {
+                for (XYChart.Data<Number, Number> d : s.getData()) {
+
+                    Node node = d.getNode();
+                    if (node == null) continue;
+
+                    // ✅ évite doublons
+                    if (node.lookup(".value-label") != null) continue;
+
+                    Label lbl = new Label(String.valueOf(d.getYValue()));
+                    lbl.getStyleClass().add("value-label");
+                    lbl.setStyle(
+                            "-fx-background-color: white;" +
+                                    "-fx-padding: 4 8 4 8;" +
+                                    "-fx-background-radius: 8;" +
+                                    "-fx-font-weight: bold;" +
+                                    "-fx-border-color: #e5e7eb;" +
+                                    "-fx-border-radius: 8;"
+                    );
+
+                    StackPane sp = (StackPane) node;
+                    sp.getChildren().add(lbl);
+                    StackPane.setAlignment(lbl, Pos.TOP_CENTER);
+                    lbl.setTranslateY(-18);
+                }
+            }
+        });
+    }
 
 }

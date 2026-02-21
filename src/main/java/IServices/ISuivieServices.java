@@ -10,5 +10,7 @@ public interface ISuivieServices {
         void supprimerSuivie(int idSuivie) throws SQLException;
         void modifierSuivie(Suivie s) throws SQLException;
         List<Suivie> afficherSuivie() throws SQLException;
+    List<String> listerNomsEnfants();
+    List<Suivie> statsParEnfant(String nomEnfant);
 
 }

@@ -51,6 +51,7 @@ public class SuivieServices implements ISuivieServices {
             ps.setString(16, s.getCrPdfPath());
 
             ps.executeUpdate();
+
             System.out.println("Suivie ajouté avec succès");
 
         } catch (SQLException e) {
@@ -170,5 +171,49 @@ public class SuivieServices implements ISuivieServices {
         }
 
         return suivies;
+    }
+
+    @Override
+    public List<String> listerNomsEnfants() {
+        List<String> noms = new ArrayList<>();
+        String sql = "SELECT DISTINCT NOM_ENFANT FROM suivie ORDER BY NOM_ENFANT";
+
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                noms.add(rs.getString("NOM_ENFANT"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return noms;
+    }
+
+    @Override
+    public List<Suivie> statsParEnfant(String nomEnfant) {
+        List<Suivie> list = new ArrayList<>();
+        String sql = "SELECT DATE_SUIVIE, SCORE_HUMEUR, SCORE_STRESS, SCORE_ATTENTION " +
+                "FROM suivie WHERE NOM_ENFANT=? ORDER BY DATE_SUIVIE ASC";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nomEnfant);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Suivie s = new Suivie();
+                    s.setDateSuivie(rs.getTimestamp("DATE_SUIVIE"));
+                    s.setScoreHumeur(rs.getInt("SCORE_HUMEUR"));
+                    s.setScoreStress(rs.getInt("SCORE_STRESS"));
+                    s.setScoreAttention(rs.getInt("SCORE_ATTENTION"));
+                    list.add(s);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
     }
 }
