@@ -30,16 +30,21 @@ public class FalImageService {
             input.addProperty("prompt", prompt + ", children's drawing style, cartoon, colorful, simple, white background");
             input.addProperty("image_size", "square_hd");
 
+            // CORRECTION ICI : Utiliser "Key " au lieu de "Bearer "
             Request request = new Request.Builder()
                     .url(API_URL)
                     .post(RequestBody.create(input.toString(), JSON))
-                    .addHeader("Authorization", "Key " + apiKey)
+                    .addHeader("Authorization", "Key " + apiKey)  // ← FORMAT CORRECT
                     .addHeader("Content-Type", "application/json")
                     .build();
 
+            System.out.println("🔑 En-tête Authorization: Key " + apiKey.substring(0, Math.min(5, apiKey.length())) + "...");
+
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
+                    String errorBody = response.body() != null ? response.body().string() : "Unknown error";
                     System.err.println("❌ Erreur API: " + response.code());
+                    System.err.println("Détails: " + errorBody);
                     return null;
                 }
 
@@ -52,11 +57,17 @@ public class FalImageService {
                             .get("url").getAsString();
                     System.out.println("✅ Image générée: " + imageUrl);
                     return imageUrl;
+                } else {
+                    System.err.println("❌ Pas d'images dans la réponse");
+                    System.err.println("Réponse: " + responseBody);
                 }
             }
 
         } catch (IOException e) {
-            System.err.println("❌ Erreur: " + e.getMessage());
+            System.err.println("❌ Erreur réseau: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ Erreur inattendue: " + e.getMessage());
             e.printStackTrace();
         }
         return null;

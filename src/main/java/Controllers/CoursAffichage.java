@@ -3,10 +3,11 @@ package Controllers;
 import Entites.Cours;
 import Services.CoursServices;
 import Services.EvaluationServices;
-import Services.FalImageService;
+import Services.StabilityImageService; // AJOUT
 import Utils.Navigation;
 import Utils.TextToSpeechManager;
 import javafx.fxml.FXML;
+import javafx.animation.RotateTransition;
 import javafx.geometry.Insets;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -38,6 +39,7 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.io.ByteArrayInputStream; // AJOUT
 
 public class CoursAffichage implements Initializable {
 
@@ -60,7 +62,7 @@ public class CoursAffichage implements Initializable {
 
     private CoursServices coursServices;
     private EvaluationServices evaluationServices;
-    private FalImageService falImageService;
+    private StabilityImageService stabilityImageService; // REMPLACE FalImageService
     private List<Cours> allCours;
 
     @Override
@@ -68,11 +70,9 @@ public class CoursAffichage implements Initializable {
         coursServices = new CoursServices();
         evaluationServices = new EvaluationServices();
 
-        
-
-        falImageService = new FalImageService(falApiKey);
-
-
+        // Initialisation de Stability AI avec votre clé API
+        remplacer
+        stabilityImageService = new StabilityImageService(stabilityApiKey);
 
         loadCours();
         setupSearch();
@@ -124,71 +124,248 @@ public class CoursAffichage implements Initializable {
         imageStage.setTitle("🤖 Générateur d'images par IA");
         imageStage.initModality(Modality.APPLICATION_MODAL);
 
-        VBox mainContainer = new VBox(20);
-        mainContainer.setStyle("-fx-background-color: linear-gradient(to bottom, #F0F8FF, #E8F0FE); -fx-padding: 30;");
-        mainContainer.setAlignment(Pos.TOP_CENTER);
-        mainContainer.setPrefWidth(1000);
-        mainContainer.setPrefHeight(700);
+        // ================= CONTENEUR PRINCIPAL =================
+        HBox mainContainer = new HBox();
+        mainContainer.setPrefWidth(1300);
+        mainContainer.setPrefHeight(800);
+
+        // ================= SIDEBAR IDENTIQUE =================
+        VBox sidebar = new VBox(10);
+        sidebar.setPrefWidth(260.0);
+        sidebar.setMinWidth(260.0);
+        sidebar.setMaxWidth(260.0);
+        sidebar.setStyle("-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 25 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);");
+
+        // Logo
+        HBox logoBox = new HBox(12);
+        logoBox.setAlignment(Pos.CENTER_LEFT);
+        logoBox.setStyle("-fx-padding: 0 0 15 5;");
+
+        ImageView logoImage = new ImageView();
+        logoImage.setFitHeight(40.0);
+        logoImage.setFitWidth(40.0);
+        logoImage.setPreserveRatio(true);
+        try {
+            Image img = new Image(getClass().getResource("/images/logo.png").toExternalForm());
+            logoImage.setImage(img);
+        } catch (Exception e) {
+            Label logoEmoji = new Label("🎨");
+            logoEmoji.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
+            logoBox.getChildren().add(logoEmoji);
+        }
+
+        VBox logoText = new VBox(2);
+        Label autiCareLabel = new Label("AutiCare");
+        autiCareLabel.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");
+        Label espaceLabel = new Label("Espace éducatif");
+        espaceLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;");
+        logoText.getChildren().addAll(autiCareLabel, espaceLabel);
+
+        logoBox.getChildren().addAll(logoImage, logoText);
+
+        Separator separator = new Separator();
+        separator.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;");
+
+        // Menu de navigation
+        VBox menuBox = new VBox(8);
+        menuBox.setStyle("-fx-padding: 10 0 20 0;");
+
+        Button coursButton = new Button("📚 Nos cours");
+        coursButton.setMaxWidth(Double.MAX_VALUE);
+        coursButton.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 1; -fx-border-radius: 10;");
+        coursButton.setOnAction(e -> {
+            System.out.println("📚 Retour à l'affichage des cours");
+            imageStage.close();
+        });
+
+        Button emploisButton = new Button("📅 Emplois du temps");
+        emploisButton.setMaxWidth(Double.MAX_VALUE);
+        emploisButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+
+        Button evenementsButton = new Button("🎉 Événements");
+        evenementsButton.setMaxWidth(Double.MAX_VALUE);
+        evenementsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+
+        Button suiviButton = new Button("📞 Suivi consultation");
+        suiviButton.setMaxWidth(Double.MAX_VALUE);
+        suiviButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10; -fx-wrap-text: true;");
+
+        Button jeuxButton = new Button("🎮 Jeux éducatifs");
+        jeuxButton.setMaxWidth(Double.MAX_VALUE);
+        jeuxButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+
+        menuBox.getChildren().addAll(coursButton, emploisButton, evenementsButton, suiviButton, jeuxButton);
+
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        Button deconnexionButton = new Button("🚪 Déconnexion");
+        deconnexionButton.setMaxWidth(Double.MAX_VALUE);
+        deconnexionButton.setStyle("-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;");
+
+        sidebar.getChildren().addAll(logoBox, separator, menuBox, spacer, deconnexionButton);
+
+        // ================= CONTENU PRINCIPAL AVEC CENTRAGE =================
+        ScrollPane mainScrollPane = new ScrollPane();
+        mainScrollPane.setFitToWidth(true);
+        mainScrollPane.setFitToHeight(true);
+        mainScrollPane.setStyle("-fx-background: white; -fx-border-width: 0;");
+        HBox.setHgrow(mainScrollPane, Priority.ALWAYS);
+
+        // Conteneur pour centrer le contenu
+        StackPane centerWrapper = new StackPane();
+        centerWrapper.setStyle("-fx-background-color: linear-gradient(to bottom, #F0F8FF, #E8F0FE);");
+
+        VBox contentContainer = new VBox(25);
+        contentContainer.setMaxWidth(900);
+        contentContainer.setAlignment(Pos.CENTER);
+        contentContainer.setPadding(new Insets(40));
+
+        // ========== EN-TÊTE ==========
+        HBox headerBox = new HBox(20);
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setMaxWidth(900);
+
+        Button backButton = new Button("← Retour aux cours");
+        backButton.setStyle("-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
+        backButton.setOnAction(e -> imageStage.close());
+
+        // Animation du bouton retour
+        ScaleTransition backScale = new ScaleTransition(Duration.millis(200), backButton);
+        backButton.setOnMouseEntered(e -> {
+            backScale.setToX(1.05);
+            backScale.setToY(1.05);
+            backScale.play();
+            backButton.setStyle("-fx-background-color: #6A1FF7; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(106,31,247,0.4), 10, 0, 0, 5);");
+        });
+
+        backButton.setOnMouseExited(e -> {
+            backScale.setToX(1.0);
+            backScale.setToY(1.0);
+            backScale.play();
+            backButton.setStyle("-fx-background-color: #8E44AD; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;");
+        });
+
+        Region headerSpacer = new Region();
+        HBox.setHgrow(headerSpacer, Priority.ALWAYS);
 
         Label titleLabel = new Label("🎨 Générateur d'images magique");
-        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
+        titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
 
+        headerBox.getChildren().addAll(backButton, headerSpacer, titleLabel);
+
+        // Sous-titre
         Label subtitleLabel = new Label("Décris ce que tu veux voir, l'IA va le créer pour toi !");
-        subtitleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666;");
+        subtitleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #666666; -fx-padding: 0 0 20 0;");
+        subtitleLabel.setAlignment(Pos.CENTER);
 
+        // ========== CARTE PRINCIPALE CENTRÉE ==========
+        VBox mainCard = new VBox(25);
+        mainCard.setMaxWidth(800);
+        mainCard.setAlignment(Pos.CENTER);
+        mainCard.setStyle("-fx-background-color: white; -fx-background-radius: 25; -fx-border-color: #7B2FF7; -fx-border-width: 3; -fx-border-radius: 25; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 15, 0, 0, 5);");
+
+        // Zone de texte pour le prompt
         VBox promptBox = new VBox(10);
-        promptBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-border-radius: 15;");
+        promptBox.setAlignment(Pos.CENTER);
 
         Label promptLabel = new Label("📝 Décris l'image à générer :");
-        promptLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
+        promptLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #7B2FF7;");
 
         TextArea promptArea = new TextArea();
         promptArea.setPromptText("Exemple: un oiseau bleu qui vole dans le ciel, style dessin animé pour enfants");
         promptArea.setWrapText(true);
         promptArea.setPrefRowCount(3);
-        promptArea.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 14px;");
+        promptArea.setMaxWidth(700);
+        promptArea.setStyle("-fx-background-radius: 15; -fx-border-radius: 15; -fx-font-size: 15px; -fx-padding: 12;");
 
         promptBox.getChildren().addAll(promptLabel, promptArea);
 
+        // Bouton générer centré
+        HBox buttonWrapper = new HBox();
+        buttonWrapper.setAlignment(Pos.CENTER);
+
         Button genererButton = new Button("✨ Générer l'image");
-        genererButton.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 15 30; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;");
+        genererButton.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 15 40; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);");
+
+        // Animation du bouton générer
+        ScaleTransition genererScale = new ScaleTransition(Duration.millis(200), genererButton);
+        genererButton.setOnMouseEntered(e -> {
+            genererScale.setToX(1.05);
+            genererScale.setToY(1.05);
+            genererScale.play();
+            genererButton.setStyle("-fx-background-color: #6A1FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 15 40; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(106,31,247,0.5), 15, 0, 0, 8);");
+        });
+
+        genererButton.setOnMouseExited(e -> {
+            genererScale.setToX(1.0);
+            genererScale.setToY(1.0);
+            genererScale.play();
+            genererButton.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 15 40; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);");
+        });
+
+        buttonWrapper.getChildren().add(genererButton);
+
+        // Indicateur de chargement centré
+        HBox progressWrapper = new HBox();
+        progressWrapper.setAlignment(Pos.CENTER);
 
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setVisible(false);
-        progressIndicator.setPrefSize(50, 50);
+        progressIndicator.setPrefSize(60, 60);
 
+        progressWrapper.getChildren().add(progressIndicator);
+
+        // Zone d'affichage de l'image centrée
         VBox imageBox = new VBox(15);
         imageBox.setAlignment(Pos.CENTER);
-        imageBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-border-radius: 15;");
-        imageBox.setPrefHeight(400);
+        imageBox.setStyle("-fx-background-color: #F8F9FA; -fx-padding: 20; -fx-background-radius: 20; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-border-radius: 20;");
+        imageBox.setPrefHeight(350);
+        imageBox.setMaxWidth(700);
 
         ImageView imageView = new ImageView();
-        imageView.setFitHeight(300);
+        imageView.setFitHeight(280);
         imageView.setFitWidth(400);
         imageView.setPreserveRatio(true);
         imageView.setVisible(false);
 
         Label placeholderLabel = new Label("L'image générée apparaîtra ici");
-        placeholderLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #999999;");
+        placeholderLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #999999;");
 
         imageBox.getChildren().addAll(placeholderLabel, imageView);
 
-        HBox actionButtons = new HBox(15);
+        // Boutons d'action centrés
+        HBox actionButtons = new HBox(20);
         actionButtons.setAlignment(Pos.CENTER);
         actionButtons.setVisible(false);
 
         Button saveButton = new Button("💾 Sauvegarder l'image");
-        saveButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;");
+        saveButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 30; -fx-font-weight: bold; -fx-font-size: 15px; -fx-cursor: hand;");
 
         Button newButton = new Button("🔄 Nouvelle image");
-        newButton.setStyle("-fx-background-color: #FFA500; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 10 20; -fx-font-weight: bold; -fx-cursor: hand;");
+        newButton.setStyle("-fx-background-color: #FFA500; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 12 30; -fx-font-weight: bold; -fx-font-size: 15px; -fx-cursor: hand;");
 
         actionButtons.getChildren().addAll(saveButton, newButton);
 
+        // Label d'erreur centré
+        HBox errorWrapper = new HBox();
+        errorWrapper.setAlignment(Pos.CENTER);
+
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: #FF4444; -fx-font-size: 14px;");
+        errorLabel.setStyle("-fx-text-fill: #FF4444; -fx-font-size: 15px; -fx-padding: 10;");
         errorLabel.setVisible(false);
 
+        errorWrapper.getChildren().add(errorLabel);
+
+        // Assemblage de la carte
+        mainCard.getChildren().addAll(promptBox, buttonWrapper, progressWrapper, imageBox, actionButtons, errorWrapper);
+
+        // Assemblage du contenu
+        contentContainer.getChildren().addAll(headerBox, subtitleLabel, mainCard);
+        centerWrapper.getChildren().add(contentContainer);
+        mainScrollPane.setContent(centerWrapper);
+
+        // ========== LOGIQUE DE GÉNÉRATION ==========
         genererButton.setOnAction(e -> {
             String prompt = promptArea.getText().trim();
             if (prompt.isEmpty()) {
@@ -205,20 +382,16 @@ public class CoursAffichage implements Initializable {
 
             new Thread(() -> {
                 try {
-                    System.out.println("🤖 Génération d'image Fal.ai pour: " + prompt);
-
-                    // Appel à Fal.ai
-                    String imageUrl = falImageService.genererImage(prompt);
+                    System.out.println("🤖 Génération d'image Stability AI pour: " + prompt);
+                    byte[] imageBytes = stabilityImageService.genererImage(prompt);
 
                     javafx.application.Platform.runLater(() -> {
-                        if (imageUrl != null && !imageUrl.isEmpty()) {
-                            // Charger l'image depuis l'URL
-                            Image image = new Image(imageUrl, true);
+                        if (imageBytes != null && imageBytes.length > 0) {
+                            Image image = new Image(new ByteArrayInputStream(imageBytes));
                             imageView.setImage(image);
                             imageView.setVisible(true);
                             actionButtons.setVisible(true);
 
-                            // Sauvegarde de l'image
                             saveButton.setOnAction(saveEvent -> {
                                 FileChooser fileChooser = new FileChooser();
                                 fileChooser.setTitle("Sauvegarder l'image");
@@ -228,27 +401,12 @@ public class CoursAffichage implements Initializable {
                                 File file = fileChooser.showSaveDialog(imageStage);
 
                                 if (file != null) {
-                                    // Télécharger l'image depuis l'URL et la sauvegarder
-                                    new Thread(() -> {
-                                        try {
-                                            java.net.URL url = new java.net.URL(imageUrl);
-                                            try (java.io.InputStream in = url.openStream();
-                                                 java.io.FileOutputStream out = new java.io.FileOutputStream(file)) {
-                                                byte[] buffer = new byte[4096];
-                                                int bytesRead;
-                                                while ((bytesRead = in.read(buffer)) != -1) {
-                                                    out.write(buffer, 0, bytesRead);
-                                                }
-                                            }
-                                            javafx.application.Platform.runLater(() ->
-                                                    showAlert(Alert.AlertType.INFORMATION, "Succès", "Image sauvegardée avec succès !")
-                                            );
-                                        } catch (IOException ex) {
-                                            javafx.application.Platform.runLater(() ->
-                                                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la sauvegarde: " + ex.getMessage())
-                                            );
-                                        }
-                                    }).start();
+                                    try {
+                                        java.nio.file.Files.write(file.toPath(), imageBytes);
+                                        showAlert(Alert.AlertType.INFORMATION, "Succès", "Image sauvegardée avec succès !");
+                                    } catch (IOException ex) {
+                                        showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la sauvegarde: " + ex.getMessage());
+                                    }
                                 }
                             });
 
@@ -282,16 +440,8 @@ public class CoursAffichage implements Initializable {
             }).start();
         });
 
-        VBox centerBox = new VBox(20, promptBox, genererButton, progressIndicator, imageBox, actionButtons, errorLabel);
-        centerBox.setAlignment(Pos.CENTER);
-
-        mainContainer.getChildren().addAll(titleLabel, subtitleLabel, centerBox);
-
-        Button closeButton = new Button("❌ Fermer");
-        closeButton.setStyle("-fx-background-color: transparent; -fx-border-color: #7B2FF7; -fx-text-fill: #7B2FF7; -fx-border-radius: 20; -fx-padding: 10 30; -fx-font-size: 14px; -fx-cursor: hand;");
-        closeButton.setOnAction(e -> imageStage.close());
-
-        mainContainer.getChildren().add(closeButton);
+        // Assemblage final
+        mainContainer.getChildren().addAll(sidebar, mainScrollPane);
 
         Scene scene = new Scene(mainContainer);
         imageStage.setScene(scene);
@@ -587,11 +737,10 @@ public class CoursAffichage implements Initializable {
 
         Button clearButton = createActionButton("🗑️", "Effacer tout", "#FF6B6B");
         Button saveButton = createActionButton("💾", "Sauvegarder", "#4CAF50");
-        Button printButton = createActionButton("🖨️", "Imprimer", "#FFA726");
         Button closeButton = createActionButton("❌", "Fermer", "#95A5A6");
         closeButton.setOnAction(e -> drawingStage.close());
 
-        actionFlowPane.getChildren().addAll(clearButton, saveButton, printButton, closeButton);
+        actionFlowPane.getChildren().addAll(clearButton, saveButton, closeButton);
 
         FlowPane shapeFlowPane = new FlowPane();
         shapeFlowPane.setHgap(15);
@@ -759,9 +908,7 @@ public class CoursAffichage implements Initializable {
             }
         });
 
-        printButton.setOnAction(e -> {
-            showHappyMessage("🖨️ Ton dessin est prêt à être imprimé !");
-        });
+
 
         circleButton.setOnAction(e -> {
             gc.setStroke(currentColor[0]);
@@ -1339,14 +1486,99 @@ public class CoursAffichage implements Initializable {
         contentStage.setTitle(cours.getTitre());
         contentStage.initModality(Modality.APPLICATION_MODAL);
 
+        // ================= CONTENEUR PRINCIPAL (MÊME TAILLE QUE L'AFFICHAGE COURS) =================
+        HBox mainContainer = new HBox();
+        mainContainer.setPrefWidth(1300);
+        mainContainer.setPrefHeight(800);
+
+        // ================= SIDEBAR IDENTIQUE À L'AFFICHAGE COURS =================
+        VBox sidebar = new VBox(10);
+        sidebar.setPrefWidth(260.0);
+        sidebar.setMinWidth(260.0);
+        sidebar.setMaxWidth(260.0);
+        sidebar.setStyle("-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 25 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);");
+
+        // Logo
+        HBox logoBox = new HBox(12);
+        logoBox.setAlignment(Pos.CENTER_LEFT);
+        logoBox.setStyle("-fx-padding: 0 0 15 5;");
+
+        ImageView logoImage = new ImageView();
+        logoImage.setFitHeight(40.0);
+        logoImage.setFitWidth(40.0);
+        logoImage.setPreserveRatio(true);
+        try {
+            Image img = new Image(getClass().getResource("/images/logo.png").toExternalForm());
+            logoImage.setImage(img);
+        } catch (Exception e) {
+            Label logoEmoji = new Label("🎨");
+            logoEmoji.setStyle("-fx-font-size: 40px; -fx-text-fill: white;");
+            logoBox.getChildren().add(logoEmoji);
+        }
+
+        VBox logoText = new VBox(2);
+        Label autiCareLabel = new Label("AutiCare");
+        autiCareLabel.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");
+        Label espaceLabel = new Label("Espace éducatif");
+        espaceLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;");
+        logoText.getChildren().addAll(autiCareLabel, espaceLabel);
+
+        logoBox.getChildren().addAll(logoImage, logoText);
+
+        Separator separator = new Separator();
+        separator.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;");
+
+        // Menu de navigation
+        VBox menuBox = new VBox(8);
+        menuBox.setStyle("-fx-padding: 10 0 20 0;");
+
+        Button coursButton = new Button("📚 Nos cours");
+        coursButton.setMaxWidth(Double.MAX_VALUE);
+        coursButton.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 1; -fx-border-radius: 10;");
+        coursButton.setOnAction(e -> {
+            System.out.println("📚 Retour à l'affichage des cours");
+            contentStage.close();
+        });
+
+        Button emploisButton = new Button("📅 Emplois du temps");
+        emploisButton.setMaxWidth(Double.MAX_VALUE);
+        emploisButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+
+        Button evenementsButton = new Button("🎉 Événements");
+        evenementsButton.setMaxWidth(Double.MAX_VALUE);
+        evenementsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+
+        Button suiviButton = new Button("📞 Suivi consultation");
+        suiviButton.setMaxWidth(Double.MAX_VALUE);
+        suiviButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10; -fx-wrap-text: true;");
+
+        Button jeuxButton = new Button("🎮 Jeux éducatifs");
+        jeuxButton.setMaxWidth(Double.MAX_VALUE);
+        jeuxButton.setStyle("-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;");
+
+        menuBox.getChildren().addAll(coursButton, emploisButton, evenementsButton, suiviButton, jeuxButton);
+
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        Button deconnexionButton = new Button("🚪 Déconnexion");
+        deconnexionButton.setMaxWidth(Double.MAX_VALUE);
+        deconnexionButton.setStyle("-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;");
+
+        sidebar.getChildren().addAll(logoBox, separator, menuBox, spacer, deconnexionButton);
+
+        // ================= CONTENU PRINCIPAL (VOTRE CODE EXISTANT) =================
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background: #F0F8FF; -fx-border-width: 0;");
+        HBox.setHgrow(scrollPane, Priority.ALWAYS);
 
-        VBox mainContainer = new VBox(30);
-        mainContainer.setStyle("-fx-background-color: #F0F8FF; -fx-padding: 40;");
-        mainContainer.setAlignment(Pos.TOP_CENTER);
+        // Conteneur pour le contenu (renommé pour éviter le conflit)
+        VBox contentContainer = new VBox(30);
+        contentContainer.setStyle("-fx-background-color: #F0F8FF; -fx-padding: 40;");
+        contentContainer.setAlignment(Pos.TOP_CENTER);
 
+        // En-tête avec bouton retour
         HBox headerBox = new HBox(20);
         headerBox.setAlignment(Pos.CENTER);
         headerBox.setMaxWidth(1200);
@@ -1358,11 +1590,12 @@ public class CoursAffichage implements Initializable {
         Label titleLabel = new Label(cours.getTitre());
         titleLabel.setStyle("-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
 
-        headerBox.getChildren().addAll(backButton, spacer, titleLabel);
+        headerBox.getChildren().addAll(backButton, spacer2, titleLabel);
 
+        // Carte de description
         VBox descriptionCard = new VBox(15);
         descriptionCard.setMaxWidth(1200);
         descriptionCard.setStyle(
@@ -1384,6 +1617,7 @@ public class CoursAffichage implements Initializable {
 
         descriptionCard.getChildren().addAll(descriptionTitle, descriptionContent);
 
+        // Section des mots
         VBox motsSection = new VBox(15);
         motsSection.setMaxWidth(1200);
 
@@ -1433,6 +1667,7 @@ public class CoursAffichage implements Initializable {
 
         motsSection.getChildren().add(motsPane);
 
+        // SECTION ÉVALUATION
         VBox evaluationSection = new VBox(15);
         evaluationSection.setMaxWidth(1200);
         evaluationSection.setAlignment(Pos.CENTER);
@@ -1505,10 +1740,15 @@ public class CoursAffichage implements Initializable {
             evaluationSection.getChildren().addAll(evaluationTitle, passerQuizBtn, evaluationHint);
         }
 
-        mainContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationSection);
-        scrollPane.setContent(mainContainer);
+        // Assemblage du contenu
+        contentContainer.getChildren().addAll(headerBox, descriptionCard, motsSection, evaluationSection);
+        scrollPane.setContent(contentContainer);
 
-        Scene scene = new Scene(scrollPane, 1300, 800);
+        // Assemblage final avec sidebar
+        mainContainer.getChildren().addAll(sidebar, scrollPane);
+        HBox.setHgrow(scrollPane, Priority.ALWAYS);
+
+        Scene scene = new Scene(mainContainer, 1300, 800);
         contentStage.setScene(scene);
         contentStage.show();
     }

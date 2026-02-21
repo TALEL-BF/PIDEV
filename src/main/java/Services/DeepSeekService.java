@@ -32,7 +32,7 @@ public class DeepSeekService {
         try {
             System.out.println("🤖 Génération IA pour: \"" + titreCours + "\"");
 
-
+            // Prompt qui force l'IA à ne répondre qu'en JSON
             String prompt = "Tu es un professeur pour enfants. " +
                     "Génère 5 questions à choix multiple sur le thème: '" + titreCours + "'.\n\n" +
                     "RÈGLES IMPÉRATIVES:\n" +
@@ -180,7 +180,7 @@ public class DeepSeekService {
 
             System.out.println("📝 Réponse IA reçue");
 
-
+            // Extraction du JSON
             String jsonStr = extraireJSON(content);
 
             if (jsonStr != null) {
@@ -216,7 +216,9 @@ public class DeepSeekService {
         return questions;
     }
 
-
+    /**
+     * Extrait le JSON d'une chaîne
+     */
     private String extraireJSON(String texte) {
         // Cherche un objet JSON { ... }
         Pattern pattern = Pattern.compile("\\{.*\\}", Pattern.DOTALL);
@@ -229,7 +231,7 @@ public class DeepSeekService {
         return null;
     }
 
-
+    // ========== CLASSE QUESTION ==========
 
     public static class GeneratedQuestion {
         private String question;
