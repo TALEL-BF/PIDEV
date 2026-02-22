@@ -41,9 +41,34 @@
                 <Region styleClass="sidebarLine"/>
 
                 <!-- ✅ Menu -->
+                <!-- ✅ Menu -->
                 <Button text="📚  Nos cours" styleClass="sideBtn" fx:id="btnCours"/>
                 <Button text="🗓  Emplois du temps" styleClass="sideBtn" fx:id="btnEmploi"/>
-                <Button text="📰  Articles &amp; conseils" styleClass="sideBtnActive" fx:id="btnArticles"/>
+
+                <!-- ✅ Psychologie (parent) -->
+                <ToggleButton text="🧠  Psychologie"
+                              fx:id="tbPsychologie"
+                              onAction="#togglePsychologie"
+                              styleClass="sideBtn"/>
+
+                <!-- ✅ Submenu Psychologie -->
+                <VBox fx:id="psychologieSubMenu"
+                      spacing="6"
+                      visible="false"
+                      managed="false"
+                      styleClass="subMenuBox">
+
+                    <Button text="📰  Articles &amp; Conseils"
+                            fx:id="btnArticlesConseils"
+                            onAction="#goArticlesConseils"
+                            styleClass="subMenuBtn"/>
+
+                    <Button text="🧩  Suivie Thérapeutique"
+                            fx:id="btnSuivieTherapeutique"
+                            onAction="#goSuivieTherapeutique"
+                            styleClass="subMenuBtn"/>
+                </VBox>
+
                 <Button text="🎉  Événements" styleClass="sideBtn" fx:id="btnEvents"/>
                 <Button text="🎮  Jeux éducatifs" styleClass="sideBtn" fx:id="btnJeux"/>
 

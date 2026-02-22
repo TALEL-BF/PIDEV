@@ -216,4 +216,88 @@ public class SuivieServices implements ISuivieServices {
         }
         return list;
     }
+    public List<String> getEnfantsByEmail(String emailParent) {
+        List<String> noms = new ArrayList<>();
+        String sql = "SELECT DISTINCT NOM_ENFANT FROM suivie WHERE EMAIL_PARENT=? ORDER BY NOM_ENFANT";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, emailParent);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    noms.add(rs.getString("NOM_ENFANT"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return noms;
+    }
+    public List<Suivie> getStatsByEmailAndEnfant(String email, String enfant) {
+        List<Suivie> list = new ArrayList<>();
+
+        String sql = "SELECT DATE_SUIVIE, SCORE_HUMEUR, SCORE_STRESS, SCORE_ATTENTION " +
+                "FROM suivie WHERE EMAIL_PARENT=? AND NOM_ENFANT=? " +
+                "ORDER BY DATE_SUIVIE ASC";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, enfant);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Suivie s = new Suivie();
+                    s.setDateSuivie(rs.getTimestamp("DATE_SUIVIE"));
+                    s.setScoreHumeur(rs.getInt("SCORE_HUMEUR"));
+                    s.setScoreStress(rs.getInt("SCORE_STRESS"));
+                    s.setScoreAttention(rs.getInt("SCORE_ATTENTION"));
+                    list.add(s);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return list;
+    }
+    public Suivie getDernierSuivi(String email, String enfant) {
+        String sql = "SELECT * FROM suivie " +
+                "WHERE EMAIL_PARENT=? AND NOM_ENFANT=? " +
+                "ORDER BY DATE_SUIVIE DESC, ID_SUIVIE DESC " +
+                "LIMIT 1";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, enfant);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Suivie s = new Suivie(
+                            rs.getInt("ID_SUIVIE"),
+                            rs.getString("NOM_ENFANT"),
+                            rs.getInt("AGE"),
+                            rs.getString("NOM_PSY"),
+                            rs.getTimestamp("DATE_SUIVIE"),
+                            rs.getInt("SCORE_HUMEUR"),
+                            rs.getInt("SCORE_STRESS"),
+                            rs.getInt("SCORE_ATTENTION"),
+                            rs.getString("COMPORTEMENT"),
+                            rs.getString("INTERACTION_SOCIALE"),
+                            rs.getString("OBSERVATION"),
+                            rs.getString("STATUT"),
+                            rs.getString("EMAIL_PARENT"),
+                            (Integer) rs.getObject("NIVEAU_SEANCE"),
+                            (Integer) rs.getObject("ID_THERAPIE_RECO"),
+                            rs.getString("CR_RESUME"),
+                            rs.getString("CR_PDF_PATH")
+                    );
+                    return s;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }

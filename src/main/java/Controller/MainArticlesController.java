@@ -34,14 +34,51 @@ public class MainArticlesController {
     // Sidebar (FrontOffice)
     @FXML private Button btnCours, btnEmploi, btnArticles, btnEvents, btnJeux, btnLogout;
 
+    @FXML private ToggleButton tbPsychologie;
+    @FXML private VBox psychologieSubMenu;
+
+    @FXML private Button btnArticlesConseils;
+    @FXML private Button btnSuivieTherapeutique;
+
+    private Button activeSubBtn;
     // ---------- Data ----------
     private final List<Conseil> allArticles = new ArrayList<>();
     private ConseilServices conseilService;
     private ToggleGroup chipsGroup;
 
     @FXML
-    public void initialize() {
+    private void togglePsychologie() {
+        boolean show = tbPsychologie.isSelected();
+        psychologieSubMenu.setVisible(show);
+        psychologieSubMenu.setManaged(show);
 
+        // style actif pour Psychologie quand ouvert
+        if (show) {
+            if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
+                tbPsychologie.getStyleClass().add("sideBtnActive");
+            }
+        } else {
+            // si aucun sous-menu n'est actif, on enlève l'état actif
+            if (activeSubBtn == null) {
+                tbPsychologie.getStyleClass().remove("sideBtnActive");
+            }
+        }
+    }
+
+    @FXML
+    public void initialize() {
+        // Ouvrir Psychologie par défaut
+        tbPsychologie.setSelected(true);
+        psychologieSubMenu.setVisible(true);
+        psychologieSubMenu.setManaged(true);
+        if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
+            tbPsychologie.getStyleClass().add("sideBtnActive");
+        }
+
+        // Activer Articles & Conseils par défaut
+        setActiveSubMenu(btnArticlesConseils);
+
+        // Ton init actuel (search, cards, etc.) reste pareil
         conseilService = new ConseilServices();
 
         setupChips();
@@ -266,4 +303,46 @@ public class MainArticlesController {
         if (t.isEmpty()) return "";
         return t.length() <= max ? t : t.substring(0, max) + "...";
     }
+
+    private void setActiveSubMenu(Button btn) {
+        // retirer l'ancien actif
+        if (activeSubBtn != null) {
+            activeSubBtn.getStyleClass().remove("subMenuBtnActive");
+        }
+
+        // mettre le nouveau actif
+        activeSubBtn = btn;
+        if (!activeSubBtn.getStyleClass().contains("subMenuBtnActive")) {
+            activeSubBtn.getStyleClass().add("subMenuBtnActive");
+        }
+
+        // garder Psychologie ouvert + actif
+        tbPsychologie.setSelected(true);
+        psychologieSubMenu.setVisible(true);
+        psychologieSubMenu.setManaged(true);
+
+        if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
+            tbPsychologie.getStyleClass().add("sideBtnActive");
+        }
+    }
+    @FXML
+    private void goArticlesConseils() {
+        setActiveSubMenu(btnArticlesConseils);
+        // Tu es déjà sur cette page, donc rien à charger.
+    }
+    @FXML
+    private void goSuivieTherapeutique() {
+        setActiveSubMenu(btnSuivieTherapeutique);
+
+        // ✅ Exemple : charger une page (remplace par TON fichier FXML front-office)
+        try {
+            javafx.scene.Parent view = javafx.fxml.FXMLLoader.load(
+                    getClass().getResource("/ParentSuivi.fxml")
+            );
+            root.setCenter(view);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

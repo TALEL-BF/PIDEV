@@ -2476,3 +2476,78 @@
     -fx-tick-label-fill: #64748b;
     -fx-font-size: 11px;
 }
+/* Sous-menu container */
+.subMenuBox {
+    -fx-padding: 0 0 0 14;
+}
+
+/* Boutons sous-menu */
+.subMenuBtn {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 9 12;
+    -fx-background-radius: 12;
+}
+
+.subMenuBtn:hover {
+    -fx-background-color: rgba(255,255,255,0.18);
+}
+
+/* Actif (reste coloré) */
+.subMenuBtnActive {
+    -fx-background-color: white;
+    -fx-text-fill: #5D2EEB;
+    -fx-font-weight: 800;
+}
+.btn-primary {
+    -fx-background-color: #6E3FF3;
+    -fx-text-fill: white;
+    -fx-background-radius: 14;
+    -fx-padding: 10 16;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover { -fx-background-color: #5D2EEB; }
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-padding: 14;
+    -fx-border-color: rgba(100, 60, 240, 0.18);
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.2, 0, 6);
+}
+/* === FIX Chart: revenir à un rendu normal lisible === */
+.chart {
+    -fx-text-fill: #111111;
+}
+
+.chart-title, .axis-label, .axis-tick-mark, .axis-minor-tick-mark {
+    -fx-stroke: #111111;
+}
+
+.axis .tick-label {
+    -fx-text-fill: #111111;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-legend-item {
+    -fx-text-fill: #111111;
+}
+
+/* Fond du plot */
+.chart-plot-background {
+    -fx-background-color: rgba(255,255,255,0.85);
+}
+
+/* Grille légère */
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: rgba(0,0,0,0.08);
+}
