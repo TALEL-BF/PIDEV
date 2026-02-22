@@ -4,8 +4,7 @@ public class TextToSpeechManager {
 
     private static boolean isEnabled = true;
 
-    // 1 = Kevin (vraie voix)
-    // 2 = Simple (bip)
+
     private static final int TTS_METHOD = 1;
 
     public static void speak(String text) {

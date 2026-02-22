@@ -14,7 +14,7 @@ public class CoursServices {
         connection = Mydatabase.getInstance().getConnection();
     }
 
-    // Ajouter un cours
+
     public boolean ajouter(Cours cours) {
         String req = "INSERT INTO cours (titre, description, type_cours, niveau, duree, image, mots, images_mots) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try {
@@ -73,7 +73,7 @@ public class CoursServices {
         }
     }
 
-    // Récupérer tous les cours
+
     public List<Cours> getAll() {
         List<Cours> coursList = new ArrayList<>();
         String req = "SELECT * FROM cours";

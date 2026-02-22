@@ -23,9 +23,7 @@ public class DeepSeekService {
         this.mapper = new ObjectMapper();
     }
 
-    /**
-     * Génère des questions DYNAMIQUEMENT par l'IA à partir du titre du cours
-     */
+
     public List<GeneratedQuestion> genererQuestions(String titreCours) {
         List<GeneratedQuestion> questions = new ArrayList<>();
 
@@ -93,9 +91,6 @@ public class DeepSeekService {
         return questions;
     }
 
-    /**
-     * Seconde tentative avec un modèle différent
-     */
     private List<GeneratedQuestion> retryAvecAutreModele(String titreCours) {
         try {
             System.out.println("🔄 Tentative avec modèle Mixtral...");
@@ -131,9 +126,7 @@ public class DeepSeekService {
         return forceGeneration(titreCours);
     }
 
-    /**
-     * Force la génération avec extraction JSON
-     */
+
     private List<GeneratedQuestion> forceGeneration(String titreCours) {
         try {
             String prompt = "Génère 5 questions sur: " + titreCours +
@@ -167,9 +160,7 @@ public class DeepSeekService {
         return new ArrayList<>();
     }
 
-    /**
-     * Parse la réponse et extrait le JSON
-     */
+
     private List<GeneratedQuestion> parserReponse(String jsonResponse) {
         List<GeneratedQuestion> questions = new ArrayList<>();
 
@@ -195,7 +186,7 @@ public class DeepSeekService {
                         String bonneReponse = q.path("bonne_reponse").asText();
                         int score = q.path("score").asInt(1);
 
-                        // Nettoyage
+
                         question = question.replaceAll("^\\d+\\.\\s*", "");
 
                         if (!question.isEmpty() && !choix1.isEmpty() &&
@@ -231,7 +222,7 @@ public class DeepSeekService {
         return null;
     }
 
-    // ========== CLASSE QUESTION ==========
+
 
     public static class GeneratedQuestion {
         private String question;
@@ -259,7 +250,7 @@ public class DeepSeekService {
         public int getScore() { return score; }
     }
 
-    // ========== CLASSES API ==========
+
 
     private static class ApiRequest {
         public String model;

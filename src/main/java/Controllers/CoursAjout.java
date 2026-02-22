@@ -113,16 +113,15 @@ public class CoursAjout implements Initializable {
             }
         });
 
-        // Initialisation du bouton Todo
+
         setupTodoButton();
 
-        // Initialiser la barre de progression
         updateCompletionProgress();
     }
 
-    // NOUVELLE MÉTHODE pour mettre à jour la progression
+
     private void updateCompletionProgress() {
-        int totalFields = 7; // titre, type, niveau, duree, description, image, mots
+        int totalFields = 7;
         int completed = 0;
 
         if (titreField.getText() != null && !titreField.getText().trim().isEmpty()) completed++;
@@ -142,7 +141,7 @@ public class CoursAjout implements Initializable {
         }
     }
 
-    // NOUVELLE MÉTHODE pour le bouton Todo
+
     private void setupTodoButton() {
         if (todoButton != null) {
             todoButton.setOnAction(event -> {
@@ -247,9 +246,7 @@ public class CoursAjout implements Initializable {
         }
     }
 
-    /**
-     * CLASSE INTERNE POUR GÉRER UN MOT ET SON IMAGE
-     */
+
     private class ImageMotLigne {
         private int index;
         private Label motLabel;
@@ -306,9 +303,7 @@ public class CoursAjout implements Initializable {
         public void setMot(String mot) { motLabel.setText(mot); }
         public String getImagePath() { return imagePath; }
 
-        /**
-         * Met à jour l'affichage de l'image
-         */
+
         public void updateImageDisplay() {
             if (imagePath != null && !imagePath.isEmpty()) {
                 imageLabel.setText(imagePath);
@@ -357,9 +352,7 @@ public class CoursAjout implements Initializable {
         }
     }
 
-    /**
-     * Choisir une image pour un mot spécifique
-     */
+
     private void choisirImagePourMot(ImageMotLigne ligne) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour le mot: " + ligne.getMot());
@@ -371,7 +364,7 @@ public class CoursAjout implements Initializable {
 
         if (selectedFile != null) {
             ligne.setImagePath(selectedFile.getName());
-            // Forcer le rafraîchissement immédiat
+
             javafx.application.Platform.runLater(() -> {
                 imagesMotsContainer.requestLayout();
                 imagesMotsContainer.applyCss();
@@ -381,9 +374,7 @@ public class CoursAjout implements Initializable {
         }
     }
 
-    /**
-     * Supprimer l'image d'un mot
-     */
+
     private void supprimerImage(ImageMotLigne ligne) {
         ligne.setImagePath("");
         javafx.application.Platform.runLater(() -> {
@@ -394,9 +385,7 @@ public class CoursAjout implements Initializable {
         System.out.println("🗑️ Image supprimée pour le mot: " + ligne.getMot());
     }
 
-    /**
-     * Met à jour les lignes d'images en fonction des mots saisis
-     */
+
     private void mettreAJourLignesImages() {
         String motsText = motsField.getText();
         if (motsText == null || motsText.trim().isEmpty()) {
@@ -448,9 +437,6 @@ public class CoursAjout implements Initializable {
         });
     }
 
-    /**
-     * Ajoute une nouvelle ligne d'image pour un mot
-     */
     private void ajouterNouvelleLigneImage() {
         String motsText = motsField.getText();
         if (motsText == null || motsText.trim().isEmpty()) {
@@ -473,7 +459,7 @@ public class CoursAjout implements Initializable {
                     motsField.setText(motsField.getText() + ";" + mot);
                 }
 
-                // Forcer le rafraîchissement immédiat
+
                 javafx.application.Platform.runLater(() -> {
                     imagesMotsContainer.requestLayout();
                     imagesMotsContainer.applyCss();
@@ -486,7 +472,7 @@ public class CoursAjout implements Initializable {
                 System.out.println("✚ Nouveau mot ajouté: " + mot);
             }
         } else {
-            // Si des mots existent déjà, on ajoute juste une ligne pour un nouveau mot
+
             String[] mots = motsText.split(";");
             for (String mot : mots) {
                 if (!mot.trim().isEmpty()) {
@@ -519,9 +505,7 @@ public class CoursAjout implements Initializable {
         }
     }
 
-    /**
-     * Supprime une ligne
-     */
+
     private void supprimerLigne(ImageMotLigne ligne) {
         imagesMotLignes.remove(ligne);
         imagesMotsContainer.getChildren().remove(ligne.getLigneContainer());
@@ -546,9 +530,7 @@ public class CoursAjout implements Initializable {
         System.out.println("✖ Ligne supprimée pour le mot: " + ligne.getMot());
     }
 
-    /**
-     * Ouvre un FileChooser pour sélectionner une image pour le cours
-     */
+
     private void choisirImageCours() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour le cours");

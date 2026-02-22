@@ -63,13 +63,11 @@ public class FreeTTSService {
                 isSpeaking = true;
                 System.out.println("🔊 [Kevin] " + text);
 
-                // Petite pause avant de parler
+
                 Thread.sleep(50);
 
-                // Parler avec la voix naturelle de Kevin
                 voice.speak(text);
 
-                // Petite pause après la parole
                 Thread.sleep(100);
 
             } catch (Exception e) {
@@ -80,10 +78,7 @@ public class FreeTTSService {
             }
         }).start();
     }
-
-    /**
-     * Parler plus lentement (pour les enfants)
-     */
+    
     public static void speakSlow(String text) {
         if (!isInitialized || voice == null) return;
 
@@ -99,9 +94,7 @@ public class FreeTTSService {
         }).start();
     }
 
-    /**
-     * Parler plus vite
-     */
+
     public static void speakFast(String text) {
         if (!isInitialized || voice == null) return;
 
@@ -146,9 +139,6 @@ public class FreeTTSService {
         return isInitialized;
     }
 
-    /**
-     * Réinitialiser aux réglages par défaut de Kevin
-     */
     public static void resetToDefault() {
         if (voice != null) {
             voice.setRate(150);

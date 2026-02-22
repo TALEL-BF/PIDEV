@@ -70,8 +70,8 @@ public class CoursAffichage implements Initializable {
         coursServices = new CoursServices();
         evaluationServices = new EvaluationServices();
 
-        // Initialisation de Stability AI avec votre clé API
-        remplacer
+
+
         stabilityImageService = new StabilityImageService(stabilityApiKey);
 
         loadCours();
@@ -124,12 +124,12 @@ public class CoursAffichage implements Initializable {
         imageStage.setTitle("🤖 Générateur d'images par IA");
         imageStage.initModality(Modality.APPLICATION_MODAL);
 
-        // ================= CONTENEUR PRINCIPAL =================
+
         HBox mainContainer = new HBox();
         mainContainer.setPrefWidth(1300);
         mainContainer.setPrefHeight(800);
 
-        // ================= SIDEBAR IDENTIQUE =================
+
         VBox sidebar = new VBox(10);
         sidebar.setPrefWidth(260.0);
         sidebar.setMinWidth(260.0);
@@ -166,7 +166,7 @@ public class CoursAffichage implements Initializable {
         Separator separator = new Separator();
         separator.setStyle("-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;");
 
-        // Menu de navigation
+
         VBox menuBox = new VBox(8);
         menuBox.setStyle("-fx-padding: 10 0 20 0;");
 
@@ -212,7 +212,7 @@ public class CoursAffichage implements Initializable {
         mainScrollPane.setStyle("-fx-background: white; -fx-border-width: 0;");
         HBox.setHgrow(mainScrollPane, Priority.ALWAYS);
 
-        // Conteneur pour centrer le contenu
+
         StackPane centerWrapper = new StackPane();
         centerWrapper.setStyle("-fx-background-color: linear-gradient(to bottom, #F0F8FF, #E8F0FE);");
 
@@ -221,7 +221,7 @@ public class CoursAffichage implements Initializable {
         contentContainer.setAlignment(Pos.CENTER);
         contentContainer.setPadding(new Insets(40));
 
-        // ========== EN-TÊTE ==========
+
         HBox headerBox = new HBox(20);
         headerBox.setAlignment(Pos.CENTER_LEFT);
         headerBox.setMaxWidth(900);
@@ -254,18 +254,18 @@ public class CoursAffichage implements Initializable {
 
         headerBox.getChildren().addAll(backButton, headerSpacer, titleLabel);
 
-        // Sous-titre
+
         Label subtitleLabel = new Label("Décris ce que tu veux voir, l'IA va le créer pour toi !");
         subtitleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #666666; -fx-padding: 0 0 20 0;");
         subtitleLabel.setAlignment(Pos.CENTER);
 
-        // ========== CARTE PRINCIPALE CENTRÉE ==========
+
         VBox mainCard = new VBox(25);
         mainCard.setMaxWidth(800);
         mainCard.setAlignment(Pos.CENTER);
         mainCard.setStyle("-fx-background-color: white; -fx-background-radius: 25; -fx-border-color: #7B2FF7; -fx-border-width: 3; -fx-border-radius: 25; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.2), 15, 0, 0, 5);");
 
-        // Zone de texte pour le prompt
+
         VBox promptBox = new VBox(10);
         promptBox.setAlignment(Pos.CENTER);
 
@@ -281,14 +281,14 @@ public class CoursAffichage implements Initializable {
 
         promptBox.getChildren().addAll(promptLabel, promptArea);
 
-        // Bouton générer centré
+
         HBox buttonWrapper = new HBox();
         buttonWrapper.setAlignment(Pos.CENTER);
 
         Button genererButton = new Button("✨ Générer l'image");
         genererButton.setStyle("-fx-background-color: #7B2FF7; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 15 40; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);");
 
-        // Animation du bouton générer
+
         ScaleTransition genererScale = new ScaleTransition(Duration.millis(200), genererButton);
         genererButton.setOnMouseEntered(e -> {
             genererScale.setToX(1.05);
@@ -306,7 +306,7 @@ public class CoursAffichage implements Initializable {
 
         buttonWrapper.getChildren().add(genererButton);
 
-        // Indicateur de chargement centré
+
         HBox progressWrapper = new HBox();
         progressWrapper.setAlignment(Pos.CENTER);
 
@@ -316,7 +316,7 @@ public class CoursAffichage implements Initializable {
 
         progressWrapper.getChildren().add(progressIndicator);
 
-        // Zone d'affichage de l'image centrée
+
         VBox imageBox = new VBox(15);
         imageBox.setAlignment(Pos.CENTER);
         imageBox.setStyle("-fx-background-color: #F8F9FA; -fx-padding: 20; -fx-background-radius: 20; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-border-radius: 20;");
@@ -334,7 +334,7 @@ public class CoursAffichage implements Initializable {
 
         imageBox.getChildren().addAll(placeholderLabel, imageView);
 
-        // Boutons d'action centrés
+
         HBox actionButtons = new HBox(20);
         actionButtons.setAlignment(Pos.CENTER);
         actionButtons.setVisible(false);
@@ -347,7 +347,7 @@ public class CoursAffichage implements Initializable {
 
         actionButtons.getChildren().addAll(saveButton, newButton);
 
-        // Label d'erreur centré
+
         HBox errorWrapper = new HBox();
         errorWrapper.setAlignment(Pos.CENTER);
 
@@ -357,15 +357,15 @@ public class CoursAffichage implements Initializable {
 
         errorWrapper.getChildren().add(errorLabel);
 
-        // Assemblage de la carte
+
         mainCard.getChildren().addAll(promptBox, buttonWrapper, progressWrapper, imageBox, actionButtons, errorWrapper);
 
-        // Assemblage du contenu
+
         contentContainer.getChildren().addAll(headerBox, subtitleLabel, mainCard);
         centerWrapper.getChildren().add(contentContainer);
         mainScrollPane.setContent(centerWrapper);
 
-        // ========== LOGIQUE DE GÉNÉRATION ==========
+
         genererButton.setOnAction(e -> {
             String prompt = promptArea.getText().trim();
             if (prompt.isEmpty()) {
@@ -440,7 +440,7 @@ public class CoursAffichage implements Initializable {
             }).start();
         });
 
-        // Assemblage final
+
         mainContainer.getChildren().addAll(sidebar, mainScrollPane);
 
         Scene scene = new Scene(mainContainer);

@@ -8,13 +8,13 @@ public class SimpleTTS {
     public static void speak(String text) {
         if (text == null || text.trim().isEmpty()) return;
 
-        // 1. Beep système
+
         java.awt.Toolkit.getDefaultToolkit().beep();
 
-        // 2. Afficher dans la console
+
         System.out.println("🔊 [SimpleTTS] " + text);
 
-        // 3. Afficher une notification
+
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("🔊 Message vocal");
@@ -29,7 +29,7 @@ public class SimpleTTS {
                             "-fx-background-radius: 15;"
             );
 
-            // Auto-fermeture après 2 secondes
+
             new Thread(() -> {
                 try {
                     Thread.sleep(2000);

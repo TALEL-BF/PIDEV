@@ -23,16 +23,12 @@ public class StabilityImageService {
                 .build();
     }
 
-    /**
-     * Génère une image avec Stability AI
-     * @param prompt La description de l'image
-     * @return Les bytes de l'image générée
-     */
+
     public byte[] genererImage(String prompt) {
         try {
             System.out.println("🎨 Stability AI - Génération pour: \"" + prompt + "\"");
 
-            // Construction de la requête pour Stability AI
+
             JsonObject input = new JsonObject();
             input.addProperty("text_prompts[0].text", prompt + ", children's drawing style, cartoon, colorful, simple, white background, educational for kids");
             input.addProperty("cfg_scale", 7);
@@ -41,7 +37,7 @@ public class StabilityImageService {
             input.addProperty("samples", 1);
             input.addProperty("steps", 30);
 
-            // Format alternatif (si le précédent ne fonctionne pas)
+
             JsonObject payload = new JsonObject();
             JsonObject textPrompt = new JsonObject();
             textPrompt.addProperty("text", prompt + ", children's drawing style, cartoon, colorful, simple, white background");
@@ -75,7 +71,7 @@ public class StabilityImageService {
                 String responseBody = response.body().string();
                 JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
 
-                // Stability AI retourne les images en base64
+
                 if (jsonResponse.has("artifacts") && jsonResponse.getAsJsonArray("artifacts").size() > 0) {
                     String base64Image = jsonResponse.getAsJsonArray("artifacts")
                             .get(0).getAsJsonObject()
@@ -99,9 +95,7 @@ public class StabilityImageService {
         return null;
     }
 
-    /**
-     * Version simplifiée avec le modèle plus rapide
-     */
+
     public byte[] genererImageRapide(String prompt) {
         try {
             String url = "https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image";
