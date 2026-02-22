@@ -14,30 +14,22 @@ public class Navigation {
     private static Stage primaryStage;
     private static Map<String, String> parameters = new HashMap<>();
 
-    /**
-     * Initialiser le stage principal
-     */
+
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
     }
 
-    /**
-     * Définir les paramètres pour la navigation
-     */
+
     public static void setParameters(Map<String, String> params) {
         parameters = params;
     }
 
-    /**
-     * Récupérer les paramètres de navigation
-     */
+
     public static Map<String, String> getParameters() {
         return parameters;
     }
 
-    /**
-     * Changer de page dans la même fenêtre
-     */
+
     public static void navigateTo(String fxmlFile, String title) {
         try {
             // Extraire les paramètres de l'URL si présents
@@ -59,10 +51,9 @@ public class Navigation {
                 }
             }
 
-            // Sauvegarder les paramètres
+
             setParameters(params);
 
-            // Construire le chemin du fichier FXML
             String path = "/" + fxmlPath;
             if (!path.endsWith(".fxml")) {
                 path += ".fxml";
@@ -71,7 +62,6 @@ public class Navigation {
             System.out.println("🔍 Chargement de : " + path);
             System.out.println("📋 Paramètres : " + params);
 
-            // Vérifier si le fichier existe
             if (Navigation.class.getResource(path) == null) {
                 System.err.println("❌ Fichier FXML introuvable : " + path);
                 System.err.println("📁 Chemins recherchés :");
@@ -104,18 +94,16 @@ public class Navigation {
         }
     }
 
-    /**
-     * Ouvrir une nouvelle fenêtre (modale)
-     */
+
     public static void openNewWindow(String fxmlFile, String title) {
         try {
-            // Vérifier que le stage principal est initialisé
+
             if (primaryStage == null) {
                 System.err.println("❌ Stage principal non initialisé !");
                 return;
             }
 
-            // Construire le chemin du fichier FXML
+
             String path = "/" + fxmlFile;
             if (!path.endsWith(".fxml")) {
                 path += ".fxml";
@@ -123,7 +111,6 @@ public class Navigation {
 
             System.out.println("🔍 Ouverture nouvelle fenêtre : " + path);
 
-            // Vérifier si le fichier existe
             if (Navigation.class.getResource(path) == null) {
                 System.err.println("❌ Fichier FXML introuvable : " + path);
                 return;
@@ -152,31 +139,21 @@ public class Navigation {
         }
     }
 
-    /**
-     * Retour à la page précédente (optionnel - à implémenter avec un historique)
-     */
+
     public static void goBack() {
         System.out.println("⏪ Retour à la page précédente");
-        // TODO: Implémenter un historique de navigation
+
     }
 
-    /**
-     * Obtenir le stage principal
-     */
+
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
 
-    /**
-     * Vérifier si le stage principal est initialisé
-     */
     public static boolean isPrimaryStageSet() {
         return primaryStage != null;
     }
 
-    /**
-     * Afficher une alerte d'erreur
-     */
     private static void showErrorAlert(String title, String content) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                 javafx.scene.control.Alert.AlertType.ERROR
@@ -187,9 +164,7 @@ public class Navigation {
         alert.showAndWait();
     }
 
-    /**
-     * Rafraîchir la page actuelle
-     */
+
     public static void refreshCurrentPage() {
         if (primaryStage != null) {
             String title = primaryStage.getTitle();

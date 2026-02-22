@@ -78,7 +78,7 @@ public class FreeTTSService {
             }
         }).start();
     }
-    
+
     public static void speakSlow(String text) {
         if (!isInitialized || voice == null) return;
 
