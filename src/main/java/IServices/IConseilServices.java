@@ -12,4 +12,6 @@ public interface IConseilServices {
 
     // optionnel: recherche DB
     List<Conseil> rechercher(String keyword);
+    int incrementLike(int idArticle);
+    int decrementLike(int idArticle);
 }

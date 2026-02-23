@@ -106,6 +106,7 @@
                                 <Label text="Aperçu rapide" styleClass="statsHint"/>
                             </HBox>
 
+
                             <!-- Card -->
                             <VBox fx:id="statsBox" managed="false" visible="false" spacing="12" styleClass="statsShell">
 

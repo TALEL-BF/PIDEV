@@ -14,72 +14,59 @@
             styleClass="appRoot">
 
     <left>
-        <StackPane prefWidth="252">
-            <!-- ✅ Sidebar container -->
-            <VBox fx:id="sidebarBox" prefWidth="252" spacing="16" styleClass="sidebar">
-                <padding>
-                    <Insets top="22" right="18" bottom="18" left="18"/>
-                </padding>
+        <VBox prefWidth="252" spacing="14" styleClass="sb">
 
-                <!-- ✅ Brand -->
-                <HBox spacing="12" styleClass="brand">
-                    <StackPane styleClass="logoCircle">
-                        <ImageView fitWidth="34" fitHeight="34" preserveRatio="true">
-                            <image>
-                                <!-- ✅ src/main/resources/assets/logo.png -->
-                                <Image url="@assets/logo.png"/>
-                            </image>
-                        </ImageView>
-                    </StackPane>
+            <!-- Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
+                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
+                    <image><Image url="@assets/logo.png"/></image>
+                </ImageView>
 
-                    <VBox spacing="2">
-                        <Label text="AutiCare" styleClass="brandTitle"/>
-                        <Label text="Plateforme éducative" styleClass="brandSub"/>
-                    </VBox>
-                </HBox>
+                <VBox spacing="2">
+                    <Label text="AutiCare" styleClass="sbTitle"/>
+                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                </VBox>
+            </HBox>
 
-                <Region styleClass="sidebarLine"/>
+            <Region styleClass="sidebarLine"/>
 
-                <!-- ✅ Menu -->
-                <!-- ✅ Menu -->
-                <Button text="📚  Nos cours" styleClass="sideBtn" fx:id="btnCours"/>
-                <Button text="🗓  Emplois du temps" styleClass="sideBtn" fx:id="btnEmploi"/>
+            <!-- Menu -->
+            <VBox spacing="6" styleClass="sbMenu">
 
-                <!-- ✅ Psychologie (parent) -->
+                <Button text="📚  Nos cours" styleClass="sbItem" fx:id="btnCours"/>
+                <Button text="🗓  Emplois du temps" styleClass="sbItem" fx:id="btnEmploi"/>
+
+                <!-- Psychologie -->
                 <ToggleButton text="🧠  Psychologie"
                               fx:id="tbPsychologie"
                               onAction="#togglePsychologie"
-                              styleClass="sideBtn"/>
+                              styleClass="sbItem"/>
 
-                <!-- ✅ Submenu Psychologie -->
                 <VBox fx:id="psychologieSubMenu"
                       spacing="6"
                       visible="false"
                       managed="false"
-                      styleClass="subMenuBox">
+                      styleClass="sbSubMenu">
 
                     <Button text="📰  Articles &amp; Conseils"
                             fx:id="btnArticlesConseils"
                             onAction="#goArticlesConseils"
-                            styleClass="subMenuBtn"/>
+                            styleClass="sbSubItem"/>
 
                     <Button text="🧩  Suivie Thérapeutique"
                             fx:id="btnSuivieTherapeutique"
                             onAction="#goSuivieTherapeutique"
-                            styleClass="subMenuBtn"/>
+                            styleClass="sbSubItem"/>
                 </VBox>
 
-                <Button text="🎉  Événements" styleClass="sideBtn" fx:id="btnEvents"/>
-                <Button text="🎮  Jeux éducatifs" styleClass="sideBtn" fx:id="btnJeux"/>
-
-                <Region VBox.vgrow="ALWAYS"/>
-
-                <Button text="⎋ Déconnexion" styleClass="logoutBtn" fx:id="btnLogout"/>
+                <Button text="🎉  Événements" styleClass="sbItem" fx:id="btnEvents"/>
+                <Button text="🎮  Jeux éducatifs" styleClass="sbItem" fx:id="btnJeux"/>
             </VBox>
 
-            <!-- ✅ (اختياري) shine overlay إذا مازلت تستعمله -->
-            <Region fx:id="sidebarShine" mouseTransparent="true" styleClass="sidebar-shine"/>
-        </StackPane>
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button text="⎋ Déconnexion" styleClass="sbLogout" fx:id="btnLogout"/>
+        </VBox>
     </left>
 
     <center>

@@ -4,132 +4,223 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.control.TextArea?>
-<BorderPane stylesheets="@styles/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ParentSuiviController">
+<BorderPane fx:id="root"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.ParentSuiviController"
+            stylesheets="@styles/app.css"
+            styleClass="appRoot">
 
-    <center>
-        <VBox prefWidth="980" spacing="16" styleClass="page">
-            <padding>
-                <Insets bottom="26" left="26" right="26" top="22"/>
-            </padding>
+    <!-- ✅ SIDEBAR (améliorée, style sb*) -->
+    <left>
+        <VBox prefWidth="252" spacing="14" styleClass="sb">
 
-            <!-- TITRE -->
-            <VBox spacing="6">
-                <Label styleClass="sectionTitle" text="Espace Parent — Suivi thérapeutique"/>
-                <Label styleClass="sectionSub" text="Entrez votre email pour voir l’avancement de votre enfant."/>
+            <!-- Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
+                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
+                    <image><Image url="@assets/logo.png"/></image>
+                </ImageView>
+
+                <VBox spacing="2">
+                    <Label text="AutiCare" styleClass="sbTitle"/>
+                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                </VBox>
+            </HBox>
+
+            <Region styleClass="sidebarLine"/>
+
+            <!-- Menu -->
+            <VBox spacing="6" styleClass="sbMenu">
+
+                <Button text="📚  Nos cours" styleClass="sbItem" fx:id="btnCours"/>
+                <Button text="🗓  Emplois du temps" styleClass="sbItem" fx:id="btnEmploi"/>
+
+                <ToggleButton text="🧠  Psychologie"
+                              fx:id="tbPsychologie"
+                              onAction="#togglePsychologie"
+                              styleClass="sbItem"/>
+
+                <VBox fx:id="psychologieSubMenu"
+                      spacing="6"
+                      visible="false"
+                      managed="false"
+                      styleClass="sbSubMenu">
+
+                    <Button text="📰 Articles &amp; Conseils"
+                            fx:id="btnArticlesConseils"
+                            onAction="#goArticlesConseils"
+                            styleClass="sbSubItem"/>
+
+                    <Button text="🧩  Suivie Thérapeutique"
+                            fx:id="btnSuivieTherapeutique"
+                            onAction="#goSuivieTherapeutique"
+                            styleClass="sbSubItem"/>
+                </VBox>
+
+                <Button text="🎉  Événements" styleClass="sbItem" fx:id="btnEvents"/>
+                <Button text="🎮  Jeux éducatifs" styleClass="sbItem" fx:id="btnJeux"/>
             </VBox>
 
-            <!-- EMAIL -->
-            <HBox alignment="CENTER_LEFT" spacing="12">
-                <TextField fx:id="tfEmailParent"
-                           prefHeight="40.0"
-                           promptText="Email parent (ex: parent@gmail.com)"
-                           styleClass="searchField"
-                           HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnChercher"
-                        onAction="#onChercher"
-                        prefHeight="42.0"
-                        prefWidth="120.0"
-                        styleClass="searchBtn"
-                        text="Chercher"/>
-            </HBox>
+            <Region VBox.vgrow="ALWAYS"/>
 
-            <!-- ENFANT + VOIR -->
-            <HBox alignment="CENTER_LEFT" spacing="12">
-                <Label styleClass="details-key" text="Enfant :"/>
-                <ComboBox fx:id="cbEnfants" prefHeight="28.0" prefWidth="260.0"/>
-                <Button fx:id="btnVoirSuivi"
-                        onAction="#onVoirSuivi"
-                        styleClass="btn-solid-dark"
-                        text="Voir suivi"/>
-            </HBox>
-
-            <!-- ✅ ZONE PRINCIPALE : GRAPHE À GAUCHE / CARTE À DROITE -->
-            <GridPane hgap="18" vgap="18">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="65"/>
-                    <ColumnConstraints minWidth="340" prefWidth="360" percentWidth="35"/>
-                </columnConstraints>
-
-                <!-- GRAPHE -->
-                <LineChart fx:id="lineChart"
-                           animated="false"
-                           prefHeight="320.0"
-                           minHeight="320.0"
-                           GridPane.columnIndex="0">
-                    <xAxis>
-                        <CategoryAxis fx:id="xAxis" label="Consultations"/>
-                    </xAxis>
-                    <yAxis>
-                        <NumberAxis fx:id="yAxis" label="Score"/>
-                    </yAxis>
-                </LineChart>
-
-                <!-- CARTE DERNIÈRE CONSULTATION -->
-                <VBox fx:id="lastCard"
-                      spacing="10"
-                      styleClass="card"
-                      GridPane.columnIndex="1">
-
-                    <Label styleClass="sectionTitle" text="Dernière consultation"/>
-
-                    <GridPane hgap="16" vgap="10" styleClass="details-grid">
-                        <columnConstraints>
-                            <ColumnConstraints minWidth="140" prefWidth="140"/>
-                            <ColumnConstraints hgrow="ALWAYS"/>
-                        </columnConstraints>
-
-                        <Label styleClass="details-key" text="Psychologue" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <Label fx:id="lblPsy" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                        <Label styleClass="details-key" text="État" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <Label fx:id="lblEtat" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                        <Label styleClass="details-key" text="Date/Heure" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <Label fx:id="lblDateHeure" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                        <Label styleClass="details-key" text="Scores (H/S/A)" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <Label fx:id="lblScores" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                        <Label styleClass="details-key" text="Exercice recommandé" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                        <Label fx:id="lblExercice" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-
-                        <Label styleClass="details-key" text="Observation" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-                        <Label fx:id="lblObs" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-                    </GridPane>
-
-                    <Button fx:id="btnDownloadPdf"
-                            onAction="#onDownloadPdf"
-                            styleClass="btn-primary"
-                            text="📥 Télécharger le compte rendu (PDF)"
-                            maxWidth="Infinity"/>
-                    <Button text="🤖 Générer conseils personnalisés (IA)"
-                            fx:id="btnAi"
-                            onAction="#onGenererConseilsIA"
-                            styleClass="btn-primary"/>
-
-                    <TextArea fx:id="taConseils"
-                              promptText="Les conseils IA s’afficheront ici..."
-                              wrapText="true"
-                              prefRowCount="8"
-                              styleClass="details-box"/>
-                </VBox>
-            </GridPane>
-
-            <!-- INFO -->
-            <Label fx:id="lblInfo" styleClass="countLabel" text=""/>
+            <Button text="⎋ Déconnexion" styleClass="sbLogout" fx:id="btnLogout"/>
         </VBox>
+    </left>
+
+    <!-- ✅ CENTER (artistique + sans bouger le repère stats) -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="pageScroll">
+            <VBox prefWidth="980" spacing="16" styleClass="page">
+                <padding>
+                    <Insets top="22" right="26" bottom="26" left="26"/>
+                </padding>
+
+                <!-- ✅ HERO (comme Articles) -->
+                <HBox spacing="16" styleClass="heroCard" alignment="CENTER_LEFT">
+                    <StackPane minWidth="90" minHeight="90"
+                               prefWidth="90" prefHeight="90"
+                               styleClass="heroImageWrapper">
+
+                        <!-- 🔁 Mets ton image ici -->
+                        <ImageView fitWidth="90" fitHeight="90" preserveRatio="true">
+                            <image>
+                                <Image url="@assets/PSY.png"/>
+                            </image>
+                        </ImageView>
+                    </StackPane>
+
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Espace Parent — Suivi thérapeutique ✨" styleClass="heroTitle"/>
+                        <Label text="Suivez l’évolution (Humeur • Stress • Attention) et téléchargez le compte rendu en un clic."
+                               wrapText="true" styleClass="heroSub"/>
+                        <Label text="✦ Conseils personnalisés + PDF" styleClass="pillInfo"/>
+                    </VBox>
+                </HBox>
+
+                <!-- EMAIL -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <TextField fx:id="tfEmailParent"
+                               prefHeight="40.0"
+                               promptText="Email parent (ex: parent@gmail.com)"
+                               styleClass="searchField"
+                               HBox.hgrow="ALWAYS"/>
+
+                    <Button fx:id="btnChercher"
+                            onAction="#onChercher"
+                            prefHeight="42.0"
+                            prefWidth="140.0"
+                            styleClass="btnGrad"
+                            text="Chercher"/>
+                </HBox>
+
+                <!-- ENFANT + VOIR -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label styleClass="details-key" text="Enfant :"/>
+                    <ComboBox fx:id="cbEnfants"
+                              prefHeight="30.0"
+                              prefWidth="280.0"
+                              styleClass="comboModern"/>
+
+                    <Button fx:id="btnVoirSuivi"
+                            onAction="#onVoirSuivi"
+                            styleClass="btnTeal"
+                            text="Voir suivi"/>
+                </HBox>
+
+                <!-- ✅ GRAPHE + CARTE (REPÈRE IDENTIQUE) -->
+                <GridPane hgap="18" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="65"/>
+                        <ColumnConstraints minWidth="340" prefWidth="360" percentWidth="35"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints/>
+                    </rowConstraints>
+
+                    <!-- Chart à gauche -->
+                    <LineChart fx:id="lineChart"
+                               styleClass="chartCard"
+                               animated="false"
+                               minHeight="320.0"
+                               prefHeight="320.0"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="0">
+                        <xAxis>
+                            <CategoryAxis fx:id="xAxis" label="Consultations"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="yAxis" label="Score"/>
+                        </yAxis>
+                    </LineChart>
+
+                    <!-- Carte droite -->
+                    <VBox fx:id="lastCard"
+                          spacing="10"
+                          styleClass="card statsCard"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="0">
+
+                        <Label styleClass="sectionTitle" text="Dernière consultation"/>
+
+                        <GridPane hgap="16" vgap="10" styleClass="details-grid">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="140" prefWidth="140"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                                <RowConstraints/>
+                            </rowConstraints>
+
+                            <Label styleClass="details-key" text="Psychologue" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Label fx:id="lblPsy" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                            <Label styleClass="details-key" text="État" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Label fx:id="lblEtat" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                            <Label styleClass="details-key" text="Date/Heure" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                            <Label fx:id="lblDateHeure" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                            <Label styleClass="details-key" text="Scores (H/S/A)" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                            <Label fx:id="lblScores" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                            <Label styleClass="details-key" text="Exercice recommandé" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                            <Label fx:id="lblExercice" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                            <Label styleClass="details-key" text="Observation" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                            <Label fx:id="lblObs" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                        </GridPane>
+
+                        <Button fx:id="btnDownloadPdf"
+                                maxWidth="Infinity"
+                                onAction="#onDownloadPdf"
+                                styleClass="btnGrad"
+                                text="📥 Télécharger le compte rendu (PDF)"/>
+
+                        <Button fx:id="btnAi"
+                                onAction="#onGenererConseilsIA"
+                                styleClass="btnPink"
+                                text="🤖 Générer conseils personnalisés (IA)"/>
+
+                        <Button fx:id="btnUploadParentPdf"
+                                text="📤 Envoyer un document (PDF)"
+                                onAction="#onUploadParentPdf"
+                                styleClass="btnGhost"/>
+                    </VBox>
+                </GridPane>
+
+                <Label fx:id="lblInfo" styleClass="countLabel" text=""/>
+            </VBox>
+        </ScrollPane>
     </center>
 
 </BorderPane>

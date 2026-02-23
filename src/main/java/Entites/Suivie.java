@@ -22,6 +22,11 @@ public class Suivie {
         private Integer idTherapieReco;   // nullable
         private String crResume;
         private String crPdfPath;
+    private String parentPdfPath;
+    private String parentPdfName;
+    private String parentPdfSubject;
+    private java.sql.Timestamp parentPdfUploadedAt;
+    private boolean parentPdfSeen;
 
 
     // 🔹 Constructeur vide
@@ -189,7 +194,20 @@ public class Suivie {
 
     public String getCrPdfPath() { return crPdfPath; }
     public void setCrPdfPath(String crPdfPath) { this.crPdfPath = crPdfPath; }
+    public String getParentPdfPath() { return parentPdfPath; }
+    public void setParentPdfPath(String parentPdfPath) { this.parentPdfPath = parentPdfPath; }
 
+    public String getParentPdfName() { return parentPdfName; }
+    public void setParentPdfName(String parentPdfName) { this.parentPdfName = parentPdfName; }
+
+    public String getParentPdfSubject() { return parentPdfSubject; }
+    public void setParentPdfSubject(String parentPdfSubject) { this.parentPdfSubject = parentPdfSubject; }
+
+    public java.sql.Timestamp getParentPdfUploadedAt() { return parentPdfUploadedAt; }
+    public void setParentPdfUploadedAt(java.sql.Timestamp parentPdfUploadedAt) { this.parentPdfUploadedAt = parentPdfUploadedAt; }
+
+    public boolean isParentPdfSeen() { return parentPdfSeen; }
+    public void setParentPdfSeen(boolean parentPdfSeen) { this.parentPdfSeen = parentPdfSeen; }
 
 
     @Override

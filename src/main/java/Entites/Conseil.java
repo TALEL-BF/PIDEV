@@ -11,6 +11,9 @@ public class Conseil {
     private Timestamp dateCreation;
     private String auteur;
 
+    // ✅ NEW
+    private int likesCount;
+
     public Conseil() {}
 
     // Insertion
@@ -21,15 +24,16 @@ public class Conseil {
         this.auteur = auteur;
     }
 
-    // Lecture DB
+    // Lecture DB (avec likes_count)
     public Conseil(Integer idArticle, String titre, String contenu,
-                   String categorie, Timestamp dateCreation, String auteur) {
+                   String categorie, Timestamp dateCreation, String auteur, int likesCount) {
         this.idArticle = idArticle;
         this.titre = titre;
         this.contenu = contenu;
         this.categorie = categorie;
         this.dateCreation = dateCreation;
         this.auteur = auteur;
+        this.likesCount = likesCount;
     }
 
     public Integer getIdArticle() { return idArticle; }
@@ -50,6 +54,11 @@ public class Conseil {
     public String getAuteur() { return auteur; }
     public void setAuteur(String auteur) { this.auteur = auteur; }
 
+    // ✅ NEW
+    public int getLikesCount() { return likesCount; }
+    public void setLikesCount(int likesCount) { this.likesCount = likesCount; }
+
+
     @Override
     public String toString() {
         return "Conseil{" +
@@ -57,6 +66,7 @@ public class Conseil {
                 ", titre='" + titre + '\'' +
                 ", categorie='" + categorie + '\'' +
                 ", auteur='" + auteur + '\'' +
+                ", likesCount=" + likesCount +
                 '}';
     }
 }

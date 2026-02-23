@@ -2551,3 +2551,1024 @@
 .chart-vertical-grid-lines, .chart-horizontal-grid-lines {
     -fx-stroke: rgba(0,0,0,0.08);
 }
+/* Humeur = Vert */
+.default-color0.chart-series-line {
+    -fx-stroke: #22C55E;   /* vert */
+}
+.default-color0.chart-line-symbol {
+    -fx-background-color: #22C55E, white;
+}
+
+/* Stress = Rouge */
+.default-color1.chart-series-line {
+    -fx-stroke: #EF4444;   /* rouge */
+}
+.default-color1.chart-line-symbol {
+    -fx-background-color: #EF4444, white;
+}
+
+/* Attention = Orange */
+.default-color2.chart-series-line {
+    -fx-stroke: #F97316;   /* orange */
+}
+.default-color2.chart-line-symbol {
+    -fx-background-color: #F97316, white;
+}
+.notifBtn {
+    -fx-background-color: white;
+    -fx-border-color: #C4B5FD;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 14;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+.notifBadge {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 2 7;
+    -fx-background-radius: 999;
+}
+
+.notifCard {
+    -fx-background-color: white;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 12;
+}
+
+.notifCardNew {
+    -fx-border-color: #7C3AED;
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.25), 10, 0.2, 0, 3);
+}
+
+.notifTitle {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0F172A;
+}
+
+.notifMeta {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+/* =========================
+   Notifications Popup
+   ========================= */
+
+.notifRoot {
+    -fx-background-color: #F7F8FC;
+    -fx-padding: 16;
+}
+
+.notifHeader {
+    -fx-background-color: white;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 14 14 14 14;
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.12), 14, 0.2, 0, 4);
+}
+
+.notifHeaderTitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
+}
+
+.notifHeaderSub {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+.notifRefreshBtn {
+    -fx-background-color: #F3E8FF;
+    -fx-text-fill: #7C3AED;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+
+.notifScroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.notifCard {
+    -fx-background-color: white;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 14;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 12, 0.2, 0, 4);
+}
+
+.notifCardNew {
+    -fx-border-color: #7C3AED;
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.18), 14, 0.25, 0, 6);
+}
+
+.notifTitle {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
+}
+
+.notifMeta {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+.notifFile {
+    -fx-font-size: 12px;
+    -fx-text-fill: #334155;
+}
+
+.notifBadgeNew {
+    -fx-background-color: #7C3AED;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-padding: 4 10;
+    -fx-background-radius: 999;
+}
+
+.notifBadgeSeen {
+    -fx-background-color: #E2E8F0;
+    -fx-text-fill: #334155;
+    -fx-font-weight: 800;
+    -fx-padding: 4 10;
+    -fx-background-radius: 999;
+}
+
+.notifDownloadBtn {
+    -fx-background-color: #7C3AED;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-background-radius: 12;
+    -fx-padding: 10 14;
+    -fx-cursor: hand;
+}
+
+.notifSecondaryBtn {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #0F172A;
+    -fx-font-weight: 700;
+    -fx-background-radius: 12;
+    -fx-padding: 10 14;
+    -fx-cursor: hand;
+}
+
+.notifEmpty {
+    -fx-background-color: white;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 18;
+}
+
+.notifEmptyTitle {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
+}
+
+.notifEmptySub {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+/* =========================
+   STATS + NOTIF (BackOffice)
+   ========================= */
+
+.statsToggleRow {
+    -fx-padding: 6 4 0 4;
+}
+
+.statsToggleText {
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
+}
+
+.statsHint {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748B;
+}
+
+/* 🔔 wrapper so badge overlays */
+.notifWrap {
+    -fx-padding: 0;
+}
+
+.notifBtn {
+    -fx-background-color: white;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.10), 10, 0.2, 0, 3);
+}
+
+.notifBtn:hover {
+    -fx-background-color: #F7F0FF;
+}
+
+.notifBadge {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 10px;
+    -fx-padding: 2 6;
+    -fx-background-radius: 999;
+    -fx-translate-x: 6;
+    -fx-translate-y: -6;
+}
+
+/* Stats card shell */
+.statsShell {
+    -fx-background-color: white;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 14, 0.2, 0, 4);
+}
+
+.statsHeader {
+    -fx-background-color: linear-gradient(to right, #7C3AED, #8B5CF6);
+    -fx-background-radius: 16;
+    -fx-padding: 12;
+}
+
+.statsHeaderTitle {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+}
+
+.statsHeaderSub {
+    -fx-text-fill: rgba(255,255,255,0.85);
+    -fx-font-size: 12px;
+}
+
+.statsCombo {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+}
+
+.statsBtn {
+    -fx-background-color: rgba(255,255,255,0.16);
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255,255,255,0.25);
+    -fx-border-radius: 12;
+}
+
+.statsBody {
+    -fx-padding: 4 2 2 2;
+}
+
+.chartShell {
+    -fx-background-color: #F7F8FC;
+    -fx-border-color: #E9D5FF;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 10;
+}
+
+.chartTitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0F172A;
+}
+
+.chartHint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+}
+
+/* Make chart clean */
+.statsLineChart {
+    -fx-background-color: transparent;
+}
+
+.statsLineChart .chart-plot-background {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+}
+
+.statsLineChart .chart-vertical-grid-lines,
+.statsLineChart .chart-horizontal-grid-lines {
+    -fx-stroke: rgba(100,116,139,0.18);
+}
+
+.statsLineChart .axis-label {
+    -fx-text-fill: #334155;
+    -fx-font-weight: 700;
+}
+
+.statsLineChart .chart-legend {
+    -fx-background-color: transparent;
+}
+/* =========================
+   STATS + NOTIF (pro)
+   ========================= */
+
+.statsToggleRow {
+    -fx-padding: 4 2 0 2;
+}
+
+.statsToggleText {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text;
+}
+
+.statsHint {
+    -fx-font-size: 12px;
+    -fx-text-fill: -muted;
+}
+
+/* notif */
+.notifWrap {
+    -fx-padding: 0 2 0 2;
+}
+
+.notifBtn {
+    -fx-background-color: white;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 10, 0, 0, 3);
+}
+
+.notifBtn:hover {
+    -fx-background-color: #F5F3FF; /* léger violet */
+}
+
+.notifBadge {
+    -fx-background-color: #EF4444;  /* rouge */
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 2 7;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-translate-x: 6;
+    -fx-translate-y: -6;
+}
+/* =========================
+   NOTIF POPUP (cards)
+   ========================= */
+.notifRoot {
+    -fx-background-color: -bg;
+}
+
+.notifTitle {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text;
+}
+
+.notifSub {
+    -fx-font-size: 12px;
+    -fx-text-fill: -muted;
+}
+
+.notifList {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-padding: 6 0 0 0;
+}
+
+.notifCard {
+    -fx-background-color: white;
+    -fx-border-color: -border;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 14;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 14, 0, 0, 4);
+}
+
+.notifCardTitle {
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text;
+}
+
+.notifCardSub {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text;
+}
+
+.notifCardMeta {
+    -fx-font-size: 11px;
+    -fx-text-fill: -muted;
+}
+
+.notifCardBtn {
+    -fx-background-color: #111827;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-padding: 10 14;
+    -fx-background-radius: 14;
+    -fx-cursor: hand;
+}
+
+.notifCardBtn:hover {
+    -fx-background-color: #0B1220;
+}
+/* =========================
+   STATS SECTION
+   ========================= */
+.statsSection{
+    -fx-padding: 6 0 0 0;
+}
+
+.statsTopRow{
+    -fx-padding: 4 2 0 2;
+}
+
+.statsToggleText{
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text;
+}
+
+.statsHint{
+    -fx-text-fill: -muted;
+    -fx-font-size: 12px;
+}
+
+/* notif */
+.notifWrap{
+    -fx-min-width: 42px;
+    -fx-min-height: 42px;
+}
+
+.notifBtn{
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-border-color: -border;
+    -fx-border-radius: 12px;
+    -fx-padding: 8 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 10, 0.2, 0, 2);
+}
+
+.notifBtn:hover{
+    -fx-border-color: rgba(124,58,237,0.45);
+}
+
+.notifBadge{
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 11px;
+    -fx-padding: 2 6;
+    -fx-background-radius: 999px;
+    -fx-translate-x: 8;
+    -fx-translate-y: -8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 8, 0.25, 0, 1);
+}
+
+/* card */
+.statsShell{
+    -fx-background-color: white;
+    -fx-background-radius: 18px;
+    -fx-border-color: rgba(124,58,237,0.55);
+    -fx-border-radius: 18px;
+    -fx-padding: 14;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 18, 0.25, 0, 6);
+}
+
+.statsHeader{
+    -fx-background-color: linear-gradient(to right, rgba(124,58,237,0.16), rgba(236,72,153,0.10));
+    -fx-background-radius: 14px;
+    -fx-padding: 12;
+    -fx-border-color: rgba(124,58,237,0.25);
+    -fx-border-radius: 14px;
+}
+
+.statsHeaderTitle{
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-text-fill: -text;
+}
+
+.statsHeaderSub{
+    -fx-font-size: 12px;
+    -fx-text-fill: -muted;
+}
+
+.statsCombo{
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+}
+
+.statsBtn{
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-background-radius: 12px;
+    -fx-padding: 8 14;
+    -fx-cursor: hand;
+}
+
+.chartShell{
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(230,232,240,1);
+    -fx-border-radius: 14px;
+    -fx-padding: 12;
+}
+
+.chartTitle{
+    -fx-font-weight: 900;
+    -fx-text-fill: -text;
+}
+
+.chartHint{
+    -fx-font-size: 12px;
+    -fx-text-fill: -muted;
+}
+
+/* chart look */
+.statsLineChart{
+    -fx-background-insets: 0;
+    -fx-padding: 6;
+}
+
+.statsLineChart .chart-plot-background{
+    -fx-background-color: #FBFBFE;
+    -fx-background-radius: 10px;
+}
+
+.statsLineChart .chart-vertical-grid-lines,
+.statsLineChart .chart-horizontal-grid-lines{
+    -fx-stroke: rgba(15,23,42,0.08);
+}
+
+.statsLineChart .chart-series-line{
+    -fx-stroke-width: 3px;
+}
+
+.statsLineChart .chart-line-symbol{
+    -fx-background-radius: 999px;
+    -fx-padding: 4px;
+}
+
+/* KPI */
+.kpiMini, .kpiMiniSoft{
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(230,232,240,1);
+    -fx-border-radius: 14px;
+    -fx-padding: 12;
+}
+
+.kpiMiniK{
+    -fx-text-fill: -muted;
+    -fx-font-weight: 700;
+}
+
+.kpiMiniV{
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: -text;
+}
+
+.kpiMiniS{
+    -fx-font-size: 11px;
+    -fx-text-fill: -muted;
+}
+
+.kpiMiniSoft{
+    -fx-background-color: rgba(124,58,237,0.08);
+    -fx-border-color: rgba(124,58,237,0.18);
+}
+
+.kpiMiniSoftText{
+    -fx-text-fill: -text;
+    -fx-font-weight: 600;
+}
+
+
+
+
+
+/* =========================
+   ParentSuivi polish (sans changer layout)
+   ========================= */
+
+/* donne un vrai “card look” au chart */
+.chartCard {
+    -fx-background-color: -surface;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(15,23,42,0.06);
+    -fx-border-radius: 18;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 18, 0.2, 0, 8);
+}
+
+/* améliore la carte stats droite sans bouger sa place */
+.statsCard {
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(15,23,42,0.06);
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 18, 0.2, 0, 8);
+}
+
+/* HBox champs plus alignés + plus “moderne” */
+.searchField, .comboModern {
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+}
+
+/* boutons plus réguliers */
+.searchBtn, .btn-primary, .btn-solid-dark {
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+}
+
+/* ===== ParentSuivi polish (ne change pas le layout) ===== */
+.chartCard {
+    -fx-background-color: -surface;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(15,23,42,0.06);
+    -fx-border-radius: 18;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 18, 0.2, 0, 8);
+}
+
+.statsCard {
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(15,23,42,0.06);
+    -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 18, 0.2, 0, 8);
+}
+
+/* =========================
+   ARTISTIC PACK (Suivi)
+   Coller à la FIN de app.css
+   ========================= */
+
+/* Palette douce + accents */
+.root, .appRoot {
+    -bg: #F7F7FF;
+    -surface: #FFFFFF;
+    -text: #121826;
+    -muted: #6B7280;
+
+    -violet1: #7C3AED;
+    -violet2: #A78BFA;
+
+    -teal1: #06B6D4;
+    -teal2: #22C55E;
+
+    -pink1: #EC4899;
+    -pink2: #F472B6;
+
+    -shadow: rgba(17, 24, 39, 0.12);
+}
+
+/* Page background plus doux */
+.pageScroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+.page {
+    -fx-background-color: transparent;
+}
+
+/* Hero (si pas déjà parfait) */
+.heroCard {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(124, 58, 237, 0.22);
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, -shadow, 22, 0.18, 0, 10);
+}
+.heroImageWrapper {
+    -fx-background-color: rgba(124,58,237,0.10);
+    -fx-background-radius: 18;
+    -fx-padding: 10;
+}
+.heroTitle {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text;
+}
+.heroSub {
+    -fx-text-fill: -muted;
+    -fx-font-size: 13.5px;
+}
+.pillInfo {
+    -fx-background-color: rgba(124,58,237,0.10);
+    -fx-text-fill: #5B21B6;
+    -fx-background-radius: 999;
+    -fx-padding: 6 10;
+    -fx-font-weight: 700;
+}
+
+/* Inputs plus modernes */
+.searchField, .comboModern, .text-field, .combo-box {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(17,24,39,0.10);
+    -fx-background-color: -surface;
+}
+.searchField:focused, .text-field:focused, .combo-box:focused {
+    -fx-border-color: rgba(124,58,237,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.25), 12, 0.25, 0, 0);
+}
+
+/* Cards (chart + stats) */
+.chartCard {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(17,24,39,0.08);
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, -shadow, 22, 0.16, 0, 10);
+}
+.statsCard, .card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(17,24,39,0.08);
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, -shadow, 22, 0.16, 0, 10);
+}
+
+/* ===== Boutons artistiques ===== */
+.btnGrad, .searchBtn {
+    -fx-background-radius: 18;
+    -fx-padding: 10 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-background-insets: 0;
+    -fx-background-color: linear-gradient(to right, -violet1, -violet2);
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.35), 16, 0.25, 0, 8);
+}
+.btnGrad:hover, .searchBtn:hover {
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.45), 18, 0.28, 0, 10);
+    -fx-cursor: hand;
+}
+.btnGrad:pressed, .searchBtn:pressed {
+    -fx-translate-y: 1;
+}
+
+/* Teal action (Voir suivi) */
+.btnTeal, .btn-solid-dark {
+    -fx-background-radius: 18;
+    -fx-padding: 10 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, -teal1, -teal2);
+    -fx-effect: dropshadow(gaussian, rgba(6,182,212,0.35), 16, 0.25, 0, 8);
+}
+.btnTeal:hover, .btn-solid-dark:hover { -fx-cursor: hand; }
+.btnTeal:pressed, .btn-solid-dark:pressed { -fx-translate-y: 1; }
+
+/* Pink action (IA) */
+.btnPink {
+    -fx-background-radius: 18;
+    -fx-padding: 10 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, -pink1, -pink2);
+    -fx-effect: dropshadow(gaussian, rgba(236,72,153,0.28), 16, 0.25, 0, 8);
+}
+.btnPink:hover { -fx-cursor: hand; }
+.btnPink:pressed { -fx-translate-y: 1; }
+
+/* Ghost / outline (Upload) */
+.btnGhost {
+    -fx-background-radius: 18;
+    -fx-padding: 10 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: #5B21B6;
+    -fx-background-color: rgba(124,58,237,0.10);
+    -fx-border-color: rgba(124,58,237,0.40);
+    -fx-border-radius: 18;
+    -fx-border-width: 1.2;
+}
+.btnGhost:hover {
+    -fx-background-color: rgba(124,58,237,0.14);
+    -fx-cursor: hand;
+}
+
+/* Harmoniser les vieux .btn-primary si tu les gardes */
+.btn-primary {
+    -fx-background-radius: 18;
+    -fx-padding: 10 18;
+    -fx-font-weight: 800;
+}
+
+/* Texts un peu plus premium */
+.sectionTitle {
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text;
+}
+.sectionSub {
+    -fx-text-fill: -muted;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   Suivi Thérapeutique - ART STYLE (sans changer ton FXML)
+   Colle à la FIN de app.css
+   ========================================================= */
+
+/* Palette */
+.root, .appRoot {
+    -bg: #F7F7FF;
+    -surface: #FFFFFF;
+    -text: #0F172A;
+    -muted: #64748B;
+
+    -violet1: #7C3AED;
+    -violet2: #A78BFA;
+
+    -teal1: #06B6D4;
+    -teal2: #22C55E;
+
+    -pink1: #EC4899;
+    -pink2: #F472B6;
+
+    -orange1: #F97316;
+    -orange2: #FDBA74;
+
+    -shadow: rgba(15, 23, 42, 0.12);
+}
+
+/* Page fond doux */
+.page {
+    -fx-background-color: transparent;
+}
+
+/* ===== Cards (chart + stats) ===== */
+.chart {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(15,23,42,0.07);
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, -shadow, 22, 0.18, 0, 10);
+}
+
+.card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-border-color: rgba(15,23,42,0.07);
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, -shadow, 22, 0.18, 0, 10);
+}
+
+/* Grid lines plus soft */
+.chart-plot-background { -fx-background-color: transparent; }
+
+.chart-horizontal-grid-lines,
+.chart-vertical-grid-lines {
+    -fx-stroke: rgba(15,23,42,0.08);
+    -fx-stroke-dash-array: 4 4;
+}
+
+/* ===== IMPORTANT: garder les dates visibles ===== */
+.axis {
+    -fx-tick-label-fill: #334155;
+    -fx-tick-label-font-size: 11px;
+}
+.axis .tick-label {  /* ✅ ne pas cacher */
+    -fx-opacity: 1.0;
+}
+.axis:bottom .axis-label {
+    -fx-text-fill: #334155;
+}
+
+/* Legend */
+.chart-legend {
+    -fx-padding: 10 0 0 0;
+}
+
+/* points */
+.chart-line-symbol {
+    -fx-background-radius: 10px;
+    -fx-padding: 4px;
+    -fx-background-color: white, white;
+}
+
+/* ===== Inputs ===== */
+.searchField, .text-field, .combo-box {
+    -fx-background-color: -surface;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(15,23,42,0.10);
+}
+.searchField:focused, .text-field:focused, .combo-box:focused {
+    -fx-border-color: rgba(124,58,237,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.22), 14, 0.25, 0, 0);
+}
+
+/* =========================================================
+   Boutons : diversifier les couleurs SANS changer le FXML
+   ========================================================= */
+
+/* Chercher */
+.searchBtn {
+    -fx-background-radius: 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, -violet1, -violet2);
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.35), 16, 0.25, 0, 8);
+}
+.searchBtn:hover { -fx-cursor: hand; }
+.searchBtn:pressed { -fx-translate-y: 1; }
+
+/* Voir suivi (btn-solid-dark) -> teal */
+.btn-solid-dark {
+    -fx-background-radius: 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, -teal1, -teal2);
+    -fx-effect: dropshadow(gaussian, rgba(6,182,212,0.30), 16, 0.25, 0, 8);
+}
+.btn-solid-dark:hover { -fx-cursor: hand; }
+.btn-solid-dark:pressed { -fx-translate-y: 1; }
+
+/* Les 3 boutons à droite (btn-primary) :
+   On va les différencier par position (1er, 2e, 3e) */
+.btn-primary {
+    -fx-background-radius: 18;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-padding: 10 18;
+}
+#btnDownloadPdf {
+    -fx-background-color: linear-gradient(to right, -violet1, -violet2);
+    -fx-effect: dropshadow(gaussian, rgba(124,58,237,0.30), 16, 0.25, 0, 8);
+}
+#btnAi {
+    -fx-background-color: linear-gradient(to right, -pink1, -pink2);
+    -fx-effect: dropshadow(gaussian, rgba(236,72,153,0.26), 16, 0.25, 0, 8);
+}
+#btnUploadParentPdf {
+    -fx-background-color: linear-gradient(to right, -orange1, -orange2);
+    -fx-effect: dropshadow(gaussian, rgba(249,115,22,0.22), 16, 0.25, 0, 8);
+}
+#btnDownloadPdf:hover, #btnAi:hover, #btnUploadParentPdf:hover {
+    -fx-cursor: hand;
+}
+#btnDownloadPdf:pressed, #btnAi:pressed, #btnUploadParentPdf:pressed {
+    -fx-translate-y: 1;
+}
+
+.likeCount{
+    -fx-text-fill: #475569;
+    -fx-font-weight: 900;
+}
+
+.likeBtn{
+    -fx-background-radius: 14;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to right, #EC4899, #A78BFA);
+    -fx-padding: 6 12;
+}
+.likeBtn:hover{ -fx-cursor: hand; }
+.likeBtn:pressed{ -fx-translate-y: 1; }

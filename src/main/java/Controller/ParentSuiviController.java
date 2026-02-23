@@ -1,50 +1,132 @@
 package Controller;
 
+import Entites.Suivie;
 import Entites.Therapie;
 import Services.CompteRenduPdfService;
 import Services.GeminiConseilsService;
 import Services.SuivieServices;
 import Services.TherapieServices;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javafx.scene.chart.*;
-import Entites.Suivie;
 
 public class ParentSuiviController {
+
+    @FXML private BorderPane root;
 
     @FXML private TextField tfEmailParent;
     @FXML private ComboBox<String> cbEnfants;
     @FXML private Label lblInfo;
+
     @FXML private LineChart<String, Number> lineChart;
     @FXML private CategoryAxis xAxis;
     @FXML private NumberAxis yAxis;
+
     @FXML private Label lblPsy;
     @FXML private Label lblEtat;
     @FXML private Label lblDateHeure;
     @FXML private Label lblScores;
     @FXML private Label lblExercice;
     @FXML private Label lblObs;
+
     @FXML private Button btnDownloadPdf;
     @FXML private Button btnAi;
     @FXML private TextArea taConseils;
+    @FXML private Button btnUploadParentPdf;
+
+    // Sidebar psychologie
+    @FXML private ToggleButton tbPsychologie;
+    @FXML private VBox psychologieSubMenu;
 
     private Suivie dernierSuivi;
 
     private final SuivieServices suivieServices = new SuivieServices();
     private final GeminiConseilsService gemini = new GeminiConseilsService();
 
-
     @FXML
     public void initialize() {
         lblInfo.setText("Veuillez saisir votre email.");
         cbEnfants.getItems().clear();
+
         xAxis.setTickLabelRotation(45);
+        lineChart.setAnimated(false);
+        lineChart.setCreateSymbols(true);
+
+        // menu psycho ouvert par défaut
+        tbPsychologie.setSelected(true);
+        psychologieSubMenu.setVisible(true);
+        psychologieSubMenu.setManaged(true);
+        if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
+            tbPsychologie.getStyleClass().add("sideBtnActive");
+        }
     }
 
+    // =========================
+    // Navigation (scene switch)
+    // =========================
+    @FXML
+    private void goArticlesConseils(ActionEvent event) {
+        switchScene(event, "/MainArticles.fxml");
+    }
+
+    @FXML
+    private void goSuivieTherapeutique(ActionEvent event) {
+        // Tu es déjà dans ParentSuivi.fxml -> rien à faire
+        // (ou reload si tu veux) : switchScene(event, "/ParentSuivi.fxml");
+    }
+
+    private void switchScene(ActionEvent event, String fxmlPath) {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(view);
+
+            // Si ton CSS est global, tu peux le remettre (optionnel si déjà dans FXML)
+            // scene.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
+
+            stage.setScene(scene);
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblInfo.setText("❌ Navigation impossible : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void togglePsychologie() {
+        boolean show = tbPsychologie.isSelected();
+        psychologieSubMenu.setVisible(show);
+        psychologieSubMenu.setManaged(show);
+
+        if (show) {
+            if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
+                tbPsychologie.getStyleClass().add("sideBtnActive");
+            }
+        } else {
+            tbPsychologie.getStyleClass().remove("sideBtnActive");
+        }
+    }
+
+    // =========================
+    // Chercher enfants
+    // =========================
     @FXML
     private void onChercher() {
         String email = tfEmailParent.getText() == null ? "" : tfEmailParent.getText().trim();
@@ -57,7 +139,6 @@ public class ParentSuiviController {
 
         try {
             List<String> enfants = suivieServices.getEnfantsByEmail(email);
-
             cbEnfants.getItems().setAll(enfants);
 
             if (enfants.isEmpty()) {
@@ -66,28 +147,24 @@ public class ParentSuiviController {
                 cbEnfants.getSelectionModel().selectFirst();
                 lblInfo.setText("✅ " + enfants.size() + " enfant(s) trouvé(s).");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             lblInfo.setText("❌ Erreur lors de la recherche.");
         }
     }
 
+    // =========================
+    // Voir suivi + Graphe
+    // =========================
     @FXML
     private void onVoirSuivi() {
-        String email = tfEmailParent.getText().trim();
+        String email = tfEmailParent.getText() == null ? "" : tfEmailParent.getText().trim();
         String enfant = cbEnfants.getValue();
 
-        if (enfant == null) {
-            lblInfo.setText("Choisissez un enfant.");
-            return;
-        }
+        if (email.isEmpty()) { lblInfo.setText("❌ Veuillez entrer un email."); return; }
+        if (enfant == null) { lblInfo.setText("Choisissez un enfant."); return; }
 
         List<Suivie> stats = suivieServices.getStatsByEmailAndEnfant(email, enfant);
-
-        System.out.println("NB consultations = " + stats.size());
-        stats.forEach(x -> System.out.println(x.getIdSuivie() + " | " + x.getDateSuivie()));
-
         lineChart.getData().clear();
 
         XYChart.Series<String, Number> humeur = new XYChart.Series<>();
@@ -102,10 +179,8 @@ public class ParentSuiviController {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         for (Suivie s : stats) {
-            String base = (s.getDateSuivie() == null) ? "Sans date" :
-                    s.getDateSuivie().toLocalDateTime().format(fmt);
-
-            // ✅ garantit unique même si même minute
+            String base = (s.getDateSuivie() == null) ? "Sans date"
+                    : s.getDateSuivie().toLocalDateTime().format(fmt);
             String label = base + " (#" + s.getIdSuivie() + ")";
 
             humeur.getData().add(new XYChart.Data<>(label, s.getScoreHumeur()));
@@ -115,9 +190,12 @@ public class ParentSuiviController {
 
         lineChart.getData().addAll(humeur, stress, attention);
 
-     //   applySeriesColors(humeur, stress, attention);
-
-        xAxis.setTickLabelRotation(45);
+        Platform.runLater(() -> {
+            applySeriesColors(humeur, stress, attention);
+            lineChart.lookupAll(".chart-line-symbol").forEach(n ->
+                    n.setStyle(n.getStyle() + "; -fx-padding: 4px;")
+            );
+        });
 
         lblInfo.setText("Statistiques chargées pour " + enfant + " (" + stats.size() + ")");
         dernierSuivi = suivieServices.getDernierSuivi(email, enfant);
@@ -134,12 +212,11 @@ public class ParentSuiviController {
             return;
         }
 
-        lblPsy.setText(dernierSuivi.getNomPsy());
-        lblEtat.setText(dernierSuivi.getStatut());
+        lblPsy.setText(safe(dernierSuivi.getNomPsy()));
+        lblEtat.setText(safe(dernierSuivi.getStatut()));
 
-        String dt = (dernierSuivi.getDateSuivie() == null) ? "-" :
-                dernierSuivi.getDateSuivie().toLocalDateTime().withSecond(0).withNano(0).toString();
-        lblDateHeure.setText(dt);
+        LocalDateTime dt = (dernierSuivi.getDateSuivie() == null) ? null : dernierSuivi.getDateSuivie().toLocalDateTime();
+        lblDateHeure.setText(dt == null ? "-" : dt.withSecond(0).withNano(0).toString());
 
         lblScores.setText(dernierSuivi.getScoreHumeur() + " / " +
                 dernierSuivi.getScoreStress() + " / " +
@@ -150,30 +227,37 @@ public class ParentSuiviController {
         } else {
             TherapieServices ts = new TherapieServices();
             Therapie t = ts.getTherapieById(dernierSuivi.getIdTherapieReco());
-
-            if (t != null) {
-                lblExercice.setText(t.getNomExercice());
-            } else {
-                lblExercice.setText("-");
-            }
+            lblExercice.setText(t != null ? safe(t.getNomExercice()) : "-");
         }
+
         lblObs.setText(dernierSuivi.getObservation() == null ? "-" : dernierSuivi.getObservation());
+        btnDownloadPdf.setDisable(false);
+    }
 
-// ✅ IMPORTANT : le PDF sera généré au clic, donc on n’utilise PLUS CR_PDF_PATH
-        btnDownloadPdf.setDisable(false);    }
-
+    private void applySeriesColors(
+            XYChart.Series<String, Number> humeur,
+            XYChart.Series<String, Number> stress,
+            XYChart.Series<String, Number> attention
+    ) {
+        setSeriesStyle(humeur, "#22C55E");    // vert
+        setSeriesStyle(stress, "#EF4444");    // rouge
+        setSeriesStyle(attention, "#F97316"); // orange
+    }
 
     private void setSeriesStyle(XYChart.Series<String, Number> series, String color) {
         if (series.getNode() != null) {
             series.getNode().setStyle("-fx-stroke: " + color + "; -fx-stroke-width: 3px;");
         }
-        // couleur des points
         for (XYChart.Data<String, Number> d : series.getData()) {
             if (d.getNode() != null) {
                 d.getNode().setStyle("-fx-background-color: " + color + ", white;");
             }
         }
     }
+
+    // =========================
+    // PDF Download
+    // =========================
     @FXML
     private void onDownloadPdf() {
         try {
@@ -182,18 +266,15 @@ public class ParentSuiviController {
                 return;
             }
 
-            // 1) Charger la thérapie recommandée (si existe)
             Therapie t = null;
             if (dernierSuivi.getIdTherapieReco() != null) {
                 TherapieServices ts = new TherapieServices();
                 t = ts.getTherapieById(dernierSuivi.getIdTherapieReco());
             }
 
-            // 2) Générer le PDF (dans user.home/PIDEV_CompteRendus)
             CompteRenduPdfService pdfService = new CompteRenduPdfService();
             File generated = pdfService.generate(dernierSuivi, t);
 
-            // 3) Choisir où enregistrer (télécharger)
             javafx.stage.FileChooser chooser = new javafx.stage.FileChooser();
             chooser.setTitle("Enregistrer le compte rendu PDF");
             chooser.getExtensionFilters().add(
@@ -217,38 +298,10 @@ public class ParentSuiviController {
             lblInfo.setText("❌ Erreur génération PDF : " + e.getMessage());
         }
     }
-    private void applySeriesColors(
-            XYChart.Series<String, Number> humeur,
-            XYChart.Series<String, Number> stress,
-            XYChart.Series<String, Number> attention
-    ) {
 
-        // Humeur = rouge
-        humeur.getNode().setStyle("-fx-stroke: #E53935;");
-
-        // Stress = orange
-        stress.getNode().setStyle("-fx-stroke: #FB8C00;");
-
-        // Attention = vert
-        attention.getNode().setStyle("-fx-stroke: #43A047;");
-
-        // Couleur des points
-        setDataPointsColor(humeur, "#E53935");
-        setDataPointsColor(stress, "#FB8C00");
-        setDataPointsColor(attention, "#43A047");
-    }
-
-    private void setDataPointsColor(XYChart.Series<String, Number> series, String color) {
-        for (XYChart.Data<String, Number> data : series.getData()) {
-            if (data.getNode() != null) {
-                data.getNode().setStyle(
-                        "-fx-background-color: " + color + ", white;"
-                );
-            }
-        }
-    }
-
-
+    // =========================
+    // IA Advice
+    // =========================
     @FXML
     private void onGenererConseilsIA() {
 
@@ -280,11 +333,6 @@ public class ParentSuiviController {
         Observation : %s
         Comportement : %s
         Interaction sociale : %s
-
-        Adapte les conseils aux scores.
-        Si le stress est bas, propose des activités de stimulation.
-        Si l’attention est élevée, propose des défis progressifs.
-        Si l’humeur est moyenne, propose des stratégies émotionnelles adaptées.
         """
                 .formatted(
                         safe(dernierSuivi.getNomEnfant()),
@@ -296,8 +344,7 @@ public class ParentSuiviController {
                         safe(dernierSuivi.getInteractionSociale())
                 );
 
-        // ✅ Appel en background pour ne pas bloquer l'UI
-        javafx.concurrent.Task<String> task = new javafx.concurrent.Task<>() {
+        Task<String> task = new Task<>() {
             @Override protected String call() throws Exception {
                 return gemini.genererConseils(prompt);
             }
@@ -305,15 +352,84 @@ public class ParentSuiviController {
 
         task.setOnSucceeded(ev -> {
             String res = task.getValue();
-            taConseils.setText(res); // taConseils = TextArea dans ton FXML
-            lblInfo.setText("Conseils IA générés ✅");
+            try {
+                suivieServices.updateConseilIA(dernierSuivi.getIdSuivie(), res);
+                dernierSuivi.setCrResume(res);
+                if (taConseils != null) taConseils.clear();
+                lblInfo.setText("✅ Conseils IA enregistrés. Ils seront ajoutés au PDF.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                lblInfo.setText("❌ Erreur sauvegarde conseils IA : " + ex.getMessage());
+            }
         });
 
         task.setOnFailed(ev -> {
-            lblInfo.setText("Erreur IA : " + task.getException().getMessage());
+            Throwable ex = task.getException();
+            if (ex != null) ex.printStackTrace();
+            lblInfo.setText("❌ Erreur IA : " + (ex != null ? ex.getMessage() : "inconnue"));
         });
 
         new Thread(task).start();
+    }
+
+    @FXML
+    private void onUploadParentPdf() {
+        try {
+            if (dernierSuivi == null) {
+                lblInfo.setText("❌ Aucune consultation trouvée pour envoyer un document.");
+                return;
+            }
+
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Sujet du document");
+            dialog.setHeaderText("Veuillez saisir le sujet du document (obligatoire)");
+            dialog.setContentText("Sujet :");
+
+            String sujet = dialog.showAndWait().orElse("").trim();
+            if (sujet.isEmpty()) {
+                lblInfo.setText("❌ Sujet obligatoire.");
+                return;
+            }
+
+            javafx.stage.FileChooser chooser = new javafx.stage.FileChooser();
+            chooser.setTitle("Choisir un document PDF (dessin / écriture)");
+            chooser.getExtensionFilters().add(
+                    new javafx.stage.FileChooser.ExtensionFilter("PDF", "*.pdf", "*.PDF")
+            );
+
+            File src = chooser.showOpenDialog(btnUploadParentPdf.getScene().getWindow());
+            if (src == null) return;
+
+            if (!src.getName().toLowerCase().endsWith(".pdf")) {
+                lblInfo.setText("❌ Veuillez choisir un fichier PDF.");
+                return;
+            }
+
+            File outDir = new File(System.getProperty("user.home"), "PIDEV_ParentUploads");
+            if (!outDir.exists()) outDir.mkdirs();
+
+            String storedName = "PARENT_" + dernierSuivi.getIdSuivie() + "_" + System.currentTimeMillis() + ".pdf";
+            File dest = new File(outDir, storedName);
+
+            java.nio.file.Files.copy(
+                    src.toPath(),
+                    dest.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
+            );
+
+            suivieServices.updateParentUpload(
+                    dernierSuivi.getIdSuivie(),
+                    src.getName(),
+                    dest.getAbsolutePath(),
+                    sujet
+            );
+
+            lblInfo.setText("✅ Document envoyé au psychologue : " + src.getName());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblInfo.setText("❌ Erreur upload : " + e.getMessage());
+        }
     }
 
     private String safe(String v) {

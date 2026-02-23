@@ -79,6 +79,10 @@ public class AjouterSuivie {
     @FXML private LineChart<String, Number> monthlyChart;
     @FXML private BarChart<String, Number> barMonthly;
     @FXML private Button btnAjouterFab;
+    @FXML private Button btnNotif;
+    @FXML private Label lblNotifBadge;
+
+    private final SuivieServices suivieServices = new SuivieServices();
 
 
     // ====== DATA / SERVICE ======
@@ -1466,6 +1470,16 @@ public class AjouterSuivie {
                 }
             }
         });
+    }
+    private void refreshNotifBadge() {
+        try {
+            int c = suivieServices.countNewParentUploads();
+            lblNotifBadge.setText(String.valueOf(c));
+            lblNotifBadge.setVisible(c > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblNotifBadge.setVisible(false);
+        }
     }
 
 }

@@ -11,7 +11,8 @@ public class GeminiConseilsService {
             .connectTimeout(Duration.ofSeconds(15))
             .build();
 
-    private final String model = "gemini-2.5-flash";
+    //private final String model = "gemini-2.5-flash";
+    private final String model = "gemini-3-flash-preview";
 
     public String genererConseils(String prompt) throws Exception {
         String apiKey = System.getenv("GEMINI_API_KEY");
@@ -19,7 +20,10 @@ public class GeminiConseilsService {
             throw new IllegalStateException("GEMINI_API_KEY est vide. Configurez la variable d'environnement.");
         }
 
-        String url = "https://generativelanguage.googleapis.com/v1/models/"
+       /* String url = "https://generativelanguage.googleapis.com/v1/models/"
+                + model + ":generateContent?key=" + apiKey;*/
+
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/"
                 + model + ":generateContent?key=" + apiKey;
 
         // ✅ CORRECTION : Augmentation drastique de maxOutputTokens pour permettre les plans de 7 jours

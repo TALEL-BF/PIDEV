@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class MainArticlesController {
 
     // ---------- UI ----------
@@ -45,6 +48,8 @@ public class MainArticlesController {
     private final List<Conseil> allArticles = new ArrayList<>();
     private ConseilServices conseilService;
     private ToggleGroup chipsGroup;
+
+    private final Set<Integer> likedSession = new HashSet<>();
 
     @FXML
     private void togglePsychologie() {
@@ -220,17 +225,62 @@ public class MainArticlesController {
         btnLire.getStyleClass().add("articleBtn");
         btnLire.setOnAction(e -> openArticle(a));
 
+// ✅ Like UI
+        Label likeCount = new Label("❤️ " + a.getLikesCount());
+        likeCount.getStyleClass().add("likeCount");
+
+        boolean liked = likedSession.contains(a.getIdArticle());
+
+        Button btnLike = new Button(liked ? "💜 Aimé" : "🤍 J’aime");
+        btnLike.getStyleClass().add(liked ? "likeBtnOn" : "likeBtnOff");
+
+        btnLike.setOnAction(ev -> {
+            int id = a.getIdArticle();
+
+            // ✅ Toggle
+            if (likedSession.contains(id)) {
+                // UNLIKE
+                likedSession.remove(id);
+
+                int newCount = conseilService.decrementLike(id);  // ✅ DB -1
+                a.setLikesCount(newCount);
+
+                likeCount.setText("❤️ " + newCount);
+                btnLike.setText("🤍 J’aime");
+                btnLike.getStyleClass().removeAll("likeBtnOn");
+                btnLike.getStyleClass().add("likeBtnOff");
+
+            } else {
+                // LIKE
+                likedSession.add(id);
+
+                int newCount = conseilService.incrementLike(id);  // ✅ DB +1
+                a.setLikesCount(newCount);
+
+                likeCount.setText("❤️ " + newCount);
+                btnLike.setText("💜 Aimé");
+                btnLike.getStyleClass().removeAll("likeBtnOff");
+                btnLike.getStyleClass().add("likeBtnOn");
+            }
+
+            // ✅ refresh order
+            loadFromDb();
+            refresh();
+        });
+
+        HBox likeRow = new HBox(10, btnLike, likeCount);
+        likeRow.setAlignment(Pos.CENTER_LEFT);
+
+
+
         HBox actions = new HBox(btnLire);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
-        content.getChildren().addAll(title, author, summary, spacer, actions);
+        content.getChildren().addAll(title, author, summary, spacer, likeRow, actions);
         card.getChildren().addAll(thumbWrap, content);
 
         return card;
     }
-
-    // ===================== POPUP ARTICLE (custom, sans entête Windows) =====================
-
     private void openArticle(Conseil a) {
 
         Stage stage = new Stage();
@@ -328,21 +378,13 @@ public class MainArticlesController {
     @FXML
     private void goArticlesConseils() {
         setActiveSubMenu(btnArticlesConseils);
-        // Tu es déjà sur cette page, donc rien à charger.
+        // أنت ديجا في الصفحة → ما تعمل حتى load
+        refresh();
     }
     @FXML
     private void goSuivieTherapeutique() {
         setActiveSubMenu(btnSuivieTherapeutique);
-
-        // ✅ Exemple : charger une page (remplace par TON fichier FXML front-office)
-        try {
-            javafx.scene.Parent view = javafx.fxml.FXMLLoader.load(
-                    getClass().getResource("/ParentSuivi.fxml")
-            );
-            root.setCenter(view);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        switchTo("/ParentSuivi.fxml");   // ✅ بدل root.setCenter
     }
 
 }
