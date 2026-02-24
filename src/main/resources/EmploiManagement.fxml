@@ -25,6 +25,10 @@
         <ComboBox fx:id="filterTranche" promptText="Tranche horaire"
                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 8 16; -fx-border-color: #d1fae5; -fx-border-width: 2; -fx-border-radius: 12;"/>
 
+        <Button text="🗓️ Vue Calendrier" onAction="#switchToCalendar"
+                style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 16; -fx-font-weight: 600;"/>
+
+
         <Region HBox.hgrow="ALWAYS"/>
 
         <Button text="➕ Nouvel Emploi" onAction="#addNewEmploi"
@@ -33,14 +37,19 @@
 
     <Label fx:id="countLabel" text="0 Emplois" styleClass="count"/>
 
-    <!-- Cards grid -->
-    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
-        <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980">
-            <padding>
-                <Insets bottom="20"/>
-            </padding>
-        </FlowPane>
-    </ScrollPane>
+    <!-- Table View -->
+    <TableView fx:id="emploiTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+        <columns>
+            <TableColumn fx:id="colAnnee" text="Année Scolaire"/>
+            <TableColumn fx:id="colJour" text="Jour"/>
+            <TableColumn fx:id="colTranche" text="Tranche Horaire"/>
+            <TableColumn fx:id="colActivite" text="Activité (RDV / Séance)"/>
+            <TableColumn fx:id="colActions" text="Actions"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
 
 </VBox>
 

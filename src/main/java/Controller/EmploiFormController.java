@@ -1,20 +1,25 @@
 package Controller;
 
 import Entites.EmploiDuTemps;
+import Entites.RDV;
+import Entites.Seance;
 import Services.EmploiDuTempsServices;
+import Services.RDVServices;
+import Services.SeanceServices;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 public class EmploiFormController {
 
     @FXML private TextField txtAnneeScolaire;
     @FXML private ComboBox<String> comboJour;
     @FXML private ComboBox<String> comboTranche;
-    @FXML private TextField txtIdRdv;
-    @FXML private TextField txtIdSeance;
+    @FXML private ComboBox<RDV> comboRdv;
+    @FXML private ComboBox<Seance> comboSeance;
     @FXML private Button btnSave;
     @FXML private Button btnCancel;
 
@@ -25,6 +30,8 @@ public class EmploiFormController {
     @FXML private Label errorActivite;
 
     private EmploiDuTempsServices emploiServices = new EmploiDuTempsServices();
+    private RDVServices rdvServices = new RDVServices();
+    private SeanceServices seanceServices = new SeanceServices();
     private EmploiDuTemps emploiToEdit;
     private Runnable onSaveCallback;
 
@@ -37,35 +44,54 @@ public class EmploiFormController {
     private void setupComboBoxes() {
         comboJour.getItems().addAll("lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche");
         comboTranche.getItems().addAll("matin", "apres_midi", "soir", "journee");
+
+        // Setup RDV ComboBox
+        comboRdv.getItems().addAll(rdvServices.afficherRDV());
+        comboRdv.setConverter(new StringConverter<RDV>() {
+            @Override
+            public String toString(RDV rdv) {
+                if (rdv == null) return null;
+                return rdv.getTypeConsultation() + " (" + rdv.getDateHeureRdv().toString() + ")"; // Customize display
+            }
+
+            @Override
+            public RDV fromString(String string) {
+                return null; // No need for read-back
+            }
+        });
+
+        // Setup Seance ComboBox
+        comboSeance.getItems().addAll(seanceServices.afficherSeances());
+        comboSeance.setConverter(new StringConverter<Seance>() {
+            @Override
+            public String toString(Seance seance) {
+                if (seance == null) return null;
+                return seance.getTitreSeance() + " (" + seance.getIdSeance() + ")"; // Customize display
+            }
+
+            @Override
+            public Seance fromString(String string) {
+                return null; // No need for read-back
+            }
+        });
     }
 
     private void setupValidation() {
-        // Real-time validation only for numeric fields and mutual exclusivity
-        txtIdRdv.textProperty().addListener((obs, old, newVal) -> {
-            validateNumericField(txtIdRdv);
-            // Clear the other field if this one is filled
-            if (!newVal.trim().isEmpty() && !txtIdSeance.getText().trim().isEmpty()) {
-                txtIdSeance.clear();
-            }
-        });
-        txtIdSeance.textProperty().addListener((obs, old, newVal) -> {
-            validateNumericField(txtIdSeance);
-            // Clear the other field if this one is filled
-            if (!newVal.trim().isEmpty() && !txtIdRdv.getText().trim().isEmpty()) {
-                txtIdRdv.clear();
+        // Mutual exclusivity
+        comboRdv.valueProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null) {
+                comboSeance.getSelectionModel().clearSelection();
             }
         });
 
-        // Enable save button always
-        btnSave.setDisable(false);
+        comboSeance.valueProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null) {
+                comboRdv.getSelectionModel().clearSelection();
+            }
+        });
     }
 
-    private void validateNumericField(TextField field) {
-        String text = field.getText();
-        if (!text.isEmpty() && !text.matches("\\d+")) {
-            field.setText(text.replaceAll("[^\\d]", ""));
-        }
-    }
+    // Numeric validation no longer needed for dropdowns
 
     private boolean isValidAnneeScolaire(String annee) {
         // Format: YYYY-YYYY (e.g., 2024-2025)
@@ -123,14 +149,14 @@ public class EmploiFormController {
         }
 
         // Check mutual exclusivity and at least one activity
-        boolean hasRdv = !txtIdRdv.getText().trim().isEmpty();
-        boolean hasSeance = !txtIdSeance.getText().trim().isEmpty();
+        boolean hasRdv = comboRdv.getValue() != null;
+        boolean hasSeance = comboSeance.getValue() != null;
 
         if (!hasRdv && !hasSeance) {
-            showError(errorActivite, "Au moins une activité (RDV ou Séance) est requise", txtIdRdv);
+            showError(errorActivite, "Au moins une activité (RDV ou Séance) est requise", comboRdv);
             isValid = false;
         } else if (hasRdv && hasSeance) {
-            showError(errorActivite, "Vous ne pouvez pas spécifier à la fois un RDV ET une Séance. Choisissez-en un seul.", txtIdRdv);
+            showError(errorActivite, "Vous ne pouvez pas spécifier à la fois un RDV ET une Séance. Choisissez-en un seul.", comboRdv);
             isValid = false;
         }
 
@@ -165,11 +191,25 @@ public class EmploiFormController {
             txtAnneeScolaire.setText(emploi.getAnneeScolaire());
             comboJour.setValue(emploi.getJourSemaine());
             comboTranche.setValue(emploi.getTrancheHoraire());
+
             if (emploi.getIdRdv() != null) {
-                txtIdRdv.setText(String.valueOf(emploi.getIdRdv()));
+                // Find and select the RDV
+                for (RDV r : comboRdv.getItems()) {
+                    if (r.getIdRdv() == emploi.getIdRdv()) {
+                        comboRdv.setValue(r);
+                        break;
+                    }
+                }
             }
+
             if (emploi.getIdSeance() != null) {
-                txtIdSeance.setText(String.valueOf(emploi.getIdSeance()));
+                // Find and select the Seance
+                for (Seance s : comboSeance.getItems()) {
+                    if (s.getIdSeance() == emploi.getIdSeance()) {
+                        comboSeance.setValue(s);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -185,8 +225,8 @@ public class EmploiFormController {
         }
 
         try {
-            Integer idRdv = txtIdRdv.getText().trim().isEmpty() ? null : Integer.parseInt(txtIdRdv.getText().trim());
-            Integer idSeance = txtIdSeance.getText().trim().isEmpty() ? null : Integer.parseInt(txtIdSeance.getText().trim());
+            Integer idRdv = (comboRdv.getValue() != null) ? comboRdv.getValue().getIdRdv() : null;
+            Integer idSeance = (comboSeance.getValue() != null) ? comboSeance.getValue().getIdSeance() : null;
 
             if (emploiToEdit == null) {
                 EmploiDuTemps newEmploi = new EmploiDuTemps(
@@ -245,4 +285,3 @@ public class EmploiFormController {
         alert.showAndWait();
     }
 }
-

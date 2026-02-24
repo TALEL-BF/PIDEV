@@ -2,6 +2,7 @@ package Controller;
 
 import Entites.RDV;
 import Services.RDVServices;
+import Services.RdvNotificationService;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -32,6 +33,7 @@ public class RDVFormController {
     @FXML private Label errorIdAutiste;
 
     private RDVServices rdvServices = new RDVServices();
+    private RdvNotificationService notificationService = new RdvNotificationService();
     private RDV rdvToEdit;
     private Runnable onSaveCallback;
 
@@ -188,6 +190,7 @@ public class RDVFormController {
                         Integer.parseInt(txtIdAutiste.getText().trim())
                 );
                 rdvServices.ajouterRDV(newRDV);
+                notificationService.checkSingleRdv(newRDV);
                 showSuccess("RDV ajouté avec succès!");
             } else {
                 rdvToEdit.setTypeConsultation(comboType.getValue());
@@ -198,6 +201,7 @@ public class RDVFormController {
                 rdvToEdit.setIdAutiste(Integer.parseInt(txtIdAutiste.getText().trim()));
 
                 rdvServices.modifierRDV(rdvToEdit);
+                notificationService.checkSingleRdv(rdvToEdit);
                 showSuccess("RDV modifié avec succès!");
             }
 
@@ -237,4 +241,3 @@ public class RDVFormController {
         alert.showAndWait();
     }
 }
-

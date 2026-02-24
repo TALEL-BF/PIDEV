@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="20" stylesheets="@styles/app.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.EmploiCalendarController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox>
+            <Label style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #2d3748;" text="Calendrier" />
+            <Label style="-fx-text-fill: #718096;" text="Vue hebdomadaire de l'emploi du temps" />
+        </VBox>
+    </HBox>
+
+    <!-- Calendar Container -->
+    <StackPane fx:id="calendarContainer" VBox.vgrow="ALWAYS" />
+
+</VBox>

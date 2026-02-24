@@ -2,6 +2,7 @@ package Controller;
 
 import Entites.Seance;
 import Services.SeanceServices;
+import Services.NotificationService; // Import the notification service
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,20 +21,31 @@ public class HomeController {
     @FXML private BorderPane mainContainer;
     @FXML private VBox contentArea;
     @FXML private Button btnSeances;
+    @FXML private Button btnSeancesAdmin; // Add this
     @FXML private Button btnRDV;
+    @FXML private Button btnRDVAdmin; // Add this
     @FXML private Button btnEmploi;
+    @FXML private Button btnEmploiAdmin; // Add this
+    @FXML private Button btnMeeting; // Add this
     @FXML private Label welcomeLabel;
     @FXML private Label statsSeances;
     @FXML private Label statsRDV;
     @FXML private Label statsEmploi;
 
     private SeanceServices seanceServices = new SeanceServices();
+    private NotificationService notificationService; // Add notification service
     private String currentModule = "home";
 
     @FXML
     public void initialize() {
         loadDashboardStats();
         animateWelcome();
+        startNotificationService(); // Start notifications
+    }
+
+    private void startNotificationService() {
+        notificationService = new NotificationService();
+        notificationService.startService();
     }
 
     private void loadDashboardStats() {
@@ -55,20 +67,58 @@ public class HomeController {
 
     @FXML
     private void showSeancesModule() {
-        loadModule("/SeanceManagement.fxml", "seances");
+        // Loads Card view for Users
+        loadModule("/SeanceCards.fxml", "seances");
         highlightActiveButton(btnSeances);
     }
 
     @FXML
+    private void showSeancesAdminModule() {
+        // Loads Table view for Admin
+        loadModule("/SeanceManagement.fxml", "seancesAdmin");
+        highlightActiveButton(btnSeancesAdmin);
+    }
+
+    @FXML
     private void showRDVModule() {
-        loadModule("/RDVManagement.fxml", "rdv");
+        // Loads Card view for Users
+        loadModule("/RDVCards.fxml", "rdv");
         highlightActiveButton(btnRDV);
     }
 
     @FXML
+    private void showRDVAdminModule() {
+        // Loads Table view for Admin
+        loadModule("/RDVManagement.fxml", "rdvAdmin");
+        highlightActiveButton(btnRDVAdmin);
+    }
+
+    @FXML
     private void showEmploiModule() {
-        loadModule("/EmploiManagement.fxml", "emploi");
+        // Updated to load the Card view for users (Gestion des plans)
+        loadModule("/EmploiCards.fxml", "emploi");
         highlightActiveButton(btnEmploi);
+    }
+
+    @FXML
+    private void showEmploiAdminModule() {
+        // Loads the Table view for admins (Gestion des plans Admin)
+        loadModule("/EmploiManagement.fxml", "emploiAdmin");
+        highlightActiveButton(btnEmploiAdmin);
+    }
+
+    @FXML
+    private void showCalendar() {
+        loadModule("/EmploiCalendar.fxml", "calendar");
+        // No specific button highlighting for calendar, or maybe btnEmploi?
+        // Let's leave it without highlighting for now or highlight btnEmploi
+        // highlightActiveButton(btnEmploi);
+    }
+
+    @FXML
+    private void showMeetingModule() {
+        loadModule("/MeetingView.fxml", "meeting");
+        highlightActiveButton(btnMeeting);
     }
 
     private void loadModule(String fxmlPath, String moduleName) {
@@ -100,9 +150,19 @@ public class HomeController {
 
     private void highlightActiveButton(Button activeBtn) {
         btnSeances.getStyleClass().remove("active");
+        if (btnSeancesAdmin != null) btnSeancesAdmin.getStyleClass().remove("active");
+
         btnRDV.getStyleClass().remove("active");
+        if (btnRDVAdmin != null) btnRDVAdmin.getStyleClass().remove("active");
+
         btnEmploi.getStyleClass().remove("active");
-        activeBtn.getStyleClass().add("active");
+        if (btnEmploiAdmin != null) btnEmploiAdmin.getStyleClass().remove("active"); // Null check if not injected yet
+
+        if (btnMeeting != null) btnMeeting.getStyleClass().remove("active");
+
+        if (activeBtn != null) {
+            activeBtn.getStyleClass().add("active");
+        }
     }
 
     private void showError(String title, String message) {
@@ -113,4 +173,3 @@ public class HomeController {
         alert.showAndWait();
     }
 }
-

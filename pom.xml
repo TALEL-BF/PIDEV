@@ -31,6 +31,8 @@
             <version>${javafx.version}</version>
         </dependency>
 
+
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -46,6 +48,12 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
@@ -77,6 +85,20 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>5.8.0</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- CalendarFX Dependency for modern calendar view -->
+        <dependency>
+            <groupId>com.calendarfx</groupId>
+            <artifactId>view</artifactId>
+            <version>11.12.7</version>
+        </dependency>
+
+        <!-- ControlsFX Dependency for desktop notifications -->
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.1</version>
         </dependency>
 
     </dependencies>

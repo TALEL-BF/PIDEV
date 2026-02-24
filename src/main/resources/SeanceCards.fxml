@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Controller.SeanceCardsController"
+      spacing="14">
+
+    <!-- Title -->
+    <VBox spacing="3">
+        <Label text="Gestion des Séances 📚" styleClass="page-title"/>
+        <Label text="Consultez les séances planifiées" styleClass="page-subtitle"/>
+    </VBox>
+
+    <!-- Search + Filters -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="🔍 Rechercher une séance..." styleClass="search"/>
+        <HBox styleClass="filters" spacing="8">
+            <ToggleButton fx:id="filterTous" text="Tous" selected="true"/>
+            <ToggleButton fx:id="filterPlanifiee" text="Planifiée"/>
+            <ToggleButton fx:id="filterConfirme" text="Confirmé"/>
+            <ToggleButton fx:id="filterTermine" text="Terminé"/>
+            <ToggleButton fx:id="filterAnnule" text="Annulé"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <Label fx:id="countLabel" text="0 Séances" styleClass="count"/>
+
+    <!-- Cards grid -->
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <FlowPane fx:id="cardsPane" hgap="18" vgap="18" prefWrapLength="980">
+            <padding>
+                <Insets bottom="20"/>
+            </padding>
+        </FlowPane>
+    </ScrollPane>
+
+</VBox>

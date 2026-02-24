@@ -1,36 +1,110 @@
 package Controller;
 
 import Entites.EmploiDuTemps;
+import Entites.RDV;
+import Entites.Seance;
 import Services.EmploiDuTempsServices;
-import javafx.animation.*;
+import Services.RDVServices;
+import Services.SeanceServices;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class EmploiManagementController {
 
-    @FXML private FlowPane cardsPane;
+    @FXML private TableView<EmploiDuTemps> emploiTable;
+    @FXML private TableColumn<EmploiDuTemps, String> colAnnee;
+    @FXML private TableColumn<EmploiDuTemps, String> colJour;
+    @FXML private TableColumn<EmploiDuTemps, String> colTranche;
+    @FXML private TableColumn<EmploiDuTemps, String> colActivite;
+    @FXML private TableColumn<EmploiDuTemps, Void> colActions;
+
     @FXML private Label countLabel;
     @FXML private ComboBox<String> filterJour;
     @FXML private ComboBox<String> filterTranche;
 
     private EmploiDuTempsServices emploiServices = new EmploiDuTempsServices();
+    private RDVServices rdvServices = new RDVServices();
+    private SeanceServices seanceServices = new SeanceServices();
+
     private List<EmploiDuTemps> allEmplois;
+    private Map<Integer, RDV> rdvMap;
+    private Map<Integer, Seance> seanceMap;
 
     @FXML
     public void initialize() {
+        setupTable();
         setupFilters();
-        loadEmplois();
+        loadData();
+    }
+
+    private void setupTable() {
+        colAnnee.setCellValueFactory(new PropertyValueFactory<>("anneeScolaire"));
+        colJour.setCellValueFactory(new PropertyValueFactory<>("jourSemaine"));
+        colTranche.setCellValueFactory(new PropertyValueFactory<>("trancheHoraire"));
+
+        // Custom factory for Activity column
+        colActivite.setCellValueFactory(cellData -> {
+            EmploiDuTemps emploi = cellData.getValue();
+            String title = "Aucune";
+
+            if (emploi.getIdRdv() != null && rdvMap != null && rdvMap.containsKey(emploi.getIdRdv())) {
+                RDV rdv = rdvMap.get(emploi.getIdRdv());
+                title = "📅 RDV: " + rdv.getTypeConsultation();
+            } else if (emploi.getIdSeance() != null && seanceMap != null && seanceMap.containsKey(emploi.getIdSeance())) {
+                Seance seance = seanceMap.get(emploi.getIdSeance());
+                title = "📚 Séance: " + seance.getTitreSeance();
+            }
+
+            return new SimpleStringProperty(title);
+        });
+
+        // Custom factory for Actions column
+        colActions.setCellFactory(param -> new TableCell<>() {
+            private final Button btnEdit = new Button("✎");
+            private final Button btnDelete = new Button("🗑");
+            private final HBox pane = new HBox(10, btnEdit, btnDelete);
+
+            {
+                btnEdit.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 5;");
+                btnDelete.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 5;");
+
+                btnEdit.setOnAction(event -> {
+                    EmploiDuTemps emploi = getTableView().getItems().get(getIndex());
+                    openEmploiForm(emploi);
+                });
+
+                btnDelete.setOnAction(event -> {
+                    EmploiDuTemps emploi = getTableView().getItems().get(getIndex());
+                    deleteEmploi(emploi);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(pane);
+                }
+            }
+        });
     }
 
     private void setupFilters() {
@@ -44,10 +118,26 @@ public class EmploiManagementController {
         filterTranche.valueProperty().addListener((obs, old, newVal) -> filterEmplois());
     }
 
+    private void loadData() {
+        try {
+            // Pre-load reference data for lookups
+            List<RDV> rdvs = rdvServices.afficherRDV();
+            rdvMap = rdvs.stream().collect(Collectors.toMap(RDV::getIdRdv, Function.identity()));
+
+            List<Seance> seances = seanceServices.afficherSeances();
+            seanceMap = seances.stream().collect(Collectors.toMap(Seance::getIdSeance, Function.identity()));
+
+            loadEmplois();
+
+        } catch (Exception e) {
+            showError("Erreur", "Impossible de charger les données: " + e.getMessage());
+        }
+    }
+
     private void loadEmplois() {
         try {
             allEmplois = emploiServices.afficherEmplois();
-            displayEmplois(allEmplois);
+            filterEmplois(); // Apply filters and display
         } catch (Exception e) {
             showError("Erreur", "Impossible de charger les emplois: " + e.getMessage());
         }
@@ -60,13 +150,15 @@ public class EmploiManagementController {
         List<EmploiDuTemps> filtered = allEmplois;
 
         if (jour != null && !jour.equals("Tous")) {
-            filtered = emploiServices.afficherEmploisByJour(jour);
+            filtered = filtered.stream()
+                    .filter(e -> e.getJourSemaine().equalsIgnoreCase(jour)) // Use equalsIgnoreCase for safety
+                    .toList(); // Java 16+
         }
 
         if (tranche != null && !tranche.equals("Tous")) {
             String finalTranche = tranche;
             filtered = filtered.stream()
-                    .filter(e -> e.getTrancheHoraire().equals(finalTranche))
+                    .filter(e -> e.getTrancheHoraire().equalsIgnoreCase(finalTranche))
                     .toList();
         }
 
@@ -74,157 +166,9 @@ public class EmploiManagementController {
     }
 
     private void displayEmplois(List<EmploiDuTemps> emplois) {
-        cardsPane.getChildren().clear();
-
-        for (EmploiDuTemps emploi : emplois) {
-            VBox card = createEmploiCard(emploi);
-            cardsPane.getChildren().add(card);
-            animateCard(card, cardsPane.getChildren().indexOf(card));
-        }
-
+        ObservableList<EmploiDuTemps> data = FXCollections.observableArrayList(emplois);
+        emploiTable.setItems(data);
         countLabel.setText(emplois.size() + " Emploi" + (emplois.size() > 1 ? "s" : ""));
-    }
-
-    private void animateCard(VBox card, int index) {
-        card.setOpacity(0);
-        card.setTranslateY(20);
-
-        FadeTransition fade = new FadeTransition(Duration.millis(300), card);
-        fade.setFromValue(0);
-        fade.setToValue(1);
-
-        TranslateTransition translate = new TranslateTransition(Duration.millis(300), card);
-        translate.setFromY(20);
-        translate.setToY(0);
-
-        ParallelTransition parallel = new ParallelTransition(fade, translate);
-        parallel.setDelay(Duration.millis(index * 50));
-        parallel.play();
-    }
-
-    private VBox createEmploiCard(EmploiDuTemps emploi) {
-        VBox card = new VBox();
-        card.getStyleClass().add("suivie-card");
-        card.setPrefWidth(360);
-
-        // Header
-        HBox band = new HBox(10);
-        band.getStyleClass().add("suivie-band");
-        band.setStyle(getBandStyle(emploi.getTrancheHoraire()));
-        band.setAlignment(Pos.CENTER_LEFT);
-
-        Label title = new Label(capitalizeFirst(emploi.getJourSemaine()));
-        title.setStyle("-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 14;");
-
-        Label typeLabel = new Label("Emploi du Temps");
-        typeLabel.setStyle("-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 11;");
-
-        VBox titleBox = new VBox(2, title, typeLabel);
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        Label badge = new Label(getTrancheLabel(emploi.getTrancheHoraire()));
-        badge.setStyle("""
-            -fx-background-color: rgba(255,255,255,0.22);
-            -fx-text-fill: white;
-            -fx-padding: 4 10;
-            -fx-background-radius: 999;
-            -fx-font-weight: 700;
-            -fx-font-size: 11;
-        """);
-
-        band.getChildren().addAll(titleBox, spacer, badge);
-
-        // Body
-        VBox body = new VBox(10);
-        body.getStyleClass().add("suivie-body");
-
-        String typeActivite = "";
-        if (emploi.getIdSeance() != null) {
-            typeActivite = "📚 Séance (ID: " + emploi.getIdSeance() + ")";
-        } else if (emploi.getIdRdv() != null) {
-            typeActivite = "📅 RDV (ID: " + emploi.getIdRdv() + ")";
-        } else {
-            typeActivite = "Aucune activité liée";
-        }
-
-        Label info = new Label(
-                "ANNÉE SCOLAIRE\n" + emploi.getAnneeScolaire() +
-                "\n\nTRANCHE HORAIRE\n" + getTrancheLabel(emploi.getTrancheHoraire()) +
-                "\n\nACTIVITÉ\n" + typeActivite
-        );
-        info.getStyleClass().add("suivie-info");
-
-        // Actions
-        HBox actions = new HBox(10);
-
-        Button btnVoir = new Button("Voir");
-        btnVoir.getStyleClass().add("btn-voir");
-        btnVoir.setMaxWidth(Double.MAX_VALUE);
-        btnVoir.setOnAction(e -> viewEmploi(emploi));
-        HBox.setHgrow(btnVoir, Priority.ALWAYS);
-
-        Button btnEdit = new Button("Éditer");
-        btnEdit.getStyleClass().add("btn-edit");
-        btnEdit.setMaxWidth(Double.MAX_VALUE);
-        btnEdit.setOnAction(e -> editEmploi(emploi));
-        HBox.setHgrow(btnEdit, Priority.ALWAYS);
-
-        Button btnDelete = new Button("Supprimer");
-        btnDelete.getStyleClass().addAll("button", "btn-delete");
-        btnDelete.setStyle("-fx-background-color: #ff4757; -fx-text-fill: white; -fx-background-radius: 10;");
-        btnDelete.setOnAction(e -> deleteEmploi(emploi));
-
-        actions.getChildren().addAll(btnVoir, btnEdit, btnDelete);
-
-        body.getChildren().addAll(info, actions);
-        card.getChildren().addAll(band, body);
-
-        addHoverEffect(card);
-
-        return card;
-    }
-
-    private void addHoverEffect(VBox card) {
-        card.setOnMouseEntered(e -> {
-            ScaleTransition scale = new ScaleTransition(Duration.millis(200), card);
-            scale.setToX(1.03);
-            scale.setToY(1.03);
-            scale.play();
-        });
-
-        card.setOnMouseExited(e -> {
-            ScaleTransition scale = new ScaleTransition(Duration.millis(200), card);
-            scale.setToX(1.0);
-            scale.setToY(1.0);
-            scale.play();
-        });
-    }
-
-    private String getBandStyle(String tranche) {
-        return switch (tranche.toLowerCase()) {
-            case "matin" -> "-fx-background-color: linear-gradient(to right, #fbbf24, #f59e0b);";
-            case "apres_midi" -> "-fx-background-color: linear-gradient(to right, #10b981, #059669);";
-            case "soir" -> "-fx-background-color: linear-gradient(to right, #8b5cf6, #7c3aed);";
-            case "journee" -> "-fx-background-color: linear-gradient(to right, #06b6d4, #0891b2);";
-            default -> "-fx-background-color: linear-gradient(to right, #6cda95, #27AE60);";
-        };
-    }
-
-    private String getTrancheLabel(String tranche) {
-        return switch (tranche.toLowerCase()) {
-            case "matin" -> "☀️ Matin";
-            case "apres_midi" -> "🌤️ Après-midi";
-            case "soir" -> "🌙 Soir";
-            case "journee" -> "📆 Journée";
-            default -> tranche;
-        };
-    }
-
-    private String capitalizeFirst(String str) {
-        if (str == null || str.isEmpty()) return str;
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     @FXML
@@ -232,31 +176,25 @@ public class EmploiManagementController {
         openEmploiForm(null);
     }
 
-    private void viewEmploi(EmploiDuTemps emploi) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Détails Emploi du Temps");
-        alert.setHeaderText(capitalizeFirst(emploi.getJourSemaine()) + " - " + getTrancheLabel(emploi.getTrancheHoraire()));
+    private void openEmploiForm(EmploiDuTemps emploi) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmploiForm.fxml"));
+            Parent root = loader.load();
 
-        String content = String.format("""
-                Année scolaire: %s
-                Jour: %s
-                Tranche horaire: %s
-                ID RDV: %s
-                ID Séance: %s
-                """,
-                emploi.getAnneeScolaire(),
-                capitalizeFirst(emploi.getJourSemaine()),
-                getTrancheLabel(emploi.getTrancheHoraire()),
-                emploi.getIdRdv() != null ? emploi.getIdRdv() : "Non défini",
-                emploi.getIdSeance() != null ? emploi.getIdSeance() : "Non défini"
-        );
+            EmploiFormController controller = loader.getController();
+            controller.setEmploiToEdit(emploi);
+            controller.setOnSaveCallback(this::loadEmplois);
 
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle(emploi == null ? "Nouvel Emploi" : "Modifier Emploi");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
 
-    private void editEmploi(EmploiDuTemps emploi) {
-        openEmploiForm(emploi);
+        } catch (IOException e) {
+            showError("Erreur", "Impossible d'ouvrir le formulaire: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void deleteEmploi(EmploiDuTemps emploi) {
@@ -269,41 +207,39 @@ public class EmploiManagementController {
             if (response == ButtonType.OK) {
                 try {
                     emploiServices.supprimerEmploi(emploi.getIdEmploi());
-                    loadEmplois();
-                    showSuccess("Emploi supprimé avec succès!");
+                    loadEmplois(); // Refresh table
                 } catch (Exception e) {
-                    showError("Erreur", "Impossible de supprimer l'emploi: " + e.getMessage());
+                    showError("Erreur", "Erreur lors de la suppression: " + e.getMessage());
                 }
             }
         });
     }
 
-    private void openEmploiForm(EmploiDuTemps emploi) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmploiForm.fxml"));
+    @FXML
+    private void switchToCalendar() {
+        // Implementation similar to previous logic, simplified
+         try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmploiCalendar.fxml"));
             Parent root = loader.load();
 
-            EmploiFormController controller = loader.getController();
-            controller.setEmploiToEdit(emploi);
-            controller.setOnSaveCallback(() -> loadEmplois());
+            // Try to find the nearest BorderPane (likely in Home.fxml)
+             if (emploiTable.getScene() != null && emploiTable.getScene().getRoot() instanceof javafx.scene.layout.BorderPane) { // Check scene from table
+                 ((javafx.scene.layout.BorderPane) emploiTable.getScene().getRoot()).setCenter(root);
+             } else {
+                 // Fallback: If not in a BorderPane, maybe just replace the root scene?
+                 // Or open a new window if that's safer.
+                 // Let's assume the BorderPane strategy works as in other controllers.
+                 if (countLabel.getScene() != null) {
+                      countLabel.getScene().setRoot(root);
+                 }
+             }
 
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle(emploi == null ? "Nouvel Emploi du Temps" : "Modifier Emploi du Temps");
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
         } catch (IOException e) {
-            showError("Erreur", "Impossible d'ouvrir le formulaire: " + e.getMessage());
+            showError("Erreur", "Impossible d'ouvrir le calendrier: " + e.getMessage());
         }
     }
 
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Succès");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+
 
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -313,4 +249,3 @@ public class EmploiManagementController {
         alert.showAndWait();
     }
 }
-
