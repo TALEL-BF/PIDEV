@@ -23,10 +23,10 @@ import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,6 +40,7 @@ import javafx.scene.chart.NumberAxis;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javafx.scene.control.OverrunStyle;
 
 public class AjouterSuivie {
 
@@ -79,8 +80,16 @@ public class AjouterSuivie {
     @FXML private LineChart<String, Number> monthlyChart;
     @FXML private BarChart<String, Number> barMonthly;
     @FXML private Button btnAjouterFab;
+
+    // 🔔 Notifications (PDF parent -> psy)
     @FXML private Button btnNotif;
     @FXML private Label lblNotifBadge;
+    @FXML private VBox notifPanel;
+    @FXML private Button btnNotifRefresh;
+
+    private Popup notifPopup;
+    private VBox notifListBox;
+    private Label notifHeaderSub;
 
     private final SuivieServices suivieServices = new SuivieServices();
 
@@ -114,6 +123,7 @@ public class AjouterSuivie {
         initNavigation();
         initUiListeners();
         initStatsToggle();
+        initNotificationsUI();
 
         // Chargement DB (catch ici => plus de "Unhandled SQLException")
         reloadFromDb();
@@ -131,6 +141,7 @@ public class AjouterSuivie {
         if (btnSubArticles != null) {
             btnSubArticles.setOnAction(e -> { setSubActive(btnSubArticles); switchTo("/GestionArticlesBack.fxml"); });
         }
+
 
         initStatsUI();
     }
@@ -1471,15 +1482,268 @@ public class AjouterSuivie {
             }
         });
     }
+
+
+
+    /* =========================================================
+   🔔 Notifications : Upload PDF parent -> psy (BackOffice)
+   ========================================================= */
+
+    private void initNotificationsUI() {
+        if (btnNotif == null) return;
+
+        notifPopup = new Popup();
+        notifPopup.setAutoHide(true);
+        notifPopup.setHideOnEscape(true);
+
+        VBox rootBox = new VBox(12);
+        rootBox.getStyleClass().add("notifRoot");
+        rootBox.setPrefWidth(460);
+        rootBox.setMaxWidth(460);
+
+        HBox header = new HBox(10);
+        header.getStyleClass().add("notifHeader");
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label title = new Label("Boîte de notifications");
+        title.getStyleClass().add("notifHeaderTitle");
+
+        notifHeaderSub = new Label("Documents envoyés par les parents");
+        notifHeaderSub.getStyleClass().add("notifHeaderSub");
+
+        VBox titleBox = new VBox(2, title, notifHeaderSub);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button refresh = new Button("Actualiser");
+        refresh.getStyleClass().add("notifRefreshBtn");
+        refresh.setOnAction(e -> refreshNotifications());
+
+        header.getChildren().addAll(titleBox, spacer, refresh);
+
+        notifListBox = new VBox(10);
+        ScrollPane sp = new ScrollPane(notifListBox);
+        sp.setFitToWidth(true);
+        sp.getStyleClass().add("notifScroll");
+        sp.setPrefHeight(420);
+
+        rootBox.getChildren().addAll(header, sp);
+        rootBox.setMinWidth(460);
+        rootBox.setMaxWidth(460);
+
+// ✅ IMPORTANT: forcer la feuille CSS dans le Popup
+        rootBox.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
+        notifPopup.getContent().add(rootBox);
+
+        btnNotif.setOnAction(e -> {
+            refreshNotifications();
+            toggleNotifPopup();
+        });
+
+        refreshNotifBadge();
+    }
+
+    private void toggleNotifPopup() {
+        if (notifPopup == null || btnNotif == null) return;
+
+        if (notifPopup.isShowing()) {
+            notifPopup.hide();
+            return;
+        }
+
+        var b = btnNotif.localToScreen(btnNotif.getBoundsInLocal());
+        if (b == null) return;
+
+        double x = b.getMaxX() - 460;
+        double y = b.getMaxY() + 8;
+
+        notifPopup.show(btnNotif, x, y);
+        notifPopup.show(root.getScene().getWindow(), x, y);
+    }
+
     private void refreshNotifBadge() {
+        if (lblNotifBadge == null) return;
+
         try {
-            int c = suivieServices.countNewParentUploads();
-            lblNotifBadge.setText(String.valueOf(c));
-            lblNotifBadge.setVisible(c > 0);
+            int n = new SuivieServices().countNewParentUploads();
+            lblNotifBadge.setText(String.valueOf(n));
+            lblNotifBadge.setVisible(n > 0);
+            lblNotifBadge.setManaged(n > 0);
         } catch (Exception e) {
-            e.printStackTrace();
             lblNotifBadge.setVisible(false);
+            lblNotifBadge.setManaged(false);
         }
     }
 
+    private void refreshNotifications() {
+        if (notifListBox == null) return;
+
+        notifListBox.getChildren().clear();
+
+        try {
+            SuivieServices ss = new SuivieServices();
+            List<SuivieServices.ParentUploadNotif> list = ss.listParentUploads();
+
+            if (list == null || list.isEmpty()) {
+                VBox empty = new VBox(6);
+                empty.getStyleClass().add("notifEmpty");
+
+                Label t = new Label("Aucune notification");
+                t.getStyleClass().add("notifEmptyTitle");
+
+                Label s = new Label("Quand un parent envoie un PDF, il apparaîtra ici.");
+                s.getStyleClass().add("notifEmptySub");
+                s.setWrapText(true);
+
+                empty.getChildren().addAll(t, s);
+                notifListBox.getChildren().add(empty);
+
+                refreshNotifBadge();
+                notifListBox.applyCss();
+                notifListBox.layout();
+                return;
+            }
+
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            for (SuivieServices.ParentUploadNotif n : list) {
+                notifListBox.getChildren().add(buildNotifCard(n, df));
+            }
+
+            refreshNotifBadge();
+
+            // ✅ force CSS/layout après ajout dynamique
+            notifListBox.applyCss();
+            notifListBox.layout();
+
+        } catch (Exception e) {
+            VBox err = new VBox(6);
+            err.getStyleClass().add("notifEmpty");
+
+            Label t = new Label("Erreur notifications");
+            t.getStyleClass().add("notifEmptyTitle");
+
+            Label s = new Label(safe(e.getMessage()));
+            s.getStyleClass().add("notifEmptySub");
+            s.setWrapText(true);
+
+            err.getChildren().addAll(t, s);
+            notifListBox.getChildren().add(err);
+
+            refreshNotifBadge();
+            notifListBox.applyCss();
+            notifListBox.layout();
+        }
+    }
+
+    private void downloadParentPdf(SuivieServices.ParentUploadNotif n) {
+        try {
+            if (n == null || n.filePath == null || n.filePath.isBlank()) {
+                showAlert("Téléchargement", "Chemin du PDF introuvable.");
+                return;
+            }
+
+            java.io.File src = new java.io.File(n.filePath);
+            if (!src.exists()) {
+                showAlert("Téléchargement", "Le fichier n'existe pas sur le disque :\n" + n.filePath);
+                return;
+            }
+
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Enregistrer le PDF");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
+
+            String initialName = (n.fileName != null && !n.fileName.isBlank()) ? n.fileName : src.getName();
+            fc.setInitialFileName(initialName);
+
+            Stage owner = (Stage) root.getScene().getWindow();
+            java.io.File dest = fc.showSaveDialog(owner);
+
+            if (dest == null) return;
+
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            showAlert("Téléchargement", "PDF enregistré :\n" + dest.getAbsolutePath());
+
+        } catch (Exception e) {
+            showAlert("Téléchargement", "Erreur : " + safe(e.getMessage()));
+        }
+    }
+
+
+    private VBox buildNotifCard(SuivieServices.ParentUploadNotif n, DateTimeFormatter df) {
+
+        VBox card = new VBox(8);
+        card.getStyleClass().add("notifCard");
+        if (!n.seen) card.getStyleClass().add("notifCardNew");
+
+        // ✅ pour éviter que la card devienne minuscule / bizarre
+        card.setMaxWidth(Double.MAX_VALUE);
+
+        HBox top = new HBox(10);
+        top.setAlignment(Pos.CENTER_LEFT);
+
+        String subject = (n.subject == null || n.subject.isBlank()) ? "Document (sans sujet)" : n.subject;
+
+        Label title = new Label(subject);
+        title.getStyleClass().add("notifTitle");
+
+        // ✅ CRUCIAL: ellipsis + ne prend pas toute la place
+        title.setWrapText(false);
+        title.setTextOverrun(OverrunStyle.ELLIPSIS);
+        title.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(title, Priority.ALWAYS);
+
+        Label status = new Label(n.seen ? "VU" : "NOUVEAU");
+        status.getStyleClass().add(n.seen ? "notifBadgeSeen" : "notifBadgeNew");
+        status.setMinWidth(Region.USE_PREF_SIZE);
+
+        top.getChildren().addAll(title, status);
+
+        String when = (n.uploadedAt == null) ? "-" : df.format(n.uploadedAt.toLocalDateTime());
+
+        Label meta = new Label("Parent : " + safe(n.email) + " • Enfant : " + safe(n.enfant) + " • " + when);
+        meta.getStyleClass().add("notifMeta");
+        meta.setWrapText(true);
+
+        Label file = new Label("Fichier : " + safe(n.fileName));
+        file.getStyleClass().add("notifFile");
+        file.setWrapText(true);
+
+        HBox actions = new HBox(10);
+        actions.setAlignment(Pos.CENTER_LEFT);
+
+        Button btnDl = new Button("Télécharger");
+        btnDl.getStyleClass().add("notifDownloadBtn");
+
+        Button btnSeen = new Button("Marquer vu");
+        btnSeen.getStyleClass().add("notifSecondaryBtn");
+        btnSeen.setDisable(n.seen);
+
+        btnDl.setOnAction(ev -> {
+            downloadParentPdf(n);
+            if (!n.seen) {
+                markNotifSeen(n.idUpload);   // ✅ ici
+                refreshNotifications();
+            }
+        });
+
+        btnSeen.setOnAction(ev -> {
+            markNotifSeen(n.idUpload);       // ✅ ici
+            refreshNotifications();
+        });
+
+        actions.getChildren().addAll(btnDl, btnSeen);
+
+        card.getChildren().addAll(top, meta, file, actions);
+        return card;
+    }
+    private void markNotifSeen(int idUpload) {
+        try {
+            new SuivieServices().markParentUploadSeen(idUpload);
+            refreshNotifBadge();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

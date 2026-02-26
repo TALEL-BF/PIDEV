@@ -103,6 +103,14 @@
                             <HBox alignment="CENTER_LEFT" spacing="10" styleClass="statsToggleRow">
                                 <Label fx:id="lblToggleStats" text="▸ Statistiques" styleClass="statsToggleText"/>
                                 <Region HBox.hgrow="ALWAYS"/>
+
+                                <StackPane styleClass="notifWrap">
+                                    <Button fx:id="btnNotif" text="🔔" styleClass="notifBtn"/>
+                                    <Label fx:id="lblNotifBadge" text="0" styleClass="notifBadge"
+                                           visible="false" managed="false"
+                                           StackPane.alignment="TOP_RIGHT"/>
+                                </StackPane>
+
                                 <Label text="Aperçu rapide" styleClass="statsHint"/>
                             </HBox>
 

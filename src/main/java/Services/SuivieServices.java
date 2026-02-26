@@ -15,7 +15,12 @@ public class SuivieServices implements ISuivieServices {
     public SuivieServices() {
         con = Mydatabase.getInstance().getConnection();
     }
-
+    private Connection ensureCon() throws SQLException {
+        if (con == null || con.isClosed()) {
+            con = Mydatabase.getInstance().getConnection();
+        }
+        return con;
+    }
     @Override
     public void ajouterSuivie(Suivie s) {
         String req = "INSERT INTO suivie (NOM_ENFANT, EMAIL_PARENT, AGE, NOM_PSY, DATE_SUIVIE, " +
@@ -312,73 +317,66 @@ public class SuivieServices implements ISuivieServices {
     }
     public void updateParentUpload(int idSuivie, String pdfName, String pdfPath, String subject) throws Exception {
         String sql = """
-        UPDATE suivie
-        SET PARENT_PDF_NAME = ?,
-            PARENT_PDF_PATH = ?,
-            PARENT_PDF_SUBJECT = ?,
-            PARENT_PDF_UPLOADED_AT = CURRENT_TIMESTAMP,
-            PARENT_PDF_SEEN = 0
+        INSERT INTO parent_uploads (ID_SUIVIE, EMAIL_PARENT, NOM_ENFANT, SUBJECT, FILE_NAME, FILE_PATH, SEEN)
+        SELECT ID_SUIVIE, EMAIL_PARENT, NOM_ENFANT, ?, ?, ?, 0
+        FROM suivie
         WHERE ID_SUIVIE = ?
     """;
 
-        try (java.sql.Connection con = Utils.Mydatabase.getInstance().getConnection();
-             java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, pdfName);
-            ps.setString(2, pdfPath);
-            ps.setString(3, subject);
+        try (PreparedStatement ps = ensureCon().prepareStatement(sql)) {
+            ps.setString(1, subject);
+            ps.setString(2, pdfName);
+            ps.setString(3, pdfPath);
             ps.setInt(4, idSuivie);
             ps.executeUpdate();
         }
     }
+
     public int countNewParentUploads() throws Exception {
-        String sql = "SELECT COUNT(*) FROM suivie WHERE PARENT_PDF_PATH IS NOT NULL AND PARENT_PDF_SEEN = 0";
-        try (var con = Utils.Mydatabase.getInstance().getConnection();
-             var st = con.prepareStatement(sql);
-             var rs = st.executeQuery()) {
+        String sql = "SELECT COUNT(*) FROM parent_uploads WHERE SEEN = 0";
+        try (PreparedStatement st = ensureCon().prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
             return rs.next() ? rs.getInt(1) : 0;
         }
     }
 
-    public java.util.List<ParentUploadNotif> listParentUploads() throws Exception {
+    public List<ParentUploadNotif> listParentUploads() throws Exception {
         String sql = """
-        SELECT ID_SUIVIE, EMAIL_PARENT, NOM_ENFANT, PARENT_PDF_SUBJECT, PARENT_PDF_UPLOADED_AT,
-               PARENT_PDF_NAME, PARENT_PDF_PATH, PARENT_PDF_SEEN
-        FROM suivie
-        WHERE PARENT_PDF_PATH IS NOT NULL
-        ORDER BY PARENT_PDF_UPLOADED_AT DESC
+        SELECT ID_UPLOAD, ID_SUIVIE, EMAIL_PARENT, NOM_ENFANT, SUBJECT, UPLOADED_AT, FILE_NAME, FILE_PATH, SEEN
+        FROM parent_uploads
+        ORDER BY UPLOADED_AT DESC
     """;
 
-        java.util.List<ParentUploadNotif> out = new java.util.ArrayList<>();
-        try (var con = Utils.Mydatabase.getInstance().getConnection();
-             var st = con.prepareStatement(sql);
-             var rs = st.executeQuery()) {
+        List<ParentUploadNotif> out = new ArrayList<>();
+        try (PreparedStatement st = ensureCon().prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
 
             while (rs.next()) {
                 ParentUploadNotif n = new ParentUploadNotif();
+                n.idUpload = rs.getInt("ID_UPLOAD");
                 n.idSuivie = rs.getInt("ID_SUIVIE");
                 n.email = rs.getString("EMAIL_PARENT");
                 n.enfant = rs.getString("NOM_ENFANT");
-                n.subject = rs.getString("PARENT_PDF_SUBJECT");
-                n.uploadedAt = rs.getTimestamp("PARENT_PDF_UPLOADED_AT");
-                n.fileName = rs.getString("PARENT_PDF_NAME");
-                n.filePath = rs.getString("PARENT_PDF_PATH");
-                n.seen = rs.getInt("PARENT_PDF_SEEN") == 1;
+                n.subject = rs.getString("SUBJECT");
+                n.uploadedAt = rs.getTimestamp("UPLOADED_AT");
+                n.fileName = rs.getString("FILE_NAME");
+                n.filePath = rs.getString("FILE_PATH");
+                n.seen = rs.getInt("SEEN") == 1;
                 out.add(n);
             }
         }
         return out;
     }
 
-    public void markParentUploadSeen(int idSuivie) throws Exception {
-        String sql = "UPDATE suivie SET PARENT_PDF_SEEN = 1 WHERE ID_SUIVIE = ?";
-        try (var con = Utils.Mydatabase.getInstance().getConnection();
-             var ps = con.prepareStatement(sql)) {
-            ps.setInt(1, idSuivie);
+    public void markParentUploadSeen(int idUpload) throws Exception {
+        String sql = "UPDATE parent_uploads SET SEEN = 1 WHERE ID_UPLOAD = ?";
+        try (PreparedStatement ps = ensureCon().prepareStatement(sql)) {
+            ps.setInt(1, idUpload);
             ps.executeUpdate();
         }
     }
-
     public static class ParentUploadNotif {
+        public int idUpload;
         public int idSuivie;
         public String email;
         public String enfant;
@@ -388,5 +386,4 @@ public class SuivieServices implements ISuivieServices {
         public String filePath;
         public boolean seen;
     }
-
 }

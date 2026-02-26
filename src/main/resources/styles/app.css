@@ -3572,3 +3572,27 @@
 }
 .likeBtn:hover{ -fx-cursor: hand; }
 .likeBtn:pressed{ -fx-translate-y: 1; }
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #ececec;
+}
+
+.chart-series-line {
+    -fx-stroke-width: 3px;
+}
+
+.axis {
+    -fx-tick-label-fill: #475569;
+    -fx-font-size: 11px;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
