@@ -379,7 +379,7 @@ public class MainArticlesController {
                 if (!btnLike.getStyleClass().contains("likeOn")) btnLike.getStyleClass().add("likeOn");
             }
 
-            // ❌ لا تعمل refresh() هنا
+            refresh();
         });
 
         HBox likeBox = new HBox(6, btnLike, likeCount);
