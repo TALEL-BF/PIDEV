@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -210,28 +211,26 @@ public class MainArticlesController {
     // ===================== CARD UI =====================
 
     private Pane buildCard(Conseil a, boolean trending) {
-
-        // ===== CARD =====
         VBox card = new VBox();
         card.getStyleClass().add("articleCard");
 
-        // ✅ Taille pour 3 cartes par ligne
         card.setPrefWidth(320);
         card.setMinWidth(320);
         card.setMaxWidth(320);
-        card.setMinHeight(360);
-        card.setMaxHeight(360);
+        card.setMinHeight(380);
+        card.setPrefHeight(380);
+        card.setMaxHeight(380);
 
-        // ===== HEADER (IMAGE FULL "COVER") =====
-        final double HEADER_H = 140;
+        final double HEADER_H = 220;
 
+        // ===== HEADER AMÉLIORÉ =====
         StackPane thumbWrap = new StackPane();
         thumbWrap.getStyleClass().add("articleThumb");
         thumbWrap.setMinHeight(HEADER_H);
         thumbWrap.setPrefHeight(HEADER_H);
         thumbWrap.setMaxHeight(HEADER_H);
 
-        // ✅ Clip arrondi haut
+        // Clip arrondi
         javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
         clip.setArcWidth(22);
         clip.setArcHeight(22);
@@ -239,73 +238,115 @@ public class MainArticlesController {
         clip.setHeight(HEADER_H);
         thumbWrap.setClip(clip);
 
-        Region bg = new Region();
-        bg.getStyleClass().add("articleThumbGradient");
-        bg.setMinHeight(HEADER_H);
-        bg.setPrefHeight(HEADER_H);
-        bg.setMaxHeight(HEADER_H);
-
+        // Image de fond avec gestion améliorée
         ImageView thumb = new ImageView();
+        thumb.setPreserveRatio(true);
         thumb.setSmooth(true);
-        thumb.setPreserveRatio(false);
-        thumb.setFitHeight(HEADER_H);
-        thumb.fitWidthProperty().bind(card.widthProperty());
 
-        Image headerImg = loadLocalImageSmart(a.getAuteurImage());
-        if (headerImg != null) {
-            thumb.setImage(headerImg);
-            thumb.imageProperty().addListener((obs, oldImg, newImg) -> {
-                if (newImg != null) applyCover(thumb, card.getPrefWidth(), HEADER_H);
-            });
-            card.widthProperty().addListener((obs, oldW, newW) -> {
-                if (thumb.getImage() != null) applyCover(thumb, newW.doubleValue(), HEADER_H);
-            });
+        // Charger l'image de l'auteur
+        Image authorImage = loadAuthorImage(a.getAuteurImage());
+
+        if (authorImage != null) {
+            thumb.setImage(authorImage);
+
+            // Ajuster pour couvrir tout l'espace
+            thumb.fitWidthProperty().bind(thumbWrap.widthProperty());
+            thumb.fitHeightProperty().bind(thumbWrap.heightProperty());
+
+            // S'assurer que l'image couvre tout
+            thumb.setPreserveRatio(false);
+
         } else {
+            // Fallback avec gradient si pas d'image
             thumb.setVisible(false);
             thumb.setManaged(false);
         }
 
-        // ✅ Tag catégorie
+        // Overlay sombre pour meilleure lisibilité du texte
+        Region darkOverlay = new Region();
+        darkOverlay.setStyle("-fx-background-color: rgba(0,0,0,0);");
+        darkOverlay.setMinHeight(HEADER_H);
+        darkOverlay.prefWidthProperty().bind(thumbWrap.widthProperty());
+
+        // Badge catégorie
         Label tag = new Label(safe(a.getCategorie()));
         tag.getStyleClass().add("articleTag");
         StackPane.setAlignment(tag, Pos.TOP_RIGHT);
-        StackPane.setMargin(tag, new Insets(10));
+        StackPane.setMargin(tag, new Insets(12));
 
-        // ✅ Badge tendance (TOP LEFT)
+        // Badge tendance
         Label trend = new Label("🔥 Tendance");
         trend.getStyleClass().add("trendBadge");
         trend.setVisible(trending);
         trend.setManaged(trending);
         StackPane.setAlignment(trend, Pos.TOP_LEFT);
-        StackPane.setMargin(trend, new Insets(10));
+        StackPane.setMargin(trend, new Insets(12));
 
-        thumbWrap.getChildren().addAll(bg, thumb, tag, trend);
+        // Titre de l'article dans le header (optionnel)
+        Label headerTitle = new Label(safe(a.getTitre()));
+        headerTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        headerTitle.setWrapText(true);
+        headerTitle.setMaxWidth(280);
+        StackPane.setAlignment(headerTitle, Pos.BOTTOM_LEFT);
+        StackPane.setMargin(headerTitle, new Insets(0, 12, 12, 12));
 
-        // ===== CONTENT =====
-        VBox content = new VBox(8);
-        content.setPadding(new Insets(12, 14, 12, 14));
+        if (trending) {
+            thumbWrap.getChildren().addAll(thumb, darkOverlay, tag, trend, headerTitle);
+        } else {
+            thumbWrap.getChildren().addAll(thumb, darkOverlay, tag, headerTitle);
+        }
 
-        Label title = new Label(safe(a.getTitre()));
-        title.getStyleClass().add("articleTitle");
-        title.setWrapText(true);
-        title.setMaxHeight(40);
+        // ===== CONTENU =====
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(14, 16, 16, 16));
 
-        Label author = new Label("Par: " + safe(a.getAuteur()));
-        author.getStyleClass().add("articleMeta");
+        // Informations auteur avec avatar mini
+        HBox authorBox = new HBox(8);
+        authorBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label summary = new Label(preview(safe(a.getContenu()), 110));
+        // Mini avatar de l'auteur
+        StackPane miniAvatar = new StackPane();
+        miniAvatar.setMinSize(30, 30);
+        miniAvatar.setPrefSize(30, 30);
+        miniAvatar.setMaxSize(30, 30);
+        miniAvatar.setStyle("-fx-background-color: linear-gradient(to bottom, #7C3AED, #EC4899); -fx-background-radius: 15;");
+
+        Label authorInitial = new Label(safe(a.getAuteur()).substring(0, 1).toUpperCase());
+        authorInitial.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        miniAvatar.getChildren().add(authorInitial);
+
+        VBox authorInfo = new VBox(2);
+        Label authorName = new Label(safe(a.getAuteur()));
+        authorName.getStyleClass().add("articleMeta");
+        authorName.setStyle("-fx-font-weight: bold;");
+
+        Label dateLabel = new Label("Article récent");
+        dateLabel.getStyleClass().add("articleMeta");
+        dateLabel.setStyle("-fx-font-size: 11px;");
+
+        authorInfo.getChildren().addAll(authorName, dateLabel);
+        authorBox.getChildren().addAll(miniAvatar, authorInfo);
+
+
+
+        // Résumé
+        Label summary = new Label(preview(safe(a.getContenu()), 100));
         summary.getStyleClass().add("articleSummary");
         summary.setWrapText(true);
-        summary.setMaxHeight(55);
+        summary.setMaxHeight(50);
 
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        // ===== LIKE (coeur rouge on/off) =====
+        // ===== LIGNE DES LIKES ET BOUTON LIRE =====
+        HBox actionRow = new HBox();
+        actionRow.setAlignment(Pos.CENTER_LEFT);
+
+        // Coeur et compteur
         Label likeCount = new Label(String.valueOf(a.getLikesCount()));
         likeCount.getStyleClass().add("likeBubble");
 
-        Button btnLike = new Button("♡");  // coeur vide
+        Button btnLike = new Button("♡");
         btnLike.getStyleClass().addAll("likeFab", "likeOff");
 
         if (likedSession.contains(a.getIdArticle())) {
@@ -318,50 +359,67 @@ public class MainArticlesController {
             int id = a.getIdArticle();
 
             if (likedSession.contains(id)) {
-                // UNLIKE
                 likedSession.remove(id);
-
                 int newCount = conseilService.decrementLike(id);
                 a.setLikesCount(newCount);
-                likeCount.setText(String.valueOf(newCount));
 
+                likeCount.setText(String.valueOf(newCount));
                 btnLike.setText("♡");
                 btnLike.getStyleClass().remove("likeOn");
                 if (!btnLike.getStyleClass().contains("likeOff")) btnLike.getStyleClass().add("likeOff");
 
             } else {
-                // LIKE
                 likedSession.add(id);
-
                 int newCount = conseilService.incrementLike(id);
                 a.setLikesCount(newCount);
-                likeCount.setText(String.valueOf(newCount));
 
+                likeCount.setText(String.valueOf(newCount));
                 btnLike.setText("♥");
                 btnLike.getStyleClass().remove("likeOff");
                 if (!btnLike.getStyleClass().contains("likeOn")) btnLike.getStyleClass().add("likeOn");
             }
 
-            // ✅ RE-TRI IMMÉDIAT : le plus liké remonte en 1er
-            refresh();
+            // ❌ لا تعمل refresh() هنا
         });
 
-        HBox likeRow = new HBox(10, btnLike, likeCount);
-        likeRow.setAlignment(Pos.CENTER_LEFT);
-        likeRow.getStyleClass().add("likeRow");
+        HBox likeBox = new HBox(6, btnLike, likeCount);
+        likeBox.setAlignment(Pos.CENTER_LEFT);
 
-        // ===== ACTIONS =====
-        Button btnLire = new Button("Lire");
+        // Bouton Lire
+        Button btnLire = new Button("Lire l'article");
         btnLire.getStyleClass().add("articleBtn");
         btnLire.setOnAction(e -> openArticle(a));
 
-        HBox actions = new HBox(btnLire);
-        actions.setAlignment(Pos.CENTER_RIGHT);
+        HBox lireBox = new HBox(btnLire);
+        lireBox.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(lireBox, Priority.ALWAYS);
 
-        content.getChildren().addAll(title, author, summary, spacer, likeRow, actions);
+        actionRow.getChildren().addAll(likeBox, lireBox);
+
+        content.getChildren().addAll(authorBox, summary, spacer, actionRow);
         card.getChildren().addAll(thumbWrap, content);
 
         return card;
+    }
+
+    private void applyCover(ImageView iv, double targetW, double targetH) {
+        Image img = iv.getImage();
+        if (img == null || targetW <= 0 || targetH <= 0) return;
+
+        double iw = img.getWidth();
+        double ih = img.getHeight();
+        if (iw <= 0 || ih <= 0) return;
+
+        double scale = Math.max(targetW / iw, targetH / ih);
+        double vw = targetW / scale;
+        double vh = targetH / scale;
+
+        double x = (iw - vw) / 2.0;
+        double y = (ih - vh) / 2.0;
+
+        iv.setViewport(new Rectangle2D(x, y, vw, vh));
+        iv.setFitWidth(targetW);
+        iv.setFitHeight(targetH);
     }
     private void openArticle(Conseil a) {
 
@@ -549,24 +607,7 @@ public class MainArticlesController {
         btn.getStyleClass().add(liked ? "heartOn" : "heartOff");
     }
 
-    private void applyCover(ImageView iv, double targetW, double targetH) {
-        Image img = iv.getImage();
-        if (img == null) return;
 
-        double iw = img.getWidth();
-        double ih = img.getHeight();
-        if (iw <= 0 || ih <= 0 || targetW <= 0 || targetH <= 0) return;
-
-        double scale = Math.max(targetW / iw, targetH / ih);
-
-        double vw = targetW / scale;
-        double vh = targetH / scale;
-
-        double x = (iw - vw) / 2.0;
-        double y = (ih - vh) / 2.0;
-
-        iv.setViewport(new Rectangle2D(x, y, vw, vh));
-    }
     private Image loadLocalImageSmart(String path) {
         try {
             if (path == null || path.trim().isEmpty()) return null;
@@ -606,4 +647,75 @@ public class MainArticlesController {
             return null;
         }
     }
+
+    // ===================== GESTION AMÉLIORÉE DES IMAGES =====================
+
+    private Image loadAuthorImage(String imagePath) {
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            return loadDefaultAuthorImage();
+        }
+
+        try {
+            String path = imagePath.trim().replace("\\", "/");
+
+            // 1. Vérifier si c'est une URL
+            if (path.startsWith("http://") || path.startsWith("https://")) {
+                return new Image(path, true);
+            }
+
+            // 2. Vérifier dans les ressources
+            String resourcePath = path.startsWith("/") ? path : "/" + path;
+            var resourceUrl = getClass().getResource(resourcePath);
+            if (resourceUrl != null) {
+                return new Image(resourceUrl.toExternalForm(), true);
+            }
+
+            // 3. Vérifier dans le dossier assets
+            String assetsPath = "/assets/" + path;
+            resourceUrl = getClass().getResource(assetsPath);
+            if (resourceUrl != null) {
+                return new Image(resourceUrl.toExternalForm(), true);
+            }
+
+            // 4. Vérifier dans le système de fichiers
+            File file = new File(path);
+            if (file.exists()) {
+                return new Image(file.toURI().toString(), true);
+            }
+
+            // 5. Essayer dans le répertoire courant
+            file = new File(System.getProperty("user.dir"), path);
+            if (file.exists()) {
+                return new Image(file.toURI().toString(), true);
+            }
+
+            return loadDefaultAuthorImage();
+
+        } catch (Exception e) {
+            System.err.println("Erreur chargement image: " + imagePath + " - " + e.getMessage());
+            return loadDefaultAuthorImage();
+        }
+    }
+
+    private Image loadDefaultAuthorImage() {
+        try {
+            var url = getClass().getResource("/assets/default-author.jpg");
+            if (url != null) {
+                return new Image(url.toExternalForm(), true);
+            }
+            // Si pas d'image par défaut, créer une image colorée
+            return createDefaultAvatar();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Image createDefaultAvatar() {
+        // Crée un avatar par défaut avec la première lettre du nom
+        WritableImage img = new WritableImage(140, 140);
+        // Tu peux laisser vide, l'image par défaut sera le gradient
+        return null;
+    }
+
+
 }
