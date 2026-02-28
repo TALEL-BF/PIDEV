@@ -23,6 +23,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class GestionArticlesBackController {
 
@@ -55,7 +64,7 @@ public class GestionArticlesBackController {
 
     @FXML private Button btnFrontOffice;
 
-
+    private static final long MAX_IMG_BYTES = 2L * 1024 * 1024; // 2 Mo
 
     private final ObservableList<Conseil> master = FXCollections.observableArrayList();
     private ConseilServices conseilService;
@@ -156,8 +165,34 @@ public class GestionArticlesBackController {
         VBox card = new VBox();
         card.getStyleClass().add("suivie-card");
 
-        HBox band = new HBox(10);
+        // ===== HEADER / BAND =====
+        HBox band = new HBox(12);
+        band.setAlignment(Pos.CENTER_LEFT);
         band.getStyleClass().add("suivie-band");
+
+        // ✅ Avatar mini à gauche
+// ✅ Avatar mini à gauche (RONDE)
+        ImageView avatar = new ImageView();
+        avatar.setFitWidth(40);
+        avatar.setFitHeight(40);
+        avatar.setPreserveRatio(true);
+
+// Charger image
+        Image img = loadLocalImage(c.getAuteurImage());
+        if (img != null) avatar.setImage(img);
+
+// ✅ Clip cercle (rendre ronde)
+        double r = 20; // rayon = fitWidth/2
+        javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(r, r, r);
+        avatar.setClip(clip);
+
+// (Optionnel) léger contour blanc + ombre (propre)
+        avatar.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0.2, 0, 2);"
+                + "-fx-background-radius: 999;");
+
+// ✅ ajoute une classe css si tu veux
+        avatar.getStyleClass().add("avatarRound");
+
 
         Label title = new Label(safe(c.getTitre()));
         title.getStyleClass().add("card-title");
@@ -171,11 +206,13 @@ public class GestionArticlesBackController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        band.getChildren().addAll(nameBox, spacer);
+        band.getChildren().addAll(avatar, nameBox, spacer);
 
+        // خط صغير تحت الهيدر (اختياري)
         Region headerLine = new Region();
         headerLine.getStyleClass().add("card-header-line");
 
+        // ===== BODY =====
         VBox body = new VBox(12);
         body.getStyleClass().add("suivie-body");
 
@@ -187,6 +224,7 @@ public class GestionArticlesBackController {
         info.setWrapText(true);
         info.getStyleClass().add("suivie-info");
 
+        // ===== ACTIONS =====
         HBox actions = new HBox(12);
         actions.getStyleClass().add("card-actions");
 
@@ -205,6 +243,7 @@ public class GestionArticlesBackController {
         HBox.setHgrow(lire, Priority.ALWAYS);
         HBox.setHgrow(modif, Priority.ALWAYS);
         HBox.setHgrow(suppr, Priority.ALWAYS);
+
         lire.setMaxWidth(Double.MAX_VALUE);
         modif.setMaxWidth(Double.MAX_VALUE);
         suppr.setMaxWidth(Double.MAX_VALUE);
@@ -213,7 +252,9 @@ public class GestionArticlesBackController {
 
         body.getChildren().addAll(info, actions);
 
+        // ✅ هنا المهم: نستعمل band موش header
         card.getChildren().addAll(band, headerLine, body);
+
         return card;
     }
 
@@ -316,19 +357,43 @@ public class GestionArticlesBackController {
         TextField tfTitre  = new TextField(initial == null ? "" : safe(initial.getTitre()));
         TextField tfAuteur = new TextField(initial == null ? "" : safe(initial.getAuteur()));
 
+        // ================= Image auteur =================
+        final String[] imagePath = { initial == null ? null : initial.getAuteurImage() };
+
+        ImageView avatarPreview = new ImageView();
+        avatarPreview.setFitWidth(64);
+        avatarPreview.setFitHeight(64);
+        avatarPreview.setPreserveRatio(true);
+        avatarPreview.getStyleClass().add("avatarPreview");
+
+        // Preview initial si existe
+        Image initImg = loadLocalImage(imagePath[0]);
+        if (initImg != null) avatarPreview.setImage(initImg);
+
+        Button btnChooseImg = new Button("Choisir image");
+        btnChooseImg.getStyleClass().addAll("btn-soft", "btn-hover");
+
+        Label imgInfo = new Label(imagePath[0] == null ? "Aucune image" : imagePath[0]);
+        imgInfo.setStyle("-fx-text-fill: #6b7280; -fx-font-weight: 600;");
+
+        // Container pour mettre rouge/vert (validation)
+        VBox imgBox = new VBox(6, btnChooseImg, imgInfo);
+        HBox imgRow = new HBox(12, avatarPreview, imgBox);
+        imgRow.setAlignment(Pos.CENTER_LEFT);
+        imgRow.getStyleClass().add("img-row"); // optionnel
+
+        // ================= Catégorie =================
         ComboBox<String> cbCat = new ComboBox<>();
         cbCat.getItems().addAll("Général", "Autisme", "Sommeil", "Comportement");
 
-        // ✅ مهم: مثل "État" في Suivie
-        // - Ajouter: تبدأ فارغة => Rouge
-        // - Modifier: تكون معبّية => Vert مباشرة (اختياري، نعملها كما Suivie في modifier)
         if (initial == null) {
             cbCat.setPromptText("Choisir...");
-            cbCat.setValue(null); // ✅ فارغة في البداية
+            cbCat.setValue(null);
         } else {
             cbCat.setValue(safe(initial.getCategorie()));
         }
 
+        // ================= Contenu =================
         TextArea taContenu = new TextArea(initial == null ? "" : safe(initial.getContenu()));
         taContenu.setWrapText(true);
         taContenu.setPrefRowCount(10);
@@ -357,9 +422,13 @@ public class GestionArticlesBackController {
         gp.add(new Label("Auteur *"), 0, 2);
         gp.add(tfAuteur, 1, 2);
 
-        gp.add(new Label("Contenu *"), 0, 3);
-        gp.add(taContenu, 1, 3);
+        gp.add(new Label("Image auteur *"), 0, 3);
+        gp.add(imgRow, 1, 3);
 
+        gp.add(new Label("Contenu *"), 0, 4);
+        gp.add(taContenu, 1, 4);
+
+        // ================= Actions =================
         HBox actions = new HBox(12);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
@@ -376,19 +445,19 @@ public class GestionArticlesBackController {
         ((VBox) stage.getScene().getRoot()).getChildren().add(content);
 
         final Conseil[] result = new Conseil[1];
+        final boolean[] catTouched = { initial != null };
 
-        // ✅ باش Catégorie تولّي خضراء فقط بعد اختيار (في ajout)
-        final boolean[] catTouched = { initial != null }; // modifier => تعتبر "touchée"
-        final boolean[] submitted  = { false };
-
+        // ================= VALIDATION =================
         Runnable validate = () -> {
-
             lblErrors.setText("");
 
             tfTitre.getStyleClass().removeAll("field-error", "field-ok");
             tfAuteur.getStyleClass().removeAll("field-error", "field-ok");
             taContenu.getStyleClass().removeAll("field-error", "field-ok");
             cbCat.getStyleClass().removeAll("field-error", "field-ok");
+
+            // Image row style reset
+            imgRow.getStyleClass().removeAll("field-error", "field-ok");
 
             boolean ok = true;
             StringBuilder sb = new StringBuilder("Champs à corriger :\n");
@@ -402,22 +471,14 @@ public class GestionArticlesBackController {
                 tfTitre.getStyleClass().add("field-ok");
             }
 
-            // ✅ Catégorie: rouge au début (ajout), vert après sélection
+            // Catégorie
             boolean catOk = cbCat.getValue() != null && !cbCat.getValue().trim().isEmpty();
-
-            if (!catTouched[0]) {
-                // au démarrage (ajout) => rouge
+            if (!catTouched[0] || !catOk) {
                 ok = false;
                 sb.append("- Catégorie (obligatoire)\n");
                 cbCat.getStyleClass().add("field-error");
             } else {
-                if (!catOk) {
-                    ok = false;
-                    sb.append("- Catégorie (obligatoire)\n");
-                    cbCat.getStyleClass().add("field-error");
-                } else {
-                    cbCat.getStyleClass().add("field-ok");
-                }
+                cbCat.getStyleClass().add("field-ok");
             }
 
             // Auteur
@@ -438,24 +499,76 @@ public class GestionArticlesBackController {
                 taContenu.getStyleClass().add("field-ok");
             }
 
+            // Image obligatoire
+            boolean imgOk = (imagePath[0] != null && !imagePath[0].trim().isEmpty());
+            if (!imgOk) {
+                ok = false;
+                sb.append("- Image auteur (obligatoire)\n");
+                imgRow.getStyleClass().add("field-error");
+            } else {
+                imgRow.getStyleClass().add("field-ok");
+            }
+
             btnSave.setDisable(!ok);
             if (!ok) lblErrors.setText(sb.toString());
         };
 
-        // listeners
+        // ================= UPLOAD IMAGE (avec contrôle) =================
+        btnChooseImg.setOnAction(ev -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Choisir une image");
+            fc.getExtensionFilters().setAll(
+                    new FileChooser.ExtensionFilter("Images (PNG/JPG)", "*.png", "*.jpg", "*.jpeg")
+            );
+
+            File chosen = fc.showOpenDialog(stage);
+            if (chosen == null) return;
+
+            String name = chosen.getName().toLowerCase();
+            boolean extOk = name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg");
+            if (!extOk) {
+                lblErrors.setText("Champs à corriger :\n- Image auteur (formats acceptés: png, jpg, jpeg)\n");
+                imagePath[0] = null;
+                imgInfo.setText("Aucune image");
+                avatarPreview.setImage(null);
+                validate.run();
+                return;
+            }
+
+            if (chosen.length() > MAX_IMG_BYTES) {
+                lblErrors.setText("Champs à corriger :\n- Image auteur (max 2 Mo)\n");
+                imagePath[0] = null;
+                imgInfo.setText("Aucune image");
+                avatarPreview.setImage(null);
+                validate.run();
+                return;
+            }
+
+            // Sauvegarde + path DB
+            String saved = saveImageToUploads(chosen);
+            imagePath[0] = saved;
+            imgInfo.setText(saved);
+
+            Image img = loadLocalImage(saved);
+            if (img != null) avatarPreview.setImage(img);
+
+            validate.run();
+        });
+
+        // ================= Listeners =================
         tfTitre.textProperty().addListener((o,a,b) -> validate.run());
         tfAuteur.textProperty().addListener((o,a,b) -> validate.run());
         taContenu.textProperty().addListener((o,a,b) -> validate.run());
 
         cbCat.valueProperty().addListener((o, a, b) -> {
-            catTouched[0] = true;     // ✅ أول sélection => touchée
+            catTouched[0] = true;
             validate.run();
         });
 
+        // Validation initiale (si modifier et image existe => vert + bouton actif)
         validate.run();
 
         btnSave.setOnAction(e -> {
-            submitted[0] = true;
             validate.run();
             if (btnSave.isDisable()) return;
 
@@ -463,7 +576,8 @@ public class GestionArticlesBackController {
                     tfTitre.getText().trim(),
                     taContenu.getText().trim(),
                     cbCat.getValue(),
-                    tfAuteur.getText().trim()
+                    tfAuteur.getText().trim(),
+                    imagePath[0]
             );
             stage.close();
         });
@@ -471,7 +585,6 @@ public class GestionArticlesBackController {
         stage.showAndWait();
         return Optional.ofNullable(result[0]);
     }
-
     // =================== Helpers UI ===================
 
     private Stage createCustomStage(String title, double w, double h) {
@@ -615,5 +728,56 @@ public class GestionArticlesBackController {
             btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
         }
     }
+    private String saveImageToUploads(File chosenFile) {
+        if (chosenFile == null) return null;
 
+        try {
+            Path uploadsDir = Path.of("uploads", "articles");
+            Files.createDirectories(uploadsDir);
+
+            String name = chosenFile.getName();
+            String ext = "";
+            int dot = name.lastIndexOf('.');
+            if (dot >= 0) ext = name.substring(dot);
+
+            String newName = System.currentTimeMillis() + "_avatar" + ext;
+            Path target = uploadsDir.resolve(newName);
+
+            Files.copy(chosenFile.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+
+            // chemin relatif (pratique pour DB)
+            return "uploads/articles/" + newName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur sauvegarde image: " + e.getMessage(), e);
+        }
+    }
+
+    private Image loadLocalImage(String relativeOrAbsolutePath) {
+        if (relativeOrAbsolutePath == null || relativeOrAbsolutePath.trim().isEmpty()) return null;
+
+        try {
+            // Si c'est déjà une URL (file:/, http:, etc.)
+            if (relativeOrAbsolutePath.startsWith("file:") || relativeOrAbsolutePath.startsWith("http")) {
+                return new Image(relativeOrAbsolutePath, true);
+            }
+
+            // WEBP -> JavaFX ne le lit pas (sans lib)
+            String lower = relativeOrAbsolutePath.toLowerCase();
+            if (lower.endsWith(".webp")) return null;
+
+            File f = new File(relativeOrAbsolutePath);
+
+            // Si path relatif et non trouvé => essayer depuis user.dir
+            if (!f.exists()) {
+                f = new File(System.getProperty("user.dir"), relativeOrAbsolutePath);
+            }
+
+            if (!f.exists()) return null;
+
+            return new Image(f.toURI().toString(), true);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

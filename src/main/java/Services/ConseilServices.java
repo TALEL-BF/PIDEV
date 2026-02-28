@@ -21,14 +21,20 @@ public class ConseilServices implements IConseilServices {
         }
     }
 
+    // =========================
+    // CRUD
+    // =========================
+
     @Override
     public void ajouterConseil(Conseil c) {
-        String sql = "INSERT INTO article_conseille (titre, contenu, categorie, Auteur, likes_count) VALUES (?,?,?,?,0)";
+        String sql = "INSERT INTO article_conseille (titre, contenu, categorie, Auteur, auteur_image, likes_count) " +
+                "VALUES (?,?,?,?,?,0)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, safe(c.getTitre()));
             ps.setString(2, safe(c.getContenu()));
             ps.setString(3, safe(c.getCategorie()));
             ps.setString(4, safe(c.getAuteur()));
+            ps.setString(5, safe(c.getAuteurImage()));
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur INSERT article_conseille: " + e.getMessage(), e);
@@ -37,13 +43,14 @@ public class ConseilServices implements IConseilServices {
 
     @Override
     public void modifierConseil(Conseil c) {
-        String sql = "UPDATE article_conseille SET titre=?, contenu=?, categorie=?, Auteur=? WHERE id_article=?";
+        String sql = "UPDATE article_conseille SET titre=?, contenu=?, categorie=?, Auteur=?, auteur_image=? WHERE id_article=?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, safe(c.getTitre()));
             ps.setString(2, safe(c.getContenu()));
             ps.setString(3, safe(c.getCategorie()));
             ps.setString(4, safe(c.getAuteur()));
-            ps.setInt(5, c.getIdArticle());
+            ps.setString(5, safe(c.getAuteurImage()));
+            ps.setInt(6, c.getIdArticle());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur UPDATE article_conseille: " + e.getMessage(), e);
@@ -61,15 +68,15 @@ public class ConseilServices implements IConseilServices {
         }
     }
 
-    /**
-     * ✅ IMPORTANT :
-     * On trie par catégorie -> likes_count DESC -> date_creation DESC
-     * Même si tu filtres côté UI, tu auras déjà l'ordre "plus likés d'abord".
-     */
+    // =========================
+    // READ (obligatoire car dans l'interface)
+    // =========================
+
     @Override
     public List<Conseil> afficherConseils() {
         List<Conseil> list = new ArrayList<>();
-        String sql = "SELECT id_article, titre, contenu, categorie, date_creation, Auteur, IFNULL(likes_count,0) AS likes_count " +
+        String sql = "SELECT id_article, titre, contenu, categorie, date_creation, Auteur, auteur_image, " +
+                "IFNULL(likes_count,0) AS likes_count " +
                 "FROM article_conseille " +
                 "ORDER BY categorie ASC, likes_count DESC, date_creation DESC";
 
@@ -77,17 +84,9 @@ public class ConseilServices implements IConseilServices {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Conseil c = new Conseil(
-                        rs.getInt("id_article"),
-                        rs.getString("titre"),
-                        rs.getString("contenu"),
-                        rs.getString("categorie"),
-                        rs.getTimestamp("date_creation"),
-                        rs.getString("Auteur"),
-                        rs.getInt("likes_count")
-                );
-                list.add(c);
+                list.add(mapRow(rs));
             }
+
         } catch (SQLException e) {
             throw new RuntimeException("Erreur SELECT article_conseille: " + e.getMessage(), e);
         }
@@ -97,37 +96,32 @@ public class ConseilServices implements IConseilServices {
 
     @Override
     public Conseil getConseilById(int idArticle) {
-        String sql = "SELECT id_article, titre, contenu, categorie, date_creation, Auteur, IFNULL(likes_count,0) AS likes_count " +
+        String sql = "SELECT id_article, titre, contenu, categorie, date_creation, Auteur, auteur_image, " +
+                "IFNULL(likes_count,0) AS likes_count " +
                 "FROM article_conseille WHERE id_article=?";
+
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, idArticle);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Conseil(
-                            rs.getInt("id_article"),
-                            rs.getString("titre"),
-                            rs.getString("contenu"),
-                            rs.getString("categorie"),
-                            rs.getTimestamp("date_creation"),
-                            rs.getString("Auteur"),
-                            rs.getInt("likes_count")
-                    );
-                }
+                if (rs.next()) return mapRow(rs);
             }
+
         } catch (SQLException e) {
             throw new RuntimeException("Erreur getConseilById: " + e.getMessage(), e);
         }
+
         return null;
     }
 
     @Override
     public List<Conseil> rechercher(String keyword) {
-        List<Conseil> list = new ArrayList<>();
         String k = (keyword == null) ? "" : keyword.trim();
         if (k.isEmpty()) return afficherConseils();
 
-        String sql = "SELECT id_article, titre, contenu, categorie, date_creation, Auteur, IFNULL(likes_count,0) AS likes_count " +
+        List<Conseil> list = new ArrayList<>();
+        String sql = "SELECT id_article, titre, contenu, categorie, date_creation, Auteur, auteur_image, " +
+                "IFNULL(likes_count,0) AS likes_count " +
                 "FROM article_conseille " +
                 "WHERE LOWER(titre) LIKE ? OR LOWER(contenu) LIKE ? OR LOWER(Auteur) LIKE ? " +
                 "ORDER BY categorie ASC, likes_count DESC, date_creation DESC";
@@ -140,17 +134,10 @@ public class ConseilServices implements IConseilServices {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(new Conseil(
-                            rs.getInt("id_article"),
-                            rs.getString("titre"),
-                            rs.getString("contenu"),
-                            rs.getString("categorie"),
-                            rs.getTimestamp("date_creation"),
-                            rs.getString("Auteur"),
-                            rs.getInt("likes_count")
-                    ));
+                    list.add(mapRow(rs));
                 }
             }
+
         } catch (SQLException e) {
             throw new RuntimeException("Erreur recherche article_conseille: " + e.getMessage(), e);
         }
@@ -159,8 +146,9 @@ public class ConseilServices implements IConseilServices {
     }
 
     // =========================
-    // ✅ LIKE SYSTEM (single table)
+    // LIKE SYSTEM
     // =========================
+
     @Override
     public int incrementLike(int idArticle) {
         String up = "UPDATE article_conseille SET likes_count = IFNULL(likes_count,0) + 1 WHERE id_article=?";
@@ -173,7 +161,18 @@ public class ConseilServices implements IConseilServices {
         return getLikesCount(idArticle);
     }
 
-
+    public int decrementLike(int idArticle) {
+        String upd = "UPDATE article_conseille " +
+                "SET likes_count = GREATEST(IFNULL(likes_count,0) - 1, 0) " +
+                "WHERE id_article=?";
+        try (PreparedStatement ps = con.prepareStatement(upd)) {
+            ps.setInt(1, idArticle);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur decrementLike: " + e.getMessage(), e);
+        }
+        return getLikesCount(idArticle);
+    }
 
     public int getLikesCount(int idArticle) {
         String sql = "SELECT IFNULL(likes_count,0) AS likes_count FROM article_conseille WHERE id_article=?";
@@ -188,31 +187,24 @@ public class ConseilServices implements IConseilServices {
         return 0;
     }
 
-    private String safe(String s) {
-        return s == null ? "" : s.trim();
+    // =========================
+    // HELPERS
+    // =========================
+
+    private Conseil mapRow(ResultSet rs) throws SQLException {
+        return new Conseil(
+                rs.getInt("id_article"),
+                rs.getString("titre"),
+                rs.getString("contenu"),
+                rs.getString("categorie"),
+                rs.getTimestamp("date_creation"),
+                rs.getString("Auteur"),
+                rs.getString("auteur_image"),
+                rs.getInt("likes_count")
+        );
     }
 
-    public int decrementLike(int idArticle) {
-        String upd = "UPDATE article_conseille " +
-                "SET likes_count = GREATEST(IFNULL(likes_count,0) - 1, 0) " +
-                "WHERE id_article=?";
-        try (PreparedStatement ps = con.prepareStatement(upd)) {
-            ps.setInt(1, idArticle);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Erreur decrementLike: " + e.getMessage(), e);
-        }
-
-        String sel = "SELECT IFNULL(likes_count,0) AS likes_count FROM article_conseille WHERE id_article=?";
-        try (PreparedStatement ps = con.prepareStatement(sel)) {
-            ps.setInt(1, idArticle);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt("likes_count");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erreur get likes_count: " + e.getMessage(), e);
-        }
-
-        return 0;
+    private String safe(String s) {
+        return s == null ? "" : s.trim();
     }
 }

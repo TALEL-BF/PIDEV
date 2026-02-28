@@ -126,10 +126,15 @@
                 <Label fx:id="countLabel" text="0 Articles disponibles" styleClass="countLabel"/>
 
                 <TilePane fx:id="cardsPane"
-                          hgap="32"
-                          vgap="32"
-                          prefTileWidth="400"
-                          styleClass="cardsPane"/>
+                          hgap="50"
+                          vgap="50"
+                          prefTileWidth="320"
+                          alignment="TOP_CENTER"
+                          styleClass="cardsPane">
+                    <padding>
+                        <Insets top="10" right="40" bottom="10" left="40"/>
+                    </padding>
+                </TilePane>
 
             </VBox>
         </ScrollPane>

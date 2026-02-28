@@ -10,6 +10,8 @@ public class Conseil {
     private String categorie;
     private Timestamp dateCreation;
     private String auteur;
+    private String auteurImage;
+
 
     // ✅ NEW
     private int likesCount;
@@ -17,22 +19,24 @@ public class Conseil {
     public Conseil() {}
 
     // Insertion
-    public Conseil(String titre, String contenu, String categorie, String auteur) {
+    public Conseil(String titre, String contenu, String categorie, String auteur, String auteurImage) {
         this.titre = titre;
         this.contenu = contenu;
         this.categorie = categorie;
         this.auteur = auteur;
+        this.auteurImage = auteurImage;
     }
 
     // Lecture DB (avec likes_count)
     public Conseil(Integer idArticle, String titre, String contenu,
-                   String categorie, Timestamp dateCreation, String auteur, int likesCount) {
+                   String categorie, Timestamp dateCreation, String auteur, String auteurImage, int likesCount) {
         this.idArticle = idArticle;
         this.titre = titre;
         this.contenu = contenu;
         this.categorie = categorie;
         this.dateCreation = dateCreation;
         this.auteur = auteur;
+        this.auteurImage = auteurImage;
         this.likesCount = likesCount;
     }
 
@@ -57,7 +61,8 @@ public class Conseil {
     // ✅ NEW
     public int getLikesCount() { return likesCount; }
     public void setLikesCount(int likesCount) { this.likesCount = likesCount; }
-
+    public String getAuteurImage() { return auteurImage; }
+    public void setAuteurImage(String auteurImage) { this.auteurImage = auteurImage; }
 
     @Override
     public String toString() {
