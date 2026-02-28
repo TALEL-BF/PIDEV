@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.layout.StackPane?>
+
+<VBox spacing="25.0" styleClass="main-bg" stylesheets="@../styles.css"
+    xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.auticare.controller.UserProfileController">
+    <children>
+        <HBox spacing="30.0" VBox.vgrow="ALWAYS">
+            <children>
+                <!-- Left Profile Card -->
+                <VBox prefWidth="320.0" spacing="20.0" styleClass="card">
+                    <children>
+                        <VBox alignment="CENTER" spacing="15.0">
+                            <children>
+                                <StackPane>
+                                    <children>
+                                        <Circle fill="#f1f2f6" radius="70.0" stroke="#7b2ff7"
+                                            strokeType="INSIDE" strokeWidth="2.0" />
+                                        <ImageView fx:id="profileImage" fitHeight="130.0"
+                                            fitWidth="130.0" pickOnBounds="true"
+                                            preserveRatio="true">
+                                            <image>
+                                                <Image url="https://via.placeholder.com/130" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                </StackPane>
+                                <VBox alignment="CENTER" spacing="5.0">
+                                    <children>
+                                        <Label fx:id="userName"
+                                            style="-fx-font-size: 20px; -fx-font-weight: bold;"
+                                            text="Lucas Martin" />
+                                        <Label fx:id="roleBadge" styleClass="badge, badge-apprenant"
+                                            text="Apprenant" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                        <VBox spacing="15.0">
+                            <children>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label styleClass="form-label" text="STATUT" />
+                                        <Label fx:id="statusBadge" styleClass="badge, badge-actif"
+                                            text="Actif" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label styleClass="form-label" text="INSCRIPTION" />
+                                        <Label fx:id="regDate" text="15 Septembre 2024" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                        <VBox alignment="BOTTOM_CENTER" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                    onAction="#handleEdit" styleClass="btn-primary"
+                                    text="MODIFIER LE PROFIL" />
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                    </padding>
+                </VBox>
+
+                <!-- Right Tabs -->
+                <VBox spacing="20.0" HBox.hgrow="ALWAYS" styleClass="card">
+                    <children>
+                        <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                            <tabs>
+                                <Tab text="Informations">
+                                    <content>
+                                        <VBox spacing="25.0">
+                                            <padding>
+                                                <Insets top="30.0" left="10.0" />
+                                            </padding>
+                                            <children>
+                                                <HBox spacing="40.0">
+                                                    <children>
+                                                        <VBox spacing="10.0">
+                                                            <children>
+                                                                <Label styleClass="form-label"
+                                                                    text="EMAIL" />
+                                                                <Label fx:id="emailLabel"
+                                                                    style="-fx-font-weight: bold;"
+                                                                    text="lucas.martin@email.com" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="10.0">
+                                                            <children>
+                                                                <Label styleClass="form-label"
+                                                                    text="TÉLÉPHONE" />
+                                                                <Label fx:id="phoneLabel"
+                                                                    style="-fx-font-weight: bold;"
+                                                                    text="06 12 34 56 78" />
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                                <Tab text="Activité">
+                                    <content>
+                                        <VBox spacing="20.0">
+                                            <padding>
+                                                <Insets top="30.0" left="10.0" />
+                                            </padding>
+                                            <children>
+                                                <HBox spacing="20.0">
+                                                    <children>
+                                                        <VBox alignment="CENTER" prefWidth="150.0"
+                                                            spacing="10.0"
+                                                            style="-fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 20;">
+                                                            <children>
+                                                                <Label
+                                                                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #7b2ff7;"
+                                                                    text="3" />
+                                                                <Label text="Cours"
+                                                                    textFill="#636e72" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox alignment="CENTER" prefWidth="150.0"
+                                                            spacing="10.0"
+                                                            style="-fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 20;">
+                                                            <children>
+                                                                <Label
+                                                                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #9d4edd;"
+                                                                    text="12" />
+                                                                <Label text="Évaluations"
+                                                                    textFill="#636e72" />
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </TabPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </HBox>
+        <HBox>
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleBack" styleClass="btn-secondary"
+                    text="← Retour à la liste" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

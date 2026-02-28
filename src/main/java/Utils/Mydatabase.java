@@ -12,7 +12,6 @@ public class Mydatabase {
 
     private Mydatabase(){
         try {
-            con= DriverManager.getConnection("jdbc:mysql://localhost:3306/PIDEV","root","");
             System.out.println("Connected to database successfully");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -29,4 +28,3 @@ public class Mydatabase {
         return con;
     }
 }
-//vbkc zlcy adno bmms
