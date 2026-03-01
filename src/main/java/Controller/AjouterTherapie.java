@@ -1,14 +1,17 @@
-package Controller;
+package com.auticare.Controller;
 
-import Entites.Therapie;
-import Services.TherapieServices;
+import com.auticare.Entites.Therapie;
+import com.auticare.Services.TherapieServices;
+import com.auticare.utils.SessionManager;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -17,9 +20,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javafx.event.ActionEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import com.auticare.utils.SessionManager;
 
 public class AjouterTherapie {
 
@@ -30,14 +40,7 @@ public class AjouterTherapie {
     @FXML private VBox emptyBox;
 
     // Sidebar dropdown
-    @FXML private ToggleButton tbConsultations;
-    @FXML private VBox consultationsSubMenu;
-    @FXML private Button btnGestionConsultations;
 
-
-    @FXML private Button btnSubSuivie;
-    @FXML private Button btnSubTherapie;
-    @FXML private Button btnSubArticles;
     @FXML private Button btnAjouterFab;
 
 
@@ -45,6 +48,8 @@ public class AjouterTherapie {
     @FXML private Button btnMenuSuivie;
     @FXML private Button btnMenuTherapie;
     @FXML private Button btnMenuArticles;
+
+    @FXML private BorderPane root;
 
 
     private final TherapieServices therapieService = new TherapieServices();
@@ -55,14 +60,18 @@ public class AjouterTherapie {
     // =========================
     @FXML
     public void initialize() {
-
         reloadFromDb();
 
-        ChangeListener<Object> refreshListener = (obs, o, n) -> refreshCards();
-        if (searchField != null) searchField.textProperty().addListener(refreshListener);
+        // Filtre de recherche
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, o, n) -> refreshCards());
+        }
 
+        // Boutons d'ajout
         if (btnAjouter != null) btnAjouter.setOnAction(e -> onAjouter());
+        if (btnAjouterFab != null) btnAjouterFab.setOnAction(e -> onAjouter());
 
+        // Ajustement du FlowPane
         if (cardsPane != null) {
             cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
                 double w = newV.doubleValue();
@@ -70,67 +79,14 @@ public class AjouterTherapie {
             });
         }
 
-        // dropdown consultations
-        if (tbConsultations != null && consultationsSubMenu != null) {
-            tbConsultations.setSelected(false);
-            tbConsultations.setText("▸");
+        // Navigation simple (menu principal)
+        if (btnMenuSuivie != null) btnMenuSuivie.setOnAction(e -> switchTo("/views/AjouterSuivie.fxml"));
+        if (btnMenuTherapie != null) btnMenuTherapie.setOnAction(e -> switchTo("/views/AjouterTherapie.fxml"));
+        if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/views/GestionArticlesBack.fxml"));
 
-            consultationsSubMenu.setVisible(false);
-            consultationsSubMenu.setManaged(false);
-
-            tbConsultations.setOnAction(e -> {
-                boolean open = tbConsultations.isSelected();
-                consultationsSubMenu.setVisible(open);
-                consultationsSubMenu.setManaged(open);
-                tbConsultations.setText(open ? "▾" : "▸");
-            });
-
-            if (btnGestionConsultations != null) {
-                btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
-            }
-            if (btnAjouterFab != null) {
-                btnAjouterFab.setOnAction(e -> onAjouter());
-            }
-
-        }
-
-        // navigation
-        if (btnMenuSuivie != null) btnMenuSuivie.setOnAction(e -> switchTo("/AjouterSuivie.fxml"));
-        if (btnMenuTherapie != null) btnMenuTherapie.setOnAction(e -> switchTo("/AjouterTherapie.fxml"));
-        if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
-// ✅ On est dans Gestion Consultations -> Suivie au démarrage
-        setParentConsultationsActive(true);
-        setSubActive(btnSubTherapie);
-
-
-// Clicks
-        btnSubSuivie.setOnAction(e -> {
-            setSubActive(btnSubSuivie);
-            switchTo("/AjouterSuivie.fxml");   // ou la page Suivie
-        });
-
-        btnSubTherapie.setOnAction(e -> {
-            setSubActive(btnSubTherapie);
-            switchTo("/AjouterTherapie.fxml"); // ou la page Thérapie
-        });
-
-        btnSubArticles.setOnAction(e -> {
-            setSubActive(btnSubArticles);
-            switchTo("/GestionArticlesBack.fxml"); // ou ta page Articles
-        });
-
+        // Plus aucun appel à des éléments absents du FXML
     }
 
-    private void switchTo(String fxmlPath) {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
-            javafx.scene.Parent root = loader.load();
-            Stage stage = (Stage) cardsPane.getScene().getWindow();
-            stage.getScene().setRoot(root);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 
     private void reloadFromDb() {
         List<Therapie> list = therapieService.afficherTherapie();
@@ -733,22 +689,88 @@ public class AjouterTherapie {
         return v.isEmpty() ? null : v;
     }
 
-    private void setParentConsultationsActive(boolean active){
-        btnGestionConsultations.getStyleClass().remove("sideBtnActive");
-        if(active) btnGestionConsultations.getStyleClass().add("sideBtnActive");
+
+
+
+// ==== MÉTHODES DE NAVIGATION (à ajouter dans AjouterTherapie.java) ====
+
+    @FXML
+    private void showDashboard() {
+        switchTo("/views/PsychologueDashboard.fxml");
     }
 
-    private void setSubActive(Button selected){
-        // reset
-        btnSubSuivie.getStyleClass().remove("subBtnActive");
-        btnSubTherapie.getStyleClass().remove("subBtnActive");
-        btnSubArticles.getStyleClass().remove("subBtnActive");
-
-        // active only the clicked one
-        selected.getStyleClass().add("subBtnActive");
-
-        // parent stays active as long as we are in this module
-        setParentConsultationsActive(true);
+    @FXML
+    private void goToProfile() {
+        switchTo("/views/PsychologueProfile.fxml");
     }
 
+    @FXML
+    private void showSchedule() {
+        // Tu peux afficher une alerte ou une future vue
+        showInfo("Emploi du temps", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showAppointments() {
+        showInfo("Rendez-vous", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showTherapeuticFollowUp() {
+        switchTo("/AjouterSuivie.fxml");
+    }
+
+    @FXML
+    private void showTherapies() {
+        // Déjà sur la page des thérapies, on peut juste rester ici
+        // ou recharger si besoin
+    }
+
+    @FXML
+    private void showArticles() {
+        switchTo("/GestionArticlesBack.fxml");
+    }
+
+    @FXML
+    private void showEvents() {
+        showInfo("Événements", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void handleLogout(ActionEvent event) {
+        SessionManager.getInstance().endSession();
+        goToLogin();
+    }
+
+    private void goToLogin() {
+        switchTo("/views/Login.fxml");
+    }
+
+    private void switchTo(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent newRoot = loader.load();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.getScene().setRoot(newRoot);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("Navigation", "Impossible de charger : " + fxmlPath);
+        }
+    }
+
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

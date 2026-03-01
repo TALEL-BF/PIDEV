@@ -1,11 +1,13 @@
-package Controller;
+package com.auticare.Controller;
 
-import Entites.Suivie;
-import Entites.Therapie;
-import Services.CompteRenduPdfService;
-import Services.GeminiConseilsService;
-import Services.SuivieServices;
-import Services.TherapieServices;
+import com.auticare.Entites.Suivie;
+import com.auticare.Entites.Therapie;
+import com.auticare.Services.CompteRenduPdfService;
+import com.auticare.Services.GeminiConseilsService;
+import com.auticare.Services.SuivieServices;
+import com.auticare.Services.TherapieServices;
+import com.auticare.models.User;
+import com.auticare.utils.SessionManager;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -32,6 +34,11 @@ public class ParentSuiviController {
 
     @FXML private BorderPane root;
 
+    // ===== Profil sidebar =====
+    @FXML private Label userNameLabel;
+    @FXML private Label userEmailLabel;
+
+    // ===== Composants existants =====
     @FXML private TextField tfEmailParent;
     @FXML private ComboBox<String> cbEnfants;
     @FXML private Label lblInfo;
@@ -52,81 +59,109 @@ public class ParentSuiviController {
     @FXML private TextArea taConseils;
     @FXML private Button btnUploadParentPdf;
 
-    // Sidebar psychologie
-    @FXML private ToggleButton tbPsychologie;
-    @FXML private VBox psychologieSubMenu;
-
     private Suivie dernierSuivi;
-
     private final SuivieServices suivieServices = new SuivieServices();
     private final GeminiConseilsService gemini = new GeminiConseilsService();
+    private User currentUser;
 
     @FXML
     public void initialize() {
+        // Récupérer l'utilisateur connecté
+        currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            userNameLabel.setText(currentUser.getPrenom() + " " + currentUser.getNom());
+            userEmailLabel.setText(currentUser.getEmail());
+        }
+
         lblInfo.setText("Veuillez saisir votre email.");
         cbEnfants.getItems().clear();
 
         xAxis.setTickLabelRotation(45);
         lineChart.setAnimated(false);
         lineChart.setCreateSymbols(true);
-
-        // menu psycho ouvert par défaut
-        tbPsychologie.setSelected(true);
-        psychologieSubMenu.setVisible(true);
-        psychologieSubMenu.setManaged(true);
-        if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
-            tbPsychologie.getStyleClass().add("sideBtnActive");
-        }
     }
 
-    // =========================
-    // Navigation (scene switch)
-    // =========================
+    // ==================== MÉTHODES DE NAVIGATION (sidebar parent) ====================
+
     @FXML
-    private void goArticlesConseils(ActionEvent event) {
-        switchScene(event, "/MainArticles.fxml");
+    private void showDashboard() {
+        switchTo("/views/ParentDashboard.fxml");
     }
 
     @FXML
-    private void goSuivieTherapeutique(ActionEvent event) {
-        // Tu es déjà dans ParentSuivi.fxml -> rien à faire
-        // (ou reload si tu veux) : switchScene(event, "/ParentSuivi.fxml");
+    private void goToProfile() {
+        switchTo("/views/ParentProfile.fxml");
     }
 
-    private void switchScene(ActionEvent event, String fxmlPath) {
+    @FXML
+    private void showSchedule() {
+        showInfo("Emploi du temps", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showCourses() {
+        switchTo("/coursaffichage.fxml");
+    }
+
+    @FXML
+    private void showGames() {
+        showInfo("Jeux", "Bientôt disponible");
+    }
+
+    @FXML
+    private void showTherapeuticFollowUp() {
+        // déjà sur la page, on peut recharger
+        onVoirSuivi();
+    }
+
+    @FXML
+    private void showEvents() {
+        showInfo("Événements", "Bientôt disponible");
+    }
+
+    @FXML
+    private void showArticles() {
+        switchTo("/MainArticles.fxml");
+    }
+
+    @FXML
+    private void handleLogout() {
+        SessionManager.getInstance().endSession();
+        switchTo("/views/Login.fxml");
+    }
+
+    // ==================== UTILITAIRE DE NAVIGATION ====================
+
+    private void switchTo(String fxmlPath) {
         try {
-            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            Scene scene = new Scene(view);
-
-            // Si ton CSS est global, tu peux le remettre (optionnel si déjà dans FXML)
-            // scene.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
-
-            stage.setScene(scene);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent newRoot = loader.load();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.getScene().setRoot(newRoot);
         } catch (Exception e) {
             e.printStackTrace();
-            lblInfo.setText("❌ Navigation impossible : " + e.getMessage());
+            showError("Navigation", "Impossible de charger : " + fxmlPath + "\n" + e.getMessage());
         }
     }
 
-    @FXML
-    private void togglePsychologie() {
-        boolean show = tbPsychologie.isSelected();
-        psychologieSubMenu.setVisible(show);
-        psychologieSubMenu.setManaged(show);
-
-        if (show) {
-            if (!tbPsychologie.getStyleClass().contains("sideBtnActive")) {
-                tbPsychologie.getStyleClass().add("sideBtnActive");
-            }
-        } else {
-            tbPsychologie.getStyleClass().remove("sideBtnActive");
-        }
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
-    // =========================
-    // Chercher enfants
-    // =========================
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // ==================== MÉTHODES EXISTANTES (inchangées) ====================
+
     @FXML
     private void onChercher() {
         String email = tfEmailParent.getText() == null ? "" : tfEmailParent.getText().trim();
@@ -153,9 +188,6 @@ public class ParentSuiviController {
         }
     }
 
-    // =========================
-    // Voir suivi + Graphe
-    // =========================
     @FXML
     private void onVoirSuivi() {
         String email = tfEmailParent.getText() == null ? "" : tfEmailParent.getText().trim();
@@ -255,9 +287,6 @@ public class ParentSuiviController {
         }
     }
 
-    // =========================
-    // PDF Download
-    // =========================
     @FXML
     private void onDownloadPdf() {
         try {
@@ -299,9 +328,6 @@ public class ParentSuiviController {
         }
     }
 
-    // =========================
-    // IA Advice
-    // =========================
     @FXML
     private void onGenererConseilsIA() {
 
@@ -434,5 +460,13 @@ public class ParentSuiviController {
 
     private String safe(String v) {
         return (v == null || v.isBlank()) ? "-" : v.trim();
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+        if (userNameLabel != null) {
+            userNameLabel.setText(user.getPrenom() + " " + user.getNom());
+            userEmailLabel.setText(user.getEmail());
+        }
     }
 }

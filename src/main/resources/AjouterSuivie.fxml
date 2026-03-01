@@ -8,6 +8,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
 
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.chart.BarChart?>
@@ -15,62 +16,104 @@
 <BorderPane fx:id="root"
             xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="Controller.AjouterSuivie"
+            fx:controller="com.auticare.Controller.AjouterSuivie"
             stylesheets="@styles/app.css">
 
-    <!-- =========================
-         SIDEBAR (moderne, clean)
-         ========================= -->
+    <!-- ================= SIDEBAR (copie exacte du Psychologue) ================= -->
     <left>
-        <VBox styleClass="sb" spacing="14" prefWidth="250">
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
-                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
-                    <image><Image url="@assets/logo.png"/></image>
+        <VBox prefWidth="220"
+              minWidth="220"
+              maxWidth="220"
+              spacing="8"
+              style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 20 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 5);">
+
+            <!-- Logo compact -->
+            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 0 12 0;">
+                <ImageView fitHeight="32" fitWidth="32" preserveRatio="true">
+                    <Image url="@assets/logo.png" />
                 </ImageView>
-                <VBox spacing="2">
-                    <Label text="AutiCare" styleClass="sbTitle"/>
-                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                <VBox spacing="1">
+                    <Label text="AutiCare" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    <Label text="Psychologue" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 10px;"/>
                 </VBox>
             </HBox>
 
-            <VBox styleClass="sbUser" spacing="6">
-                <Label text="Connecté en tant que" styleClass="sbMuted"/>
-                <Label text="Admin" styleClass="sbBadge"/>
-            </VBox>
+            <Separator style="-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;"/>
 
-            <VBox styleClass="sbMenu" spacing="6">
-                <Button text="Gestion Utilisateur" styleClass="sbItem"/>
-                <Button text="Gestion Cours &amp; Evaluations" styleClass="sbItem"/>
-                <Button text="Gestion Emploi" styleClass="sbItem"/>
-
-                <HBox spacing="8" alignment="CENTER_LEFT" styleClass="sbRow">
-                    <Button fx:id="btnGestionConsultations"
-                            text="Gestion Consultations"
-                            styleClass="sbItem"
-                            HBox.hgrow="ALWAYS"
-                            maxWidth="1.7976931348623157E308"/>
-                    <ToggleButton fx:id="tbConsultations" text="▸" styleClass="sbChevron"/>
-                </HBox>
-
-                <VBox fx:id="consultationsSubMenu" managed="false" visible="false" spacing="6" styleClass="sbSubMenu">
-                    <Button fx:id="btnSubSuivie" text="Suivie" styleClass="sbSubItem"/>
-                    <Button fx:id="btnSubTherapie" text="Thérapie" styleClass="sbSubItem"/>
-                    <Button fx:id="btnSubArticles" text="Articles" styleClass="sbSubItem"/>
+            <!-- Profil compact -->
+            <VBox alignment="CENTER" spacing="8" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10; -fx-padding: 12;">
+                <Circle radius="25" fill="white" />
+                <VBox alignment="CENTER" spacing="1">
+                    <Label fx:id="userNameLabel" text="Psychologue"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label fx:id="userEmailLabel" text="psychologue@test.com"
+                           style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 10px;"/>
                 </VBox>
-
-                <Button text="Gestion Evenements" styleClass="sbItem"/>
-                <Button text="Gestion Jeux" styleClass="sbItem"/>
             </VBox>
 
-            <Region VBox.vgrow="ALWAYS"/>
+            <!-- Menu principal (actions conservées) -->
+            <VBox spacing="4" style="-fx-padding: 8 0;">
+                <!-- Dashboard (actif) -->
+                <Button text="🏠 Dashboard"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#showDashboard"/>
 
-            <Button text="⎋ Déconnexion" styleClass="sbLogout"/>
+                <!-- Mon Profil -->
+                <Button text="👤 Mon Profil"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#goToProfile"/>
+
+                <!-- Emploi du temps -->
+                <Button text="📅 Emploi du temps"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#showSchedule"/>
+
+                <!-- Rendez-vous -->
+                <Button text="📆 Rendez-vous"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#showAppointments"/>
+
+                <!-- Suivi thérapeutique -->
+                <Button text="📊 Suivi thérapeutique"
+                        styleClass="sidebar-button, sideBtnActive"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 8 12; -fx-alignment: CENTER_LEFT; -fx-font-size: 13px; -fx-background-radius: 8;"
+                        maxWidth="Infinity"
+                        onAction="#showTherapeuticFollowUp"/>
+
+                <!-- Thérapies -->
+                <Button text="🧠 Thérapies"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#showTherapies"/>
+
+                <!-- Articles & Conseils -->
+                <Button text="📚 Articles &amp; Conseils"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#showArticles"/>
+
+                <!-- Événements -->
+                <Button text="🎉 Événements"
+                        styleClass="sidebar-button, sideBtnActive"
+                        maxWidth="Infinity"
+                        onAction="#showEvents"/>
+            </VBox>
+
+            <VBox VBox.vgrow="ALWAYS" />
+
+            <!-- Déconnexion -->
+            <Button fx:id="logoutBtn" text="🚪 Déconnexion"
+                    style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: #ffb4b4; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 12; -fx-font-size: 13px; -fx-alignment: CENTER_LEFT;"
+                    maxWidth="Infinity"
+                    onAction="#handleLogout"/>
         </VBox>
     </left>
 
-    <!-- =========================
-         CONTENT
-         ========================= -->
+    <!-- ================= CONTENU PRINCIPAL (inchangé) ================= -->
     <center>
         <StackPane styleClass="pageBg">
 
@@ -96,70 +139,50 @@
                                     visible="false" managed="false"/>
                         </HBox>
 
-                        <!-- ✅ Stats (nouveau design) -->
+                        <!-- Stats -->
                         <VBox spacing="10">
-
-                            <!-- Toggle row -->
                             <HBox alignment="CENTER_LEFT" spacing="10" styleClass="statsToggleRow">
                                 <Label fx:id="lblToggleStats" text="▸ Statistiques" styleClass="statsToggleText"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-
                                 <StackPane styleClass="notifWrap">
                                     <Button fx:id="btnNotif" text="🔔" styleClass="notifBtn"/>
                                     <Label fx:id="lblNotifBadge" text="0" styleClass="notifBadge"
                                            visible="false" managed="false"
                                            StackPane.alignment="TOP_RIGHT"/>
                                 </StackPane>
-
                                 <Label text="Aperçu rapide" styleClass="statsHint"/>
                             </HBox>
 
-
-                            <!-- Card -->
                             <VBox fx:id="statsBox" managed="false" visible="false" spacing="12" styleClass="statsShell">
-
-                                <!-- Header gradient -->
                                 <HBox alignment="CENTER_LEFT" spacing="12" styleClass="statsHeader">
                                     <VBox spacing="2" HBox.hgrow="ALWAYS">
                                         <Label text="Tableau de bord" styleClass="statsHeaderTitle"/>
                                         <Label text="Évolution mensuelle + deltas par enfant" styleClass="statsHeaderSub"/>
                                     </VBox>
-
                                     <ComboBox fx:id="cbEnfantStats" promptText="Choisir un enfant..." styleClass="statsCombo"/>
                                     <Button fx:id="btnRefreshStats" text="Actualiser" styleClass="statsBtn"/>
                                 </HBox>
 
-                                <!-- ✅ Body: CHART (TOP) + KPI (BOTTOM) -->
                                 <VBox spacing="14" styleClass="statsBody" VBox.vgrow="ALWAYS">
-
-                                    <!-- ✅ Chart (grand) -->
                                     <VBox spacing="8" VBox.vgrow="ALWAYS" styleClass="chartShell">
                                         <HBox alignment="CENTER_LEFT">
                                             <Label text="Tendance mensuelle" styleClass="chartTitle"/>
                                             <Region HBox.hgrow="ALWAYS"/>
                                             <Label text="Moyennes" styleClass="chartHint"/>
                                         </HBox>
-
                                         <VBox spacing="8" VBox.vgrow="ALWAYS" styleClass="chartShell">
                                             <HBox alignment="CENTER_LEFT">
                                                 <Label text="Comparatif mensuel" styleClass="chartTitle"/>
                                                 <Region HBox.hgrow="ALWAYS"/>
                                                 <Label text="H / S / A" styleClass="chartHint"/>
                                             </HBox>
-
-                                            <!-- ✅ minHeight + vgrow => courbe ne sera plus coupée -->
                                             <LineChart fx:id="lineConsultations" VBox.vgrow="ALWAYS" minHeight="420">
-                                                <xAxis>
-                                                    <NumberAxis fx:id="xAxisStats"/>
-                                                </xAxis>
-                                                <yAxis>
-                                                    <NumberAxis fx:id="yAxisStats"/>
-                                                </yAxis>
+                                                <xAxis><NumberAxis fx:id="xAxisStats"/></xAxis>
+                                                <yAxis><NumberAxis fx:id="yAxisStats"/></yAxis>
                                             </LineChart>
                                         </VBox>
                                     </VBox>
 
-                                    <!-- ✅ KPI + Astuce sous la courbe -->
                                     <GridPane hgap="12" vgap="12" styleClass="kpiRow">
                                         <columnConstraints>
                                             <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
@@ -167,31 +190,26 @@
                                             <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
                                             <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
                                         </columnConstraints>
-
                                         <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="kpiMini">
                                             <Label text="Δ Humeur" styleClass="kpiMiniK"/>
                                             <Label fx:id="lblDeltaHumeur" text="-" styleClass="kpiMiniV"/>
                                             <Label text="Dernier mois vs précédent" styleClass="kpiMiniS"/>
                                         </VBox>
-
                                         <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="kpiMini">
                                             <Label text="Δ Stress" styleClass="kpiMiniK"/>
                                             <Label fx:id="lblDeltaStress" text="-" styleClass="kpiMiniV"/>
                                             <Label text="Plus haut = amélioration" styleClass="kpiMiniS"/>
                                         </VBox>
-
                                         <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="kpiMini">
                                             <Label text="Δ Attention" styleClass="kpiMiniK"/>
                                             <Label fx:id="lblDeltaAttention" text="-" styleClass="kpiMiniV"/>
                                             <Label text="Dernier mois vs précédent" styleClass="kpiMiniS"/>
                                         </VBox>
-
                                         <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="kpiMiniSoft">
                                             <Label text="Astuce" styleClass="kpiMiniK"/>
                                             <Label text="Choisis un enfant puis Actualiser" styleClass="kpiMiniSoftText" wrapText="true"/>
                                         </VBox>
                                     </GridPane>
-
                                 </VBox>
                             </VBox>
                         </VBox>
@@ -221,17 +239,14 @@
                 </content>
             </ScrollPane>
 
-            <!-- ✅ FAB: toujours visible -->
+            <!-- FAB -->
             <Button fx:id="btnAjouterFab"
                     text="＋"
                     styleClass="fabAdd"
                     StackPane.alignment="CENTER_RIGHT">
-                <StackPane.margin>
-                    <Insets top="0" right="24" bottom="0" left="0"/>
-                </StackPane.margin>
+                <StackPane.margin><Insets top="0" right="24" bottom="0" left="0"/></StackPane.margin>
             </Button>
 
         </StackPane>
     </center>
-
 </BorderPane>

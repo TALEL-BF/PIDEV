@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane fx:id="root"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.MainArticlesController"
+            stylesheets="@styles/app.css"
+            styleClass="appRoot">
+
+    <left>
+        <VBox prefWidth="252" spacing="14" styleClass="sb">
+
+            <!-- Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
+                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
+                    <image><Image url="@assets/logo.png"/></image>
+                </ImageView>
+
+                <VBox spacing="2">
+                    <Label text="AutiCare" styleClass="sbTitle"/>
+                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                </VBox>
+            </HBox>
+
+            <Region styleClass="sidebarLine"/>
+
+            <!-- Menu -->
+            <VBox spacing="6" styleClass="sbMenu">
+
+                <Button text="📚  Nos cours" styleClass="sbItem" fx:id="btnCours"/>
+                <Button text="🗓  Emplois du temps" styleClass="sbItem" fx:id="btnEmploi"/>
+
+                <!-- Psychologie -->
+                <ToggleButton text="🧠  Psychologie"
+                              fx:id="tbPsychologie"
+                              onAction="#togglePsychologie"
+                              styleClass="sbItem"/>
+
+                <VBox fx:id="psychologieSubMenu"
+                      spacing="6"
+                      visible="false"
+                      managed="false"
+                      styleClass="sbSubMenu">
+
+                    <Button text="📰  Articles &amp; Conseils"
+                            fx:id="btnArticlesConseils"
+                            onAction="#goArticlesConseils"
+                            styleClass="sbSubItem"/>
+
+                    <Button text="🧩  Suivie Thérapeutique"
+                            fx:id="btnSuivieTherapeutique"
+                            onAction="#goSuivieTherapeutique"
+                            styleClass="sbSubItem"/>
+                </VBox>
+
+                <Button text="🎉  Événements" styleClass="sbItem" fx:id="btnEvents"/>
+                <Button text="🎮  Jeux éducatifs" styleClass="sbItem" fx:id="btnJeux"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button text="⎋ Déconnexion" styleClass="sbLogout" fx:id="btnLogout"/>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="pageScroll">
+            <VBox spacing="18" styleClass="page" prefWidth="980">
+                <padding>
+                    <Insets top="20" right="26" bottom="26" left="26"/>
+                </padding>
+
+                <HBox spacing="16" styleClass="heroCard" alignment="CENTER_LEFT">
+                    <StackPane minWidth="90" minHeight="90"
+                               prefWidth="90" prefHeight="90"
+                               styleClass="heroImageWrapper">
+
+                        <ImageView fitWidth="90"
+                                   fitHeight="90"
+                                   preserveRatio="true">
+                            <image>
+                                <Image url="@assets/PSY.png"/>
+                            </image>
+                        </ImageView>
+
+                    </StackPane>
+
+
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Conseils de psychologues 🧩" styleClass="heroTitle"/>
+                        <Label text="Des articles pour les enfants en général et pour les enfants autistes : routines, communication, gestion des émotions, sommeil, etc."
+                               wrapText="true" styleClass="heroSub"/>
+                        <Label text="✦ Nouveaux articles chaque semaine" styleClass="pillInfo"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="6">
+                    <Label text="📰 Articles &amp; Conseils" styleClass="sectionTitle"/>
+                    <Label text="Recherchez un thème et ouvrez un article en un clic 🤍" styleClass="sectionSub"/>
+                </VBox>
+
+                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="searchRow">
+                    <TextField fx:id="searchField"
+                               promptText="Rechercher un article..."
+                               styleClass="searchField"
+                               HBox.hgrow="ALWAYS"/>
+
+
+                    <Button text="Rechercher" styleClass="searchBtn" fx:id="btnSearch"/>
+                </HBox>
+
+                <HBox spacing="10" styleClass="chipsRow">
+                    <ToggleButton text="Général" styleClass="chip" fx:id="chipGeneral"/>
+                    <ToggleButton text="Autisme" styleClass="chip" fx:id="chipAutisme"/>
+                    <ToggleButton text="Sommeil" styleClass="chip" fx:id="chipSommeil"/>
+                    <ToggleButton text="Comportement" styleClass="chip" fx:id="chipComportement"/>
+                </HBox>
+
+
+                <Label fx:id="countLabel" text="0 Articles disponibles" styleClass="countLabel"/>
+
+                <TilePane fx:id="cardsPane"
+                          hgap="50"
+                          vgap="50"
+                          prefTileWidth="320"
+                          alignment="TOP_CENTER"
+                          styleClass="cardsPane">
+                    <padding>
+                        <Insets top="10" right="40" bottom="10" left="40"/>
+                    </padding>
+                </TilePane>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root"
+            stylesheets="@styles/app.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.GestionArticlesBackController">
+
+    <!-- ✅ SIDEBAR -->
+    <left>
+        <VBox styleClass="sb" spacing="14" prefWidth="250">
+
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
+                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
+                    <image><Image url="@assets/logo.png"/></image>
+                </ImageView>
+                <VBox spacing="2">
+                    <Label text="AutiCare" styleClass="sbTitle"/>
+                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                </VBox>
+            </HBox>
+
+            <VBox styleClass="sbUser" spacing="6">
+                <Label text="Connecté en tant que" styleClass="sbMuted"/>
+                <Label text="Admin" styleClass="sbBadge"/>
+            </VBox>
+
+            <VBox styleClass="sbMenu" spacing="6">
+                <Button text="Gestion Utilisateur" styleClass="sbItem"/>
+                <Button text="Gestion Cours &amp; Evaluations" styleClass="sbItem"/>
+                <Button text="Gestion Emploi" styleClass="sbItem"/>
+
+                <HBox spacing="8" alignment="CENTER_LEFT" styleClass="sbRow">
+                    <Button fx:id="btnGestionConsultations"
+                            text="Gestion Consultations"
+                            styleClass="sbItem"
+                            HBox.hgrow="ALWAYS"
+                            maxWidth="1.7976931348623157E308"/>
+                    <ToggleButton fx:id="tbConsultations" text="▸" styleClass="sbChevron"/>
+                </HBox>
+
+                <VBox fx:id="consultationsSubMenu"
+                      managed="false"
+                      visible="false"
+                      spacing="6"
+                      styleClass="sbSubMenu">
+                    <Button fx:id="btnSubSuivie" text="Suivie" styleClass="sbSubItem"/>
+                    <Button fx:id="btnSubTherapie" text="Thérapie" styleClass="sbSubItem"/>
+                    <Button fx:id="btnSubArticles" text="Articles" styleClass="sbSubItem"/>
+                </VBox>
+
+                <Button text="Gestion Evenements" styleClass="sbItem"/>
+                <Button text="Gestion Jeux" styleClass="sbItem"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button text="⎋ Déconnexion" styleClass="sbLogout"/>
+        </VBox>
+    </left>
+
+    <!-- ✅ CONTENT -->
+    <center>
+        <StackPane styleClass="pageBg">
+
+            <!-- SCROLL -->
+            <ScrollPane fx:id="mainScroll"
+                        fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        pannable="true"
+                        styleClass="pageScroll">
+                <content>
+                    <VBox spacing="16" styleClass="page" maxWidth="1200">
+
+                        <!-- TopBar -->
+                        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="topbarBox">
+                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                <Label text="Gestion des Articles" styleClass="h1"/>
+                                <Label text="Ajoutez / modifiez / supprimez les articles &amp; conseils." styleClass="sub"/>
+                            </VBox>
+
+                            <TextField fx:id="searchField"
+                                       promptText="Rechercher un article..."
+                                       styleClass="searchField"/>
+                        </HBox>
+
+                        <!-- Count -->
+                        <HBox alignment="CENTER_LEFT">
+                            <Label fx:id="countLabel" text="0 Articles" styleClass="count"/>
+                        </HBox>
+
+                        <!-- ✅ Empty séparé (IMPORTANT) -->
+                        <VBox fx:id="emptyBox"
+                              managed="false"
+                              visible="false"
+                              spacing="6"
+                              styleClass="emptyCard">
+                            <Label text="Aucun article trouvé" styleClass="emptyTitle"/>
+                            <Label text="Essayez une autre recherche ou ajoutez un article." styleClass="emptySub"/>
+                        </VBox>
+
+                        <!-- Cards -->
+                        <VBox styleClass="cardsFrame">
+                            <FlowPane fx:id="cardsPane"
+                                      alignment="TOP_CENTER"
+                                      hgap="20"
+                                      vgap="20"
+                                      prefWrapLength="1100"
+                                      styleClass="cardsWrap"/>
+                        </VBox>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- ✅ FABs bottom-right (UNE SEULE ZONE) -->
+            <VBox spacing="14"
+                  alignment="CENTER_RIGHT"
+                  StackPane.alignment="CENTER_RIGHT"
+                  pickOnBounds="false">
+                <StackPane.margin>
+                    <Insets top="0" right="26" bottom="26" left="0"/>
+                </StackPane.margin>
+
+                <Button fx:id="btnAjouterFab" text="＋" styleClass="fabAdd"/>
+                <Button fx:id="btnFrontOfficeFab" text="🌐" styleClass="fabFront"/>
+            </VBox>
+
+        </StackPane>
+    </center>
+
+</BorderPane>

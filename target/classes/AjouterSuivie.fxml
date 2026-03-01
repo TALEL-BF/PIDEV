@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.StackedBarChart?>
+<BorderPane fx:id="root"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.AjouterSuivie"
+            stylesheets="@styles/app.css">
+
+    <!-- =========================
+         SIDEBAR (moderne, clean)
+         ========================= -->
+    <left>
+        <VBox styleClass="sb" spacing="14" prefWidth="250">
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
+                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
+                    <image><Image url="@assets/logo.png"/></image>
+                </ImageView>
+                <VBox spacing="2">
+                    <Label text="AutiCare" styleClass="sbTitle"/>
+                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                </VBox>
+            </HBox>
+
+            <VBox styleClass="sbUser" spacing="6">
+                <Label text="Connecté en tant que" styleClass="sbMuted"/>
+                <Label text="Admin" styleClass="sbBadge"/>
+            </VBox>
+
+            <VBox styleClass="sbMenu" spacing="6">
+                <Button text="Gestion Utilisateur" styleClass="sbItem"/>
+                <Button text="Gestion Cours &amp; Evaluations" styleClass="sbItem"/>
+                <Button text="Gestion Emploi" styleClass="sbItem"/>
+
+                <HBox spacing="8" alignment="CENTER_LEFT" styleClass="sbRow">
+                    <Button fx:id="btnGestionConsultations"
+                            text="Gestion Consultations"
+                            styleClass="sbItem"
+                            HBox.hgrow="ALWAYS"
+                            maxWidth="1.7976931348623157E308"/>
+                    <ToggleButton fx:id="tbConsultations" text="▸" styleClass="sbChevron"/>
+                </HBox>
+
+                <VBox fx:id="consultationsSubMenu" managed="false" visible="false" spacing="6" styleClass="sbSubMenu">
+                    <Button fx:id="btnSubSuivie" text="Suivie" styleClass="sbSubItem"/>
+                    <Button fx:id="btnSubTherapie" text="Thérapie" styleClass="sbSubItem"/>
+                    <Button fx:id="btnSubArticles" text="Articles" styleClass="sbSubItem"/>
+                </VBox>
+
+                <Button text="Gestion Evenements" styleClass="sbItem"/>
+                <Button text="Gestion Jeux" styleClass="sbItem"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button text="⎋ Déconnexion" styleClass="sbLogout"/>
+        </VBox>
+    </left>
+
+    <!-- =========================
+         CONTENT
+         ========================= -->
+    <center>
+        <StackPane styleClass="pageBg">
+
+            <ScrollPane fx:id="mainScroll"
+                        fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        pannable="true"
+                        styleClass="pageScroll">
+                <content>
+                    <VBox spacing="16" styleClass="page" maxWidth="1200">
+
+                        <!-- Top Bar -->
+                        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="topbar">
+                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                <Label text="Gestion des Suivies" styleClass="h1"/>
+                                <Label text="Gérez les suivies et les informations associées" styleClass="sub"/>
+                            </VBox>
+
+                            <TextField fx:id="searchField" promptText="Rechercher un suivi..." styleClass="searchField"/>
+
+                            <Button fx:id="btnAjouter" text="+ Ajouter" styleClass="btnPrimary"
+                                    visible="false" managed="false"/>
+                        </HBox>
+
+                        <!-- ✅ Stats (nouveau design) -->
+                        <VBox spacing="10">
+
+                            <!-- Toggle row -->
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="statsToggleRow">
+                                <Label fx:id="lblToggleStats" text="▸ Statistiques" styleClass="statsToggleText"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+
+                                <StackPane styleClass="notifWrap">
+                                    <Button fx:id="btnNotif" text="🔔" styleClass="notifBtn"/>
+                                    <Label fx:id="lblNotifBadge" text="0" styleClass="notifBadge"
+                                           visible="false" managed="false"
+                                           StackPane.alignment="TOP_RIGHT"/>
+                                </StackPane>
+
+                                <Label text="Aperçu rapide" styleClass="statsHint"/>
+                            </HBox>
+
+
+                            <!-- Card -->
+                            <VBox fx:id="statsBox" managed="false" visible="false" spacing="12" styleClass="statsShell">
+
+                                <!-- Header gradient -->
+                                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="statsHeader">
+                                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                        <Label text="Tableau de bord" styleClass="statsHeaderTitle"/>
+                                        <Label text="Évolution mensuelle + deltas par enfant" styleClass="statsHeaderSub"/>
+                                    </VBox>
+
+                                    <ComboBox fx:id="cbEnfantStats" promptText="Choisir un enfant..." styleClass="statsCombo"/>
+                                    <Button fx:id="btnRefreshStats" text="Actualiser" styleClass="statsBtn"/>
+                                </HBox>
+
+                                <!-- ✅ Body: CHART (TOP) + KPI (BOTTOM) -->
+                                <VBox spacing="14" styleClass="statsBody" VBox.vgrow="ALWAYS">
+
+                                    <!-- ✅ Chart (grand) -->
+                                    <VBox spacing="8" VBox.vgrow="ALWAYS" styleClass="chartShell">
+                                        <HBox alignment="CENTER_LEFT">
+                                            <Label text="Tendance mensuelle" styleClass="chartTitle"/>
+                                            <Region HBox.hgrow="ALWAYS"/>
+                                            <Label text="Moyennes" styleClass="chartHint"/>
+                                        </HBox>
+
+                                        <VBox spacing="8" VBox.vgrow="ALWAYS" styleClass="chartShell">
+                                            <HBox alignment="CENTER_LEFT">
+                                                <Label text="Comparatif mensuel" styleClass="chartTitle"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label text="H / S / A" styleClass="chartHint"/>
+                                            </HBox>
+
+                                            <!-- ✅ minHeight + vgrow => courbe ne sera plus coupée -->
+                                            <LineChart fx:id="lineConsultations" VBox.vgrow="ALWAYS" minHeight="420">
+                                                <xAxis>
+                                                    <NumberAxis fx:id="xAxisStats"/>
+                                                </xAxis>
+                                                <yAxis>
+                                                    <NumberAxis fx:id="yAxisStats"/>
+                                                </yAxis>
+                                            </LineChart>
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- ✅ KPI + Astuce sous la courbe -->
+                                    <GridPane hgap="12" vgap="12" styleClass="kpiRow">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                                            <ColumnConstraints percentWidth="25" hgrow="ALWAYS"/>
+                                        </columnConstraints>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="kpiMini">
+                                            <Label text="Δ Humeur" styleClass="kpiMiniK"/>
+                                            <Label fx:id="lblDeltaHumeur" text="-" styleClass="kpiMiniV"/>
+                                            <Label text="Dernier mois vs précédent" styleClass="kpiMiniS"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="kpiMini">
+                                            <Label text="Δ Stress" styleClass="kpiMiniK"/>
+                                            <Label fx:id="lblDeltaStress" text="-" styleClass="kpiMiniV"/>
+                                            <Label text="Plus haut = amélioration" styleClass="kpiMiniS"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="2" styleClass="kpiMini">
+                                            <Label text="Δ Attention" styleClass="kpiMiniK"/>
+                                            <Label fx:id="lblDeltaAttention" text="-" styleClass="kpiMiniV"/>
+                                            <Label text="Dernier mois vs précédent" styleClass="kpiMiniS"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="3" styleClass="kpiMiniSoft">
+                                            <Label text="Astuce" styleClass="kpiMiniK"/>
+                                            <Label text="Choisis un enfant puis Actualiser" styleClass="kpiMiniSoftText" wrapText="true"/>
+                                        </VBox>
+                                    </GridPane>
+
+                                </VBox>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Count -->
+                        <HBox alignment="CENTER_LEFT">
+                            <Label fx:id="countLabel" text="0 Suivies" styleClass="count"/>
+                        </HBox>
+
+                        <!-- Empty -->
+                        <VBox fx:id="emptyBox" managed="false" visible="false" spacing="6" styleClass="emptyCard">
+                            <Label text="Aucun suivi trouvé" styleClass="emptyTitle"/>
+                            <Label text="Essayez une autre recherche ou ajoutez un suivi." styleClass="emptySub"/>
+                        </VBox>
+
+                        <!-- Cards -->
+                        <VBox styleClass="cardsContainer">
+                            <FlowPane fx:id="cardsPane"
+                                      alignment="CENTER"
+                                      hgap="20"
+                                      vgap="20"
+                                      prefWrapLength="1100"
+                                      styleClass="cardsWrap"/>
+                        </VBox>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- ✅ FAB: toujours visible -->
+            <Button fx:id="btnAjouterFab"
+                    text="＋"
+                    styleClass="fabAdd"
+                    StackPane.alignment="CENTER_RIGHT">
+                <StackPane.margin>
+                    <Insets top="0" right="24" bottom="0" left="0"/>
+                </StackPane.margin>
+            </Button>
+
+        </StackPane>
+    </center>
+
+</BorderPane>

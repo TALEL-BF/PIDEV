@@ -1,102 +1,71 @@
-package Controller;
+package com.auticare.Controller;
 
-import Entites.Conseil;
-import Services.ConseilServices;
+import com.auticare.Entites.Conseil;
+import com.auticare.Services.ConseilServices;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-
-import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 
 public class GestionArticlesBackController {
 
+    @FXML private BorderPane root;               // nécessaire pour switchTo
     @FXML private FlowPane cardsPane;
     @FXML private Label countLabel;
     @FXML private TextField searchField;
     @FXML private Button btnAjouter;
     @FXML private VBox emptyBox;
-
-    @FXML private ToggleButton tbConsultations;
-    @FXML private VBox consultationsSubMenu;
-    @FXML private Button btnGestionConsultations;
     @FXML private Button btnAjouterFab;
     @FXML private Button btnFrontOfficeFab;
-    @FXML private VBox fabGroup;
-    @FXML private StackPane pageBg; // si ton StackPane a ce styleClass, donne-lui fx:id="pageBg" dans FXML
-
-    @FXML
-    private void openFrontOffice() { switchTo("/MainArticles.fxml"); }
-
-
-    @FXML private Button btnSubSuivie;
-    @FXML private Button btnSubTherapie;
-    @FXML private Button btnSubArticles;
-
-
-    @FXML private Button btnMenuSuivie;
-    @FXML private Button btnMenuTherapie;
-    @FXML private Button btnMenuArticles;
-
-    @FXML private Button btnFrontOffice;
-
-    private static final long MAX_IMG_BYTES = 2L * 1024 * 1024; // 2 Mo
 
     private final ObservableList<Conseil> master = FXCollections.observableArrayList();
     private ConseilServices conseilService;
 
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final long MAX_IMG_BYTES = 2L * 1024 * 1024; // 2 Mo
 
     @FXML
     public void initialize() {
-
         conseilService = new ConseilServices();
 
-        // Sidebar dropdown (فتح submenu لأننا في Articles)
-        initSidebarDropdownOpenByDefault(true);
-
-        setParentConsultationsActive(true);
-        setSubActive(btnSubArticles);
-
-        // Navigation submenu
-        if (btnSubSuivie != null) btnSubSuivie.setOnAction(e -> { setSubActive(btnSubSuivie); switchTo("/AjouterSuivie.fxml"); });
-        if (btnSubTherapie != null) btnSubTherapie.setOnAction(e -> { setSubActive(btnSubTherapie); switchTo("/AjouterTherapie.fxml"); });
-        if (btnSubArticles != null) btnSubArticles.setOnAction(e -> { setSubActive(btnSubArticles); switchTo("/GestionArticlesBack.fxml"); });
-
-        // Actions FAB
-        if (btnAjouterFab != null) btnAjouterFab.setOnAction(e -> onAjouter());
-        if (btnFrontOfficeFab != null) btnFrontOfficeFab.setOnAction(e -> switchTo("/MainArticles.fxml"));
-
-        // Search
+        // Recherche
         if (searchField != null) {
             searchField.textProperty().addListener((obs, o, n) -> refreshCards());
         }
 
-        // Wrap responsive
+        // Boutons d'ajout
+        if (btnAjouter != null) btnAjouter.setOnAction(e -> onAjouter());
+        if (btnAjouterFab != null) btnAjouterFab.setOnAction(e -> onAjouter());
+
+        // Bouton front office
+        if (btnFrontOfficeFab != null) btnFrontOfficeFab.setOnAction(e -> switchTo("/MainArticles.fxml"));
+
+        // Ajustement responsive du FlowPane
         if (cardsPane != null) {
             cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
                 double w = newV.doubleValue();
@@ -107,35 +76,7 @@ public class GestionArticlesBackController {
         reloadFromDb();
     }
 
-
-
-    private void initNavigation() {
-        if (btnMenuSuivie != null) btnMenuSuivie.setOnAction(e -> switchTo("/AjouterSuivie.fxml"));
-        if (btnMenuTherapie != null) btnMenuTherapie.setOnAction(e -> switchTo("/AjouterTherapie.fxml"));
-        if (btnMenuArticles != null) btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
-
-        if (btnFrontOffice != null) btnFrontOffice.setOnAction(e -> switchTo("/MainArticles.fxml"));
-    }
-
-    private void initUiListeners() {
-        if (searchField != null) {
-            ChangeListener<String> l = (obs, o, n) -> refreshCards();
-            searchField.textProperty().addListener(l);
-        }
-
-        if (btnAjouter != null) {
-            btnAjouter.setOnAction(e -> onAjouter());
-        }
-
-        if (cardsPane != null) {
-            cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
-                double w = newV.doubleValue();
-                cardsPane.setPrefWrapLength(Math.max(500, w - 40));
-            });
-        }
-
-
-    }
+    // ==================== CHARGEMENT DES DONNÉES ====================
 
     private void reloadFromDb() {
         List<Conseil> list = conseilService.afficherConseils();
@@ -160,39 +101,29 @@ public class GestionArticlesBackController {
         }
     }
 
-    private Node buildCard(Conseil c) {
+    // ==================== CARTE D'UN ARTICLE ====================
 
+    private Node buildCard(Conseil c) {
         VBox card = new VBox();
         card.getStyleClass().add("suivie-card");
 
-        // ===== HEADER / BAND =====
+        // Bandeau supérieur avec avatar
         HBox band = new HBox(12);
         band.setAlignment(Pos.CENTER_LEFT);
         band.getStyleClass().add("suivie-band");
 
-        // ✅ Avatar mini à gauche
-// ✅ Avatar mini à gauche (RONDE)
         ImageView avatar = new ImageView();
         avatar.setFitWidth(40);
         avatar.setFitHeight(40);
         avatar.setPreserveRatio(true);
-
-// Charger image
         Image img = loadLocalImage(c.getAuteurImage());
         if (img != null) avatar.setImage(img);
-
-// ✅ Clip cercle (rendre ronde)
-        double r = 20; // rayon = fitWidth/2
+        // Rendre l'avatar rond
+        double r = 20;
         javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(r, r, r);
         avatar.setClip(clip);
-
-// (Optionnel) léger contour blanc + ombre (propre)
-        avatar.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0.2, 0, 2);"
-                + "-fx-background-radius: 999;");
-
-// ✅ ajoute une classe css si tu veux
+        avatar.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0.2, 0, 2);");
         avatar.getStyleClass().add("avatarRound");
-
 
         Label title = new Label(safe(c.getTitre()));
         title.getStyleClass().add("card-title");
@@ -208,11 +139,11 @@ public class GestionArticlesBackController {
 
         band.getChildren().addAll(avatar, nameBox, spacer);
 
-        // خط صغير تحت الهيدر (اختياري)
+        // Ligne de séparation
         Region headerLine = new Region();
         headerLine.getStyleClass().add("card-header-line");
 
-        // ===== BODY =====
+        // Corps de la carte
         VBox body = new VBox(12);
         body.getStyleClass().add("suivie-body");
 
@@ -224,7 +155,7 @@ public class GestionArticlesBackController {
         info.setWrapText(true);
         info.getStyleClass().add("suivie-info");
 
-        // ===== ACTIONS =====
+        // Boutons d'action
         HBox actions = new HBox(12);
         actions.getStyleClass().add("card-actions");
 
@@ -249,14 +180,13 @@ public class GestionArticlesBackController {
         suppr.setMaxWidth(Double.MAX_VALUE);
 
         actions.getChildren().addAll(lire, modif, suppr);
-
         body.getChildren().addAll(info, actions);
 
-        // ✅ هنا المهم: نستعمل band موش header
         card.getChildren().addAll(band, headerLine, body);
-
         return card;
     }
+
+    // ==================== ACTIONS CRUD ====================
 
     private void onLire(Conseil c) {
         Stage stage = createCustomStage("Article", 920, 520);
@@ -343,10 +273,9 @@ public class GestionArticlesBackController {
         stage.showAndWait();
     }
 
-    // =================== Fenêtre Ajouter/Modifier (comme Suivie) ===================
+    // ==================== FENÊTRE AJOUT/MODIFICATION ====================
 
     private Optional<Conseil> showConseilWindow(Conseil initial, String title) {
-
         Stage stage = createCustomStage(title, 980, 560);
         VBox content = makeContentBox();
 
@@ -357,7 +286,7 @@ public class GestionArticlesBackController {
         TextField tfTitre  = new TextField(initial == null ? "" : safe(initial.getTitre()));
         TextField tfAuteur = new TextField(initial == null ? "" : safe(initial.getAuteur()));
 
-        // ================= Image auteur =================
+        // Image auteur
         final String[] imagePath = { initial == null ? null : initial.getAuteurImage() };
 
         ImageView avatarPreview = new ImageView();
@@ -366,7 +295,6 @@ public class GestionArticlesBackController {
         avatarPreview.setPreserveRatio(true);
         avatarPreview.getStyleClass().add("avatarPreview");
 
-        // Preview initial si existe
         Image initImg = loadLocalImage(imagePath[0]);
         if (initImg != null) avatarPreview.setImage(initImg);
 
@@ -376,16 +304,14 @@ public class GestionArticlesBackController {
         Label imgInfo = new Label(imagePath[0] == null ? "Aucune image" : imagePath[0]);
         imgInfo.setStyle("-fx-text-fill: #6b7280; -fx-font-weight: 600;");
 
-        // Container pour mettre rouge/vert (validation)
         VBox imgBox = new VBox(6, btnChooseImg, imgInfo);
         HBox imgRow = new HBox(12, avatarPreview, imgBox);
         imgRow.setAlignment(Pos.CENTER_LEFT);
-        imgRow.getStyleClass().add("img-row"); // optionnel
+        imgRow.getStyleClass().add("img-row");
 
-        // ================= Catégorie =================
+        // Catégorie
         ComboBox<String> cbCat = new ComboBox<>();
         cbCat.getItems().addAll("Général", "Autisme", "Sommeil", "Comportement");
-
         if (initial == null) {
             cbCat.setPromptText("Choisir...");
             cbCat.setValue(null);
@@ -393,7 +319,7 @@ public class GestionArticlesBackController {
             cbCat.setValue(safe(initial.getCategorie()));
         }
 
-        // ================= Contenu =================
+        // Contenu
         TextArea taContenu = new TextArea(initial == null ? "" : safe(initial.getContenu()));
         taContenu.setWrapText(true);
         taContenu.setPrefRowCount(10);
@@ -428,7 +354,6 @@ public class GestionArticlesBackController {
         gp.add(new Label("Contenu *"), 0, 4);
         gp.add(taContenu, 1, 4);
 
-        // ================= Actions =================
         HBox actions = new HBox(12);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
@@ -447,16 +372,13 @@ public class GestionArticlesBackController {
         final Conseil[] result = new Conseil[1];
         final boolean[] catTouched = { initial != null };
 
-        // ================= VALIDATION =================
+        // Validation
         Runnable validate = () -> {
             lblErrors.setText("");
-
             tfTitre.getStyleClass().removeAll("field-error", "field-ok");
             tfAuteur.getStyleClass().removeAll("field-error", "field-ok");
             taContenu.getStyleClass().removeAll("field-error", "field-ok");
             cbCat.getStyleClass().removeAll("field-error", "field-ok");
-
-            // Image row style reset
             imgRow.getStyleClass().removeAll("field-error", "field-ok");
 
             boolean ok = true;
@@ -513,7 +435,7 @@ public class GestionArticlesBackController {
             if (!ok) lblErrors.setText(sb.toString());
         };
 
-        // ================= UPLOAD IMAGE (avec contrôle) =================
+        // Choix image
         btnChooseImg.setOnAction(ev -> {
             FileChooser fc = new FileChooser();
             fc.setTitle("Choisir une image");
@@ -544,7 +466,6 @@ public class GestionArticlesBackController {
                 return;
             }
 
-            // Sauvegarde + path DB
             String saved = saveImageToUploads(chosen);
             imagePath[0] = saved;
             imgInfo.setText(saved);
@@ -555,17 +476,15 @@ public class GestionArticlesBackController {
             validate.run();
         });
 
-        // ================= Listeners =================
+        // Listeners
         tfTitre.textProperty().addListener((o,a,b) -> validate.run());
         tfAuteur.textProperty().addListener((o,a,b) -> validate.run());
         taContenu.textProperty().addListener((o,a,b) -> validate.run());
-
         cbCat.valueProperty().addListener((o, a, b) -> {
             catTouched[0] = true;
             validate.run();
         });
 
-        // Validation initiale (si modifier et image existe => vert + bouton actif)
         validate.run();
 
         btnSave.setOnAction(e -> {
@@ -585,7 +504,88 @@ public class GestionArticlesBackController {
         stage.showAndWait();
         return Optional.ofNullable(result[0]);
     }
-    // =================== Helpers UI ===================
+
+    // ==================== MÉTHODES DE NAVIGATION (AJOUTÉES) ====================
+
+    @FXML
+    private void showDashboard() {
+        switchTo("/views/PsychologueDashboard.fxml");
+    }
+
+    @FXML
+    private void goToProfile() {
+        switchTo("/views/PsychologueProfile.fxml");
+    }
+
+    @FXML
+    private void showSchedule() {
+        showInfo("Emploi du temps", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showAppointments() {
+        showInfo("Rendez-vous", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showTherapeuticFollowUp() {
+        switchTo("/AjouterSuivie.fxml");
+    }
+
+    @FXML
+    private void showTherapies() {
+        switchTo("/AjouterTherapie.fxml");
+    }
+
+    @FXML
+    private void showArticles() {
+        // déjà sur la page
+    }
+
+    @FXML
+    private void showEvents() {
+        showInfo("Événements", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void handleLogout(ActionEvent event) {
+        com.auticare.utils.SessionManager.getInstance().endSession();
+        switchTo("/Login.fxml");
+    }
+
+    // ==================== UTILITAIRES ====================
+
+    private void switchTo(String fxmlPath) {
+        try {
+            java.net.URL url = getClass().getResource(fxmlPath);
+            if (url == null) {
+                throw new IllegalArgumentException("FXML introuvable: " + fxmlPath);
+            }
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent newRoot = loader.load();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.getScene().setRoot(newRoot);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("Navigation", "Impossible de charger : " + fxmlPath + "\n" + ex.getMessage());
+        }
+    }
+
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
     private Stage createCustomStage(String title, double w, double h) {
         Stage stage = new Stage();
@@ -634,7 +634,7 @@ public class GestionArticlesBackController {
         return s == null ? "" : s;
     }
 
-    private String previewText(String s, int max){
+    private String previewText(String s, int max) {
         if (s == null) return "";
         s = s.trim();
         return s.length() <= max ? s : s.substring(0, max) + "...";
@@ -645,92 +645,8 @@ public class GestionArticlesBackController {
         return ts.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(DF);
     }
 
-    private void switchTo(String fxmlPath) {
-        try {
-            java.net.URL url = getClass().getResource(fxmlPath);
-            if (url == null) {
-                throw new IllegalArgumentException("FXML introuvable: " + fxmlPath +
-                        "\n✅ Vérifie qu’il est bien dans: src/main/resources" +
-                        "\n✅ Vérifie majuscules/minuscules du nom.");
-            }
-
-            FXMLLoader loader = new FXMLLoader(url);
-            Parent root = loader.load();
-
-            Stage stage = (Stage) cardsPane.getScene().getWindow();
-            stage.getScene().setRoot(root);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("Erreur Navigation");
-            a.setHeaderText("Erreur lors du chargement");
-            a.setContentText(ex.getMessage());
-            a.showAndWait();
-        }
-    }
-
-    private void setParentConsultationsActive(boolean active){
-        btnGestionConsultations.getStyleClass().remove("sideBtnActive");
-        if(active) btnGestionConsultations.getStyleClass().add("sideBtnActive");
-    }
-
-    private void setSubActive(Button selected){
-        // reset
-        btnSubSuivie.getStyleClass().remove("subBtnActive");
-        btnSubTherapie.getStyleClass().remove("subBtnActive");
-        btnSubArticles.getStyleClass().remove("subBtnActive");
-
-        // active only the clicked one
-        selected.getStyleClass().add("subBtnActive");
-
-        // parent stays active as long as we are in this module
-        setParentConsultationsActive(true);
-    }
-
-    private void initSidebarDropdown(boolean openByDefault) {
-        if (tbConsultations == null || consultationsSubMenu == null) return;
-
-        tbConsultations.setSelected(openByDefault);
-        tbConsultations.setText(openByDefault ? "▾" : "▸");
-
-        consultationsSubMenu.setVisible(openByDefault);
-        consultationsSubMenu.setManaged(openByDefault);
-
-        tbConsultations.setOnAction(e -> {
-            boolean open = tbConsultations.isSelected();
-            consultationsSubMenu.setVisible(open);
-            consultationsSubMenu.setManaged(open);
-            tbConsultations.setText(open ? "▾" : "▸");
-        });
-
-        if (btnGestionConsultations != null) {
-            btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
-        }
-    }
-    private void initSidebarDropdownOpenByDefault(boolean open) {
-        if (tbConsultations == null || consultationsSubMenu == null) return;
-
-        tbConsultations.setSelected(open);
-        tbConsultations.setText(open ? "▾" : "▸");
-
-        consultationsSubMenu.setVisible(open);
-        consultationsSubMenu.setManaged(open);
-
-        tbConsultations.setOnAction(e -> {
-            boolean isOpen = tbConsultations.isSelected();
-            consultationsSubMenu.setVisible(isOpen);
-            consultationsSubMenu.setManaged(isOpen);
-            tbConsultations.setText(isOpen ? "▾" : "▸");
-        });
-
-        if (btnGestionConsultations != null) {
-            btnGestionConsultations.setOnAction(e -> tbConsultations.fire());
-        }
-    }
     private String saveImageToUploads(File chosenFile) {
         if (chosenFile == null) return null;
-
         try {
             Path uploadsDir = Path.of("uploads", "articles");
             Files.createDirectories(uploadsDir);
@@ -744,10 +660,7 @@ public class GestionArticlesBackController {
             Path target = uploadsDir.resolve(newName);
 
             Files.copy(chosenFile.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
-
-            // chemin relatif (pratique pour DB)
             return "uploads/articles/" + newName;
-
         } catch (IOException e) {
             throw new RuntimeException("Erreur sauvegarde image: " + e.getMessage(), e);
         }
@@ -755,26 +668,18 @@ public class GestionArticlesBackController {
 
     private Image loadLocalImage(String relativeOrAbsolutePath) {
         if (relativeOrAbsolutePath == null || relativeOrAbsolutePath.trim().isEmpty()) return null;
-
         try {
-            // Si c'est déjà une URL (file:/, http:, etc.)
             if (relativeOrAbsolutePath.startsWith("file:") || relativeOrAbsolutePath.startsWith("http")) {
                 return new Image(relativeOrAbsolutePath, true);
             }
-
-            // WEBP -> JavaFX ne le lit pas (sans lib)
             String lower = relativeOrAbsolutePath.toLowerCase();
             if (lower.endsWith(".webp")) return null;
 
             File f = new File(relativeOrAbsolutePath);
-
-            // Si path relatif et non trouvé => essayer depuis user.dir
             if (!f.exists()) {
                 f = new File(System.getProperty("user.dir"), relativeOrAbsolutePath);
             }
-
             if (!f.exists()) return null;
-
             return new Image(f.toURI().toString(), true);
         } catch (Exception e) {
             return null;

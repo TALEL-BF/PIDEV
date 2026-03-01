@@ -6,66 +6,114 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 
+<?import javafx.scene.shape.Circle?>
 <BorderPane fx:id="root"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="Controller.MainArticlesController"
+            fx:controller="com.auticare.Controller.MainArticlesController"
             stylesheets="@styles/app.css"
             styleClass="appRoot">
 
     <left>
-        <VBox prefWidth="252" spacing="14" styleClass="sb">
+        <VBox prefWidth="260"
+              minWidth="260"
+              maxWidth="260"
+              spacing="10"
+              style="-fx-background-color: linear-gradient(to bottom, #7c3aed, #64009D);
+                 -fx-background-radius: 25;
+                 -fx-padding: 25 15;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
 
-            <!-- Header -->
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="sbHeader">
-                <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
-                    <image><Image url="@assets/logo.png"/></image>
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 0 0 15 5;">
+                <ImageView fitHeight="40.0" fitWidth="40.0" preserveRatio="true">
+                    <Image url="@assets/logo.png" />
                 </ImageView>
-
                 <VBox spacing="2">
-                    <Label text="AutiCare" styleClass="sbTitle"/>
-                    <Label text="Plateforme éducative" styleClass="sbSub"/>
+                    <Label text="AutiCare" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    <Label text="Psychologue" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;"/>
                 </VBox>
             </HBox>
 
-            <Region styleClass="sidebarLine"/>
+            <Separator style="-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;"/>
 
-            <!-- Menu -->
-            <VBox spacing="6" styleClass="sbMenu">
-
-                <Button text="📚  Nos cours" styleClass="sbItem" fx:id="btnCours"/>
-                <Button text="🗓  Emplois du temps" styleClass="sbItem" fx:id="btnEmploi"/>
-
-                <!-- Psychologie -->
-                <ToggleButton text="🧠  Psychologie"
-                              fx:id="tbPsychologie"
-                              onAction="#togglePsychologie"
-                              styleClass="sbItem"/>
-
-                <VBox fx:id="psychologieSubMenu"
-                      spacing="6"
-                      visible="false"
-                      managed="false"
-                      styleClass="sbSubMenu">
-
-                    <Button text="📰  Articles &amp; Conseils"
-                            fx:id="btnArticlesConseils"
-                            onAction="#goArticlesConseils"
-                            styleClass="sbSubItem"/>
-
-                    <Button text="🧩  Suivie Thérapeutique"
-                            fx:id="btnSuivieTherapeutique"
-                            onAction="#goSuivieTherapeutique"
-                            styleClass="sbSubItem"/>
+            <!-- Profil utilisateur (à remplir par le contrôleur) -->
+            <VBox alignment="CENTER" spacing="10"
+                  style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 15; -fx-padding: 15;">
+                <Circle radius="30" fill="white" />
+                <VBox alignment="CENTER" spacing="2">
+                    <Label fx:id="userNameLabel" text="Parent"
+                           style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label fx:id="userEmailLabel" text="parent@test.com"
+                           style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12px;"/>
+                    <Label text="👪 Parent"
+                           style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 11px; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 3 8; -fx-background-radius: 10;"/>
                 </VBox>
-
-                <Button text="🎉  Événements" styleClass="sbItem" fx:id="btnEvents"/>
-                <Button text="🎮  Jeux éducatifs" styleClass="sbItem" fx:id="btnJeux"/>
             </VBox>
 
-            <Region VBox.vgrow="ALWAYS"/>
+            <!-- ===== MENU ===== -->
+            <VBox spacing="8" style="-fx-padding: 10 0 20 0;">
 
-            <Button text="⎋ Déconnexion" styleClass="sbLogout" fx:id="btnLogout"/>
+                <!-- 🏠 Accueil -->
+                <Button text="🏠 Accueil"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showDashboard"/>
+
+                <!-- 👤 Mon Profil -->
+                <Button text="👤 Mon Profil"
+                        onAction="#goToProfile"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"/>
+
+                <!-- 📅 Emploi du temps -->
+                <Button text="📅 Emploi du temps"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showSchedule"/>
+
+                <!-- 📚 Cours -->
+                <Button text="📚 Cours"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showCourses"/>
+
+                <!-- 📚 Articles & Conseils (page active) -->
+                <Button text="📚 Articles &amp; Conseils"
+                        style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showArticles"/>
+
+
+                <!-- 📊 Suivi thérapeutique -->
+                <Button text="📊 Suivi thérapeutique"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showTherapeuticFollowUp"/>
+
+
+                <!-- 🎉 Événements -->
+                <Button text="🎉 Événements"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showEvents"/>
+
+                <!-- 🎮 Jeux -->
+                <Button text="🎮 Jeux"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showGames"/>
+
+
+            </VBox>
+
+            <VBox VBox.vgrow="ALWAYS" />
+
+            <!-- Déconnexion -->
+            <Button text="🚪 Déconnexion"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;"
+                    maxWidth="Infinity"
+                    onAction="#handleLogout"/>
         </VBox>
     </left>
 

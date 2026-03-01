@@ -1,15 +1,18 @@
-package Controller;
+package com.auticare.Controller;
 
-import Entites.Suivie;
-import Entites.Therapie;
-import IServices.ISuivieServices;
-import Services.CompteRenduPdfService;
-import Services.MailService;
-import Services.SuivieServices;
-import Services.TherapieServices;
+import com.auticare.Entites.Suivie;
+import com.auticare.Entites.Therapie;
+import com.auticare.IServices.ISuivieServices;
+import com.auticare.Services.CompteRenduPdfService;
+import com.auticare.Services.MailService;
+import com.auticare.Services.SuivieServices;
+import com.auticare.Services.TherapieServices;
+import com.auticare.models.User;
+import com.auticare.utils.SessionManager;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -22,7 +25,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
 import javafx.stage.*;
 
 import java.nio.file.Files;
@@ -37,7 +39,6 @@ import java.time.format.DateTimeFormatter;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javafx.scene.control.OverrunStyle;
@@ -64,7 +65,7 @@ public class AjouterSuivie {
     @FXML private Button btnMenuTherapie;
     @FXML private Button btnMenuArticles;
 
-    // Stats UI (dans ton FXML)
+    // Stats UI
     @FXML private ComboBox<String> cbEnfantStats;
     @FXML private Button btnRefreshStats;
     @FXML private Label lblDeltaHumeur, lblDeltaStress, lblDeltaAttention;
@@ -74,18 +75,23 @@ public class AjouterSuivie {
     @FXML private NumberAxis yAxisStats;
     @FXML private LineChart<Number, Number> lineConsultations;
 
-    // Champs qui existent peut-être dans ton projet (si pas dans ton FXML -> restent null, OK)
+    // Autres charts éventuels
     @FXML private StackedBarChart<String, Number> stackedMonthly;
     @FXML private LineChart<String, Number> monthlyLine;
     @FXML private LineChart<String, Number> monthlyChart;
     @FXML private BarChart<String, Number> barMonthly;
     @FXML private Button btnAjouterFab;
 
-    // 🔔 Notifications (PDF parent -> psy)
+    // 🔔 Notifications
     @FXML private Button btnNotif;
     @FXML private Label lblNotifBadge;
     @FXML private VBox notifPanel;
     @FXML private Button btnNotifRefresh;
+
+    // Profil utilisateur (sidebar)
+    @FXML private Label userNameLabel;
+    @FXML private Label userEmailLabel;
+    @FXML private Button logoutBtn; // déjà présent dans le FXML
 
     private Popup notifPopup;
     private VBox notifListBox;
@@ -93,42 +99,47 @@ public class AjouterSuivie {
 
     private final SuivieServices suivieServices = new SuivieServices();
 
-
     // ====== DATA / SERVICE ======
     private final ObservableList<Suivie> master = FXCollections.observableArrayList();
     private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/yyyy");
-    // ✅ UN SEUL SERVICE : interface + impl (BONNE PRATIQUE)
     private final ISuivieServices suivieService = new SuivieServices();
-    // Affichage date sur l'axe X
     private static final DateTimeFormatter AXIS_FMT = DateTimeFormatter.ofPattern("dd/MM");
-
-    // Optionnel: date + heure si tu veux
-    private static final DateTimeFormatter AXIS_FMT_DT = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
     private String labelDateForAxis(Suivie s) {
         if (s == null || s.getDateSuivie() == null) return "";
-        // choisis 1 des 2 :
-        return s.getDateSuivie().toLocalDateTime().format(AXIS_FMT);     // juste date
-        // return s.getDateSuivie().toLocalDateTime().format(AXIS_FMT_DT); // date+heure
+        return s.getDateSuivie().toLocalDateTime().format(AXIS_FMT);
     }
 
-    // Styles bordures
     private static final String STYLE_OK   = "-fx-border-color: #22c55e; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
     private static final String STYLE_BAD  = "-fx-border-color: #ef4444; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
     private static final String STYLE_NONE = "-fx-border-color: transparent; -fx-border-width: 0;";
 
+    private User currentUser;
+
     @FXML
     public void initialize() {
+        // Récupérer l'utilisateur connecté
+        currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            if (userNameLabel != null) {
+                userNameLabel.setText(currentUser.getPrenom() + " " + currentUser.getNom());
+            }
+            if (userEmailLabel != null) {
+                userEmailLabel.setText(currentUser.getEmail());
+            }
+        } else {
+            // Rediriger vers login si nécessaire
+            goToLogin();
+        }
+
         initSidebarDropdown();
         initNavigation();
         initUiListeners();
         initStatsToggle();
         initNotificationsUI();
 
-        // Chargement DB (catch ici => plus de "Unhandled SQLException")
         reloadFromDb();
 
-        // sidebar active
         setParentConsultationsActive(true);
         if (btnSubSuivie != null) setSubActive(btnSubSuivie);
 
@@ -142,34 +153,83 @@ public class AjouterSuivie {
             btnSubArticles.setOnAction(e -> { setSubActive(btnSubArticles); switchTo("/GestionArticlesBack.fxml"); });
         }
 
-
         initStatsUI();
     }
 
-    // -----------------------------
-    // UI listeners
-    // -----------------------------
-    private void initUiListeners() {
-        if (searchField != null) {
-            ChangeListener<Object> refreshListener = (obs, o, n) -> refreshCards();
-            searchField.textProperty().addListener(refreshListener);
-        }
-        if (btnAjouter != null) {
-            btnAjouter.setOnAction(e -> onAjouter());
-        }
-        if (cardsPane != null) {
-            cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
-                double w = newV.doubleValue();
-                cardsPane.setPrefWrapLength(Math.max(360, w - 40));
-            });
-        }
-        if (btnAjouterFab != null) {
-            btnAjouterFab.setOnAction(e -> onAjouter());
-        }
-        if (btnMenuArticles != null) {
-            btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
+    // ========== MÉTHODES DE NAVIGATION AJOUTÉES ==========
+
+    @FXML
+    private void showDashboard() {
+        switchTo("/views/PsychologueDashboard.fxml");
+    }
+
+    @FXML
+    private void goToProfile() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/PsychologueProfile.fxml"));
+            Parent profileRoot = loader.load();
+            // Optionnel : passer l'utilisateur au contrôleur du profil
+            // PsychologueProfileController controller = loader.getController();
+            // controller.setCurrentUser(currentUser);
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.getScene().setRoot(profileRoot);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible d'ouvrir le profil");
         }
     }
+
+    @FXML
+    private void showSchedule() {
+        showInfo("Emploi du temps", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showAppointments() {
+        showInfo("Rendez-vous", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void showTherapeuticFollowUp() {
+        // Déjà sur la page des suivis
+        // Optionnel : rafraîchir ou afficher un message
+        showInfo("Suivi thérapeutique", "Vous êtes déjà sur la page des suivis.");
+    }
+
+    @FXML
+    private void showTherapies() {
+        switchTo("/AjouterTherapie.fxml");
+    }
+
+    @FXML
+    private void showArticles() {
+        switchTo("/GestionArticlesBack.fxml");
+    }
+
+    @FXML
+    private void showEvents() {
+        showInfo("Événements", "Fonctionnalité à venir");
+    }
+
+    @FXML
+    private void handleLogout(ActionEvent event) {
+        SessionManager.getInstance().endSession();
+        goToLogin();
+    }
+
+    private void goToLogin() {
+        try {
+            Parent loginRoot = FXMLLoader.load(getClass().getResource("/views/Login.fxml"));
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.getScene().setRoot(loginRoot);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ========== FIN DES MÉTHODES AJOUTÉES ==========
+
+    // Le reste du code existant (gardé intact) ...
 
     private void initSidebarDropdown() {
         if (tbConsultations == null || consultationsSubMenu == null) return;
@@ -197,9 +257,28 @@ public class AjouterSuivie {
         if (btnMenuTherapie != null) btnMenuTherapie.setOnAction(e -> switchTo("/AjouterTherapie.fxml"));
     }
 
-    // -----------------------------
-    // DB load + cards
-    // -----------------------------
+    private void initUiListeners() {
+        if (searchField != null) {
+            ChangeListener<Object> refreshListener = (obs, o, n) -> refreshCards();
+            searchField.textProperty().addListener(refreshListener);
+        }
+        if (btnAjouter != null) {
+            btnAjouter.setOnAction(e -> onAjouter());
+        }
+        if (cardsPane != null) {
+            cardsPane.widthProperty().addListener((obs, oldV, newV) -> {
+                double w = newV.doubleValue();
+                cardsPane.setPrefWrapLength(Math.max(360, w - 40));
+            });
+        }
+        if (btnAjouterFab != null) {
+            btnAjouterFab.setOnAction(e -> onAjouter());
+        }
+        if (btnMenuArticles != null) {
+            btnMenuArticles.setOnAction(e -> switchTo("/GestionArticlesBack.fxml"));
+        }
+    }
+
     private void reloadFromDb() {
         try {
             List<Suivie> list = suivieService.afficherSuivie();
@@ -421,7 +500,6 @@ public class AjouterSuivie {
         addRow(grid, r++, "Heure", heure);
         addRow(grid, r++, "Scores (H/S/A)", s.getScoreHumeur()+" / "+s.getScoreStress()+" / "+s.getScoreAttention());
 
-        // Charger nom exercice si déjà présent
         String exerciceNom = "Aucun exercice choisi";
         try {
             if (s.getIdTherapieReco() != null) {
@@ -446,7 +524,6 @@ public class AjouterSuivie {
         obs.getStyleClass().add("details-box");
         obs.setMaxWidth(Double.MAX_VALUE);
 
-        // ===== Actions =====
         HBox actions = new HBox(12);
         actions.getStyleClass().add("dialog-footer");
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -458,25 +535,18 @@ public class AjouterSuivie {
         btnEnvoyerPdf.getStyleClass().addAll("btn-solid-dark","btn-hover");
         btnEnvoyerPdf.setDisable(s.getIdTherapieReco() == null);
 
-        // 1) Choisir exercice
         btnExercices.setOnAction(e -> {
             try {
                 Optional<Therapie> chosen = showExercicesAdaptesWindow(s);
                 chosen.ifPresent(t -> {
                     lblExercice.setText(t.getNomExercice());
-
-                    // Important : mettre à jour l'objet sélectionné
                     s.setIdTherapieReco(t.getIdTherapie());
-
-                    // Mettre à jour la liste master (pour refresh UI ailleurs)
                     for (Suivie x : master) {
                         if (x.getIdSuivie() == s.getIdSuivie()) {
                             x.setIdTherapieReco(t.getIdTherapie());
                             break;
                         }
                     }
-
-                    // activer le bouton PDF
                     btnEnvoyerPdf.setDisable(false);
                 });
             } catch (Exception ex) {
@@ -484,7 +554,6 @@ public class AjouterSuivie {
             }
         });
 
-        // 2) Générer PDF + envoyer au parent
         btnEnvoyerPdf.setOnAction(e -> {
             if (s.getEmailParent() == null || s.getEmailParent().isBlank()) {
                 showAlert("Email parent manquant", "Impossible d’envoyer : EMAIL_PARENT est vide.");
@@ -498,33 +567,23 @@ public class AjouterSuivie {
             javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
                 @Override
                 protected Void call() throws Exception {
-
-                    // a) charger thérapie complète
                     TherapieServices ts = new TherapieServices();
                     Therapie therapie = ts.getTherapieById(s.getIdTherapieReco());
-
-                    // b) générer PDF pro (suivi + exercice complet)
                     CompteRenduPdfService pdfService = new CompteRenduPdfService();
                     java.io.File pdfFile = pdfService.generate(s, therapie);
-
-                    // c) sauver en base (ID_THERAPIE_RECO + CR_PDF_PATH si tu le gères)
-                    s.setCrPdfPath(pdfFile.getAbsolutePath()); // si ton Entité a ce champ
+                    s.setCrPdfPath(pdfFile.getAbsolutePath());
                     SuivieServices ss = new SuivieServices();
                     ss.modifierSuivie(s);
-
-                    // d) envoyer mail + PDF
                     MailService mail = new MailService(
                             System.getenv("GMAIL_USER"),
                             System.getenv("GMAIL_APP_PASSWORD")
                     );
-
                     mail.sendWithAttachment(
                             s.getEmailParent(),
                             "Compte rendu (PDF) - " + safe(s.getNomEnfant()),
                             "Bonjour,\nVeuillez trouver en pièce jointe le compte rendu du suivi et l'exercice recommandé.\nCordialement.",
                             pdfFile
                     );
-
                     return null;
                 }
             };
@@ -555,6 +614,7 @@ public class AjouterSuivie {
         setCenter(stage, content);
         stage.showAndWait();
     }
+
     private void showAlert(String title, String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(title);
@@ -993,10 +1053,8 @@ public class AjouterSuivie {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent newRoot = loader.load();
-
             Stage stage = (Stage) root.getScene().getWindow();
             stage.getScene().setRoot(newRoot);
-
         } catch (Exception ex) {
             ex.printStackTrace();
             Alert a = new Alert(Alert.AlertType.ERROR);
@@ -1093,21 +1151,19 @@ public class AjouterSuivie {
 
         if (rows == null || rows.isEmpty()) return;
 
-        // ✅ labels X (date) dans le même ordre que rows
         final List<String> labelsX = new ArrayList<>();
         for (Suivie s : rows) labelsX.add(labelDateForAxis(s));
 
-        // ✅ Formatter: afficher date au lieu de 1..N
         xAxisStats.setTickLabelFormatter(new StringConverter<Number>() {
             @Override
             public String toString(Number value) {
-                int i = value.intValue(); // 1..N
+                int i = value.intValue();
                 if (i >= 1 && i <= labelsX.size()) return labelsX.get(i - 1);
                 return "";
             }
             @Override
             public Number fromString(String string) {
-                return 0; // pas utilisé
+                return 0;
             }
         });
 
@@ -1128,14 +1184,11 @@ public class AjouterSuivie {
             index++;
         }
 
-        // ✅ bornes X propres et stables
         xAxisStats.setAutoRanging(false);
         xAxisStats.setLowerBound(0.5);
         xAxisStats.setUpperBound(rows.size() + 0.5);
         xAxisStats.setTickUnit(1);
 
-
-        // ✅ Y reste 0..10 (déjà fixé), on le re-force au cas où
         yAxisStats.setAutoRanging(false);
         yAxisStats.setLowerBound(0);
         yAxisStats.setUpperBound(15.5);
@@ -1143,7 +1196,6 @@ public class AjouterSuivie {
 
         lineConsultations.getData().setAll(serH, serS, serA);
 
-        // Δ : dernière - précédente
         if (rows.size() >= 2) {
             Suivie prev = rows.get(rows.size() - 2);
             Suivie last = rows.get(rows.size() - 1);
@@ -1159,6 +1211,7 @@ public class AjouterSuivie {
 
         addValueLabelsSafe(lineConsultations);
     }
+
     private String formatDelta(int d) {
         return (d > 0 ? "+" : "") + d;
     }
@@ -1212,7 +1265,7 @@ public class AjouterSuivie {
 
             try {
                 s.setIdTherapieReco(selected.getIdTherapie());
-                suivieService.modifierSuivie(s); // ✅ plus de "if (suivieService == null)" car final
+                suivieService.modifierSuivie(s);
 
                 chosen[0] = selected;
                 st.close();
@@ -1256,7 +1309,6 @@ public class AjouterSuivie {
         setParentConsultationsActive(true);
     }
 
-
     // -----------------------------
     // Helpers
     // -----------------------------
@@ -1299,15 +1351,14 @@ public class AjouterSuivie {
         a.setContentText(ex == null ? "" : ex.getMessage());
         a.showAndWait();
     }
+
     private void applyValueLabels(LineChart<String, Number> chart) {
-        // attendre que JavaFX crée les nodes des points
         javafx.application.Platform.runLater(() -> {
             for (XYChart.Series<String, Number> s : chart.getData()) {
                 for (XYChart.Data<String, Number> d : s.getData()) {
                     Node node = d.getNode();
                     if (node == null) continue;
 
-                    // évite double ajout si refresh
                     if (node.lookup(".value-label") != null) continue;
 
                     Label lbl = new Label(String.valueOf(d.getYValue()));
@@ -1317,7 +1368,6 @@ public class AjouterSuivie {
                     StackPane wrapper = (StackPane) node;
                     wrapper.getChildren().add(lbl);
 
-                    // position au-dessus du point
                     StackPane.setAlignment(lbl, Pos.TOP_CENTER);
                     lbl.setTranslateY(-12);
                 }
@@ -1333,17 +1383,15 @@ public class AjouterSuivie {
         chart.setCreateSymbols(true);
         chart.setLegendVisible(true);
 
-        // ✅ X axis = NumberAxis
         if (chart.getXAxis() instanceof NumberAxis x) {
-            x.setAutoRanging(true);      // ou false si tu fixes bounds
+            x.setAutoRanging(true);
             x.setForceZeroInRange(false);
-            x.setTickUnit(1);            // 1 consultation, 2 consultation...
+            x.setTickUnit(1);
             x.setMinorTickVisible(false);
             x.setTickLabelRotation(0);
             x.setLabel("Consultation");
         }
 
-        // ✅ Y axis = NumberAxis
         if (chart.getYAxis() instanceof NumberAxis y) {
             y.setAutoRanging(false);
             y.setLowerBound(0);
@@ -1359,6 +1407,7 @@ public class AjouterSuivie {
         chart.applyCss();
         chart.layout();
     }
+
     private void applyPointLabelsAndTooltips(LineChart<String, Number> chart,
                                              List<String> tooltipTexts) {
 
@@ -1370,13 +1419,11 @@ public class AjouterSuivie {
                     Node node = d.getNode();
                     if (node == null) continue;
 
-                    // Tooltip (date/heure)
                     String tip = (tooltipTexts != null && index < tooltipTexts.size())
                             ? tooltipTexts.get(index)
                             : d.getXValue();
                     Tooltip.install(node, new Tooltip(series.getName() + " = " + d.getYValue() + "\n" + tip));
 
-                    // Label valeur
                     if (node.lookup(".value-label") == null) {
                         Label lbl = new Label(String.valueOf(d.getYValue()));
                         lbl.getStyleClass().add("value-label");
@@ -1389,11 +1436,11 @@ public class AjouterSuivie {
                     }
                     index++;
                 }
-                // reset index par série ? non : car tooltips list est par consultation
                 index = 0;
             }
         });
     }
+
     private void configureCartesianChart() {
 
         if (lineConsultations == null || xAxisStats == null || yAxisStats == null) return;
@@ -1402,19 +1449,16 @@ public class AjouterSuivie {
         lineConsultations.setCreateSymbols(true);
         lineConsultations.setLegendVisible(true);
 
-        // X (index des consultations) -> labels seront remplacés par date via formatter
-        // X: consultations 1..N (on laisse une marge)
         xAxisStats.setAutoRanging(false);
-        xAxisStats.setLowerBound(0);     // ✅ marge à gauche
-        xAxisStats.setUpperBound(5);     // ✅ marge à droite (sera recalculé)
+        xAxisStats.setLowerBound(0);
+        xAxisStats.setUpperBound(5);
         xAxisStats.setTickUnit(1);
         xAxisStats.setMinorTickVisible(false);
         xAxisStats.setForceZeroInRange(false);
 
-// Y: score 0..10 (marge haut pour les labels)
         yAxisStats.setAutoRanging(false);
         yAxisStats.setLowerBound(0);
-        yAxisStats.setUpperBound(0);    // ✅ marge en haut
+        yAxisStats.setUpperBound(0);
         yAxisStats.setTickUnit(1);
         yAxisStats.setMinorTickVisible(false);
 
@@ -1422,6 +1466,7 @@ public class AjouterSuivie {
         lineConsultations.setVerticalGridLinesVisible(true);
         lineConsultations.setPadding(new Insets(10, 10, 10, 10));
     }
+
     private void addValueLabels(LineChart<Number, Number> chart) {
 
         javafx.application.Platform.runLater(() -> {
@@ -1437,7 +1482,7 @@ public class AjouterSuivie {
                             "-fx-background-color: white;" +
                                     "-fx-padding: 1 1 1 1;" +
                                     "-fx-background-radius: 1;" +
-                                    "-fx-font-size: 50px;" +   // plus petit
+                                    "-fx-font-size: 50px;" +
                                     "-fx-font-weight: bold;" +
                                     "-fx-border-color: #e5e7eb;" +
                                     "-fx-border-radius: 1;"
@@ -1451,6 +1496,7 @@ public class AjouterSuivie {
             }
         });
     }
+
     private void addValueLabelsSafe(LineChart<Number, Number> chart) {
 
         javafx.application.Platform.runLater(() -> {
@@ -1460,7 +1506,6 @@ public class AjouterSuivie {
                     Node node = d.getNode();
                     if (node == null) continue;
 
-                    // ✅ évite doublons
                     if (node.lookup(".value-label") != null) continue;
 
                     Label lbl = new Label(String.valueOf(d.getYValue()));
@@ -1483,11 +1528,9 @@ public class AjouterSuivie {
         });
     }
 
-
-
     /* =========================================================
-   🔔 Notifications : Upload PDF parent -> psy (BackOffice)
-   ========================================================= */
+       🔔 Notifications : Upload PDF parent -> psy (BackOffice)
+       ========================================================= */
 
     private void initNotificationsUI() {
         if (btnNotif == null) return;
@@ -1532,7 +1575,6 @@ public class AjouterSuivie {
         rootBox.setMinWidth(460);
         rootBox.setMaxWidth(460);
 
-// ✅ IMPORTANT: forcer la feuille CSS dans le Popup
         rootBox.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
         notifPopup.getContent().add(rootBox);
 
@@ -1613,7 +1655,6 @@ public class AjouterSuivie {
 
             refreshNotifBadge();
 
-            // ✅ force CSS/layout après ajout dynamique
             notifListBox.applyCss();
             notifListBox.layout();
 
@@ -1670,14 +1711,12 @@ public class AjouterSuivie {
         }
     }
 
-
     private VBox buildNotifCard(SuivieServices.ParentUploadNotif n, DateTimeFormatter df) {
 
         VBox card = new VBox(8);
         card.getStyleClass().add("notifCard");
         if (!n.seen) card.getStyleClass().add("notifCardNew");
 
-        // ✅ pour éviter que la card devienne minuscule / bizarre
         card.setMaxWidth(Double.MAX_VALUE);
 
         HBox top = new HBox(10);
@@ -1688,7 +1727,6 @@ public class AjouterSuivie {
         Label title = new Label(subject);
         title.getStyleClass().add("notifTitle");
 
-        // ✅ CRUCIAL: ellipsis + ne prend pas toute la place
         title.setWrapText(false);
         title.setTextOverrun(OverrunStyle.ELLIPSIS);
         title.setMaxWidth(Double.MAX_VALUE);
@@ -1723,13 +1761,13 @@ public class AjouterSuivie {
         btnDl.setOnAction(ev -> {
             downloadParentPdf(n);
             if (!n.seen) {
-                markNotifSeen(n.idUpload);   // ✅ ici
+                markNotifSeen(n.idUpload);
                 refreshNotifications();
             }
         });
 
         btnSeen.setOnAction(ev -> {
-            markNotifSeen(n.idUpload);       // ✅ ici
+            markNotifSeen(n.idUpload);
             refreshNotifications();
         });
 
@@ -1738,6 +1776,7 @@ public class AjouterSuivie {
         card.getChildren().addAll(top, meta, file, actions);
         return card;
     }
+
     private void markNotifSeen(int idUpload) {
         try {
             new SuivieServices().markParentUploadSeen(idUpload);
@@ -1746,4 +1785,22 @@ public class AjouterSuivie {
             e.printStackTrace();
         }
     }
+
+
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }
