@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="25.0" style="-fx-background-color: #f5f7fb;" stylesheets="@../styles.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.auticare.controller.UserFormController">
+
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+
+    <children>
+        <!-- Logo et titre -->
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/logo.jpg" />
+                    </image>
+                </ImageView>
+                <Label text="Ajouter un utilisateur"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-font-family: 'Poppins';" />
+            </children>
+        </HBox>
+
+        <!-- Carte principale avec effet d'ombre -->
+        <HBox spacing="40.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 5);">
+            <children>
+                <!-- Section photo de profil (gauche) -->
+                <VBox alignment="TOP_CENTER" spacing="15.0" prefWidth="200.0">
+                    <children>
+                        <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                               text="PHOTO DE PROFIL" />
+
+                        <StackPane>
+                            <children>
+                                <Circle radius="70.0" fill="white" stroke="#e2e8f0" strokeWidth="2" />
+                                <Circle radius="65.0" style="-fx-fill: linear-gradient(to bottom, #667eea, #764ba2);" />
+                                <ImageView fx:id="photoPreview" fitHeight="110.0" fitWidth="110.0"
+                                           pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="https://via.placeholder.com/110" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                            <effect>
+                                <DropShadow offsetX="0" offsetY="4" color="#00000020" radius="8" />
+                            </effect>
+                        </StackPane>
+
+                        <Button fx:id="btnChoosePhoto" mnemonicParsing="false"
+                                onAction="#handleChoosePhoto"
+                                style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 10 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #667eea66, 8, 0, 0, 2);"
+                                text="Choisir une photo" />
+
+                        <Label fx:id="errorLabel" textFill="#EF4444" wrapText="true"
+                               style="-fx-font-size: 12px; -fx-font-family: 'Poppins';" />
+                    </children>
+                </VBox>
+
+                <!-- Section formulaire (droite) -->
+                <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <!-- Ligne 1: Nom complet et Email -->
+                        <HBox spacing="20.0">
+                            <children>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                                               text="NOM COMPLET" />
+                                        <TextField fx:id="nameField" prefHeight="45.0"
+                                                   promptText="Ex: Jean Dupont"
+                                                   style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-padding: 0 15; -fx-font-size: 14px;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                                               text="EMAIL" />
+                                        <TextField fx:id="emailField" prefHeight="45.0"
+                                                   promptText="email@domaine.com"
+                                                   style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-padding: 0 15; -fx-font-size: 14px;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <!-- Ligne 2: Téléphone et Rôle -->
+                        <HBox spacing="20.0">
+                            <children>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                                               text="TÉLÉPHONE" />
+                                        <TextField fx:id="phoneField" prefHeight="45.0"
+                                                   promptText="06 12 34 56 78"
+                                                   style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-padding: 0 15; -fx-font-size: 14px;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                                               text="RÔLE" />
+                                        <ComboBox fx:id="roleCombo" prefHeight="45.0"
+                                                  promptText="Sélectionner"
+                                                  style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <!-- Ligne 3: Statut et Mot de passe -->
+                        <HBox spacing="20.0">
+                            <children>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                                               text="STATUT" />
+                                        <ComboBox fx:id="statusCombo" prefHeight="45.0"
+                                                  promptText="Actif"
+                                                  style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';"
+                                               text="MOT DE PASSE" />
+                                        <PasswordField fx:id="passwordField" prefHeight="45.0"
+                                                       promptText="••••••••"
+                                                       style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-padding: 0 15; -fx-font-size: 14px;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <!-- Boutons d'action -->
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 20 0 0 0;">
+                            <children>
+                                <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#close"
+                                        prefHeight="45.0" prefWidth="120.0"
+                                        style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand;"
+                                        text="Annuler" />
+                                <Button fx:id="btnSave" mnemonicParsing="false" onAction="#save"
+                                        prefHeight="45.0" prefWidth="150.0"
+                                        style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2); -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #667eea66, 8, 0, 0, 2);"
+                                        text="ENREGISTRER" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+</VBox>

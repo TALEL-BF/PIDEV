@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="650.0" prefWidth="900.0" stylesheets="@../styles.css"
+    xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.auticare.controller.UserDashboardController">
+    <children>
+        <BorderPane fx:id="mainContainer" prefHeight="650.0" prefWidth="900.0"
+            AnchorPane.bottomAnchor="0.0"
+            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <left>
+                <VBox prefWidth="250.0" spacing="10.0" styleClass="sidebar"
+                    BorderPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="sidebarTitle" text="USER SPACE" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets bottom="30.0" left="20.0" top="30.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                            styleClass="sidebar-btn-active" text="Tableau de bord" />
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                            styleClass="sidebar-btn" text="Mon Profil" />
+                        <VBox VBox.vgrow="ALWAYS" />
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                            onAction="#handleLogout" styleClass="sidebar-btn" text="Déconnexion" />
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </left>
+            <center>
+                <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label text="Bienvenue sur votre Dashboard Utilisateur" textFill="#7b2ff7">
+                            <font>
+                                <Font name="System Bold" size="24.0" />
+                            </font>
+                        </Label>
+                        <Label text="Cette section est en cours de développement."
+                            textFill="#636e72" />
+                    </children>
+                </VBox>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

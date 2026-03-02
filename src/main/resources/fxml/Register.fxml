@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="750.0" prefWidth="1000.0"
+            style="-fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.auticare.controller.RegisterController">
+
+    <children>
+        <!-- Carte d'inscription -->
+        <VBox alignment="CENTER" prefWidth="450.0" spacing="20.0"
+              style="-fx-background-color: white; -fx-background-radius: 30; -fx-padding: 30;"
+              AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="275.0"
+              AnchorPane.rightAnchor="275.0" AnchorPane.topAnchor="30.0">
+
+            <effect>
+                <DropShadow offsetX="0" offsetY="10" color="#00000040" radius="20" />
+            </effect>
+
+            <!-- Logo -->
+            <VBox alignment="CENTER" spacing="5">
+                <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/logo.jpg" />
+                    </image>
+                </ImageView>
+                <Label text="AutiCare"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: linear-gradient(to right, #667eea, #764ba2); -fx-font-family: 'Poppins';" />
+            </VBox>
+
+            <!-- Titre -->
+            <Label text="Créer un compte"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1E293B; -fx-font-family: 'Poppins';" />
+            <Label text="Rejoignez la communauté AutiCare"
+                   style="-fx-font-size: 14px; -fx-text-fill: #64748B; -fx-font-family: 'Poppins';" />
+
+            <!-- Formulaire -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox spacing="15.0" style="-fx-background-color: transparent; -fx-padding: 5 0 0 0;">
+
+                        <!-- NOM COMPLET -->
+                        <VBox spacing="5.0">
+                            <Label text="NOM COMPLET"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';" />
+                            <TextField fx:id="nameField" promptText="Votre nom"
+                                       style="-fx-background-color: #F8FAFC; -fx-background-radius: 15; -fx-border-color: #E2E8F0; -fx-border-radius: 15; -fx-padding: 12 18; -fx-font-size: 14px;" />
+                            <Label fx:id="nameErrorLabel" text="Le nom est requis"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- EMAIL -->
+                        <VBox spacing="5.0">
+                            <Label text="EMAIL"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';" />
+                            <TextField fx:id="emailField" promptText="nom@exemple.com"
+                                       style="-fx-background-color: #F8FAFC; -fx-background-radius: 15; -fx-border-color: #E2E8F0; -fx-border-radius: 15; -fx-padding: 12 18; -fx-font-size: 14px;" />
+                            <Label fx:id="emailErrorLabel" text="Email invalide"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- TÉLÉPHONE -->
+                        <VBox spacing="5.0">
+                            <Label text="TÉLÉPHONE"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';" />
+                            <TextField fx:id="phoneField" promptText="06 12 34 56 78"
+                                       style="-fx-background-color: #F8FAFC; -fx-background-radius: 15; -fx-border-color: #E2E8F0; -fx-border-radius: 15; -fx-padding: 12 18; -fx-font-size: 14px;" />
+                            <Label fx:id="phoneErrorLabel" text="Téléphone invalide"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- MOT DE PASSE -->
+                        <VBox spacing="5.0">
+                            <Label text="MOT DE PASSE"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';" />
+                            <PasswordField fx:id="passwordField" promptText="••••••••"
+                                           style="-fx-background-color: #F8FAFC; -fx-background-radius: 15; -fx-border-color: #E2E8F0; -fx-border-radius: 15; -fx-padding: 12 18; -fx-font-size: 14px;" />
+                            <Label fx:id="passwordErrorLabel" text="Mot de passe requis (min 6 caractères)"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold;"
+                                   visible="false" managed="false" />
+                        </VBox>
+
+                        <!-- CONFIRMER MOT DE PASSE -->
+                        <VBox spacing="5.0">
+                            <Label text="CONFIRMER MOT DE PASSE"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-family: 'Poppins';" />
+                            <PasswordField fx:id="confirmPasswordField" promptText="••••••••"
+                                           style="-fx-background-color: #F8FAFC; -fx-background-radius: 15; -fx-border-color: #E2E8F0; -fx-border-radius: 15; -fx-padding: 12 18; -fx-font-size: 14px;" />
+                            <Label fx:id="confirmPasswordErrorLabel" text="Les mots de passe ne correspondent pas"
+                                   style="-fx-text-fill: #EF4444; -fx-font-size: 11px; -fx-font-weight: bold;"
+                                   visible="false" managed="false" />
+                        </VBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- Bouton d'inscription -->
+            <Button fx:id="btnRegister" text="CRÉER MON COMPTE" maxWidth="1.7976931348623157E308"
+                    style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 15 0; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, #667eea66, 10, 0, 0, 2);"
+                    onAction="#handleRegister" />
+
+            <!-- Lien vers connexion -->
+            <HBox alignment="CENTER" spacing="5.0">
+                <Label text="Déjà un compte ?"
+                       style="-fx-text-fill: #64748B; -fx-font-family: 'Poppins';" />
+                <Hyperlink onAction="#handleBackToLogin"
+                           style="-fx-text-fill: #764ba2; -fx-font-weight: bold; -fx-border-color: transparent; -fx-font-family: 'Poppins';"
+                           text="Se connecter" />
+            </HBox>
+        </VBox>
+    </children>
+</AnchorPane>

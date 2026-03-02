@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Utilisateurs - AutiCare</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <h3>AutiCare</h3>
+            <p>Plateforme éducative</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="users-list.html" class="active"><i class="fas fa-users"></i> Gestion des utilisateurs</a></li>
+            <li><a href="#"><i class="fas fa-clipboard-check"></i> Gestion des évaluations</a></li>
+            <li><a href="#"><i class="fas fa-calendar-alt"></i> Gestion des consultations</a></li>
+            <li><a href="#"><i class="fas fa-calendar-day"></i> Gestion des événements</a></li>
+            <li><a href="#"><i class="fas fa-exclamation-circle"></i> Gestion des réclamations</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Paramètres</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <p>Connecté en tant que</p>
+            <strong>Administrateur</strong>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar-custom">
+            <div>
+                <button class="btn btn-link d-md-none" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h4 class="mb-0">Gestion des Utilisateurs</h4>
+                    <p class="text-muted mb-0" style="font-size: 14px;">Gérez les apprenants, parents et professionnels
+                        AutiCare</p>
+                </div>
+            </div>
+
+            <div class="navbar-right">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+
+                <div class="dropdown">
+                    <div class="profile-dropdown" data-bs-toggle="dropdown">
+                        <div class="profile-avatar">AD</div>
+                        <span class="d-none d-md-inline">Admin</span>
+                        <i class="fas fa-chevron-down ms-2"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mon profil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Paramètres</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="login.html"><i
+                                    class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Header with Add Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div></div>
+                <a href="users-add.html" class="btn btn-gradient">
+                    <i class="fas fa-plus me-2"></i> Nouvel utilisateur
+                </a>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" id="searchInput" class="form-control"
+                            placeholder="Rechercher par nom ou email...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="roleFilter">
+                            <option value="">Tous les rôles</option>
+                            <option value="Apprenant">Apprenant</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Educateur">Éducateur</option>
+                            <option value="Therapeute">Thérapeute</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Tous les statuts</option>
+                            <option value="Actif">Actif</option>
+                            <option value="En attente">En attente</option>
+                            <option value="Bloqué">Bloqué</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-modern">
+                <table class="table mb-0" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Contact</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Date d'inscription</th>
+                            <th>Dernière activité</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample Data -->
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">LM</div>
+                                    <div>
+                                        <strong>Lucas Martin</strong><br>
+                                        <small class="text-muted">Inscrit le 2024-09-15</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <i class="fas fa-envelope text-muted me-2"></i> lucas.martin@email.com<br>
+                                    <i class="fas fa-phone text-muted me-2"></i> 06 12 34 56 78
+                                </div>
+                            </td>
+                            <td><span class="badge-role badge-apprenant">Apprenant</span></td>
+                            <td><span class="badge-role badge-actif">Actif</span></td>
+                            <td>2025-01-24</td>
+                            <td>2025-01-23</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="users-profile.html"><i
+                                                    class="fas fa-eye me-2"></i> Voir profil</a></li>
+                                        <li><a class="dropdown-item" href="users-edit.html"><i
+                                                    class="fas fa-edit me-2"></i> Modifier</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(1)"><i
+                                                    class="fas fa-trash me-2"></i> Supprimer</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">MD</div>
+                                    <div>
+                                        <strong>Marie Dubois</strong><br>
+                                        <small class="text-muted">Inscrit le 2024-10-01</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <i class="fas fa-envelope text-muted me-2"></i> marie.dubois@email.com<br>
+                                    <i class="fas fa-phone text-muted me-2"></i> 06 23 45 67 89
+                                </div>
+                            </td>
+                            <td><span class="badge-role badge-parent">Parent</span></td>
+                            <td><span class="badge-role badge-actif">Actif</span></td>
+                            <td>2025-01-25</td>
+                            <td>2025-01-25</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="users-profile.html"><i
+                                                    class="fas fa-eye me-2"></i> Voir profil</a></li>
+                                        <li><a class="dropdown-item" href="users-edit.html"><i
+                                                    class="fas fa-edit me-2"></i> Modifier</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(2)"><i
+                                                    class="fas fa-trash me-2"></i> Supprimer</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">SB</div>
+                                    <div>
+                                        <strong>Dr. Sophie Bernard</strong><br>
+                                        <small class="text-muted">Inscrit le 2024-08-01</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <i class="fas fa-envelope text-muted me-2"></i> sophie.bernard@auticare.com<br>
+                                    <i class="fas fa-phone text-muted me-2"></i> 06 34 56 78 90
+                                </div>
+                            </td>
+                            <td><span class="badge-role badge-therapeute">Thérapeute</span></td>
+                            <td><span class="badge-role badge-actif">Actif</span></td>
+                            <td>2025-01-25</td>
+                            <td>2025-01-25</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="users-profile.html"><i
+                                                    class="fas fa-eye me-2"></i> Voir profil</a></li>
+                                        <li><a class="dropdown-item" href="users-edit.html"><i
+                                                    class="fas fa-edit me-2"></i> Modifier</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(3)"><i
+                                                    class="fas fa-trash me-2"></i> Supprimer</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">TP</div>
+                                    <div>
+                                        <strong>Thomas Petit</strong><br>
+                                        <small class="text-muted">Inscrit le 2024-07-23</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <i class="fas fa-envelope text-muted me-2"></i> thomas.petit@auticare.com<br>
+                                    <i class="fas fa-phone text-muted me-2"></i> 06 45 67 89 01
+                                </div>
+                            </td>
+                            <td><span class="badge-role badge-educateur">Éducateur</span></td>
+                            <td><span class="badge-role badge-actif">Actif</span></td>
+                            <td>2025-01-23</td>
+                            <td>2025-01-23</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="users-profile.html"><i
+                                                    class="fas fa-eye me-2"></i> Voir profil</a></li>
+                                        <li><a class="dropdown-item" href="users-edit.html"><i
+                                                    class="fas fa-edit me-2"></i> Modifier</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(4)"><i
+                                                    class="fas fa-trash me-2"></i> Supprimer</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">EL</div>
+                                    <div>
+                                        <strong>Emma Laurent</strong><br>
+                                        <small class="text-muted">Inscrit le 2025-01-20</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <i class="fas fa-envelope text-muted me-2"></i> emma.laurent@email.com<br>
+                                    <i class="fas fa-phone text-muted me-2"></i> 06 56 78 90 12
+                                </div>
+                            </td>
+                            <td><span class="badge-role badge-apprenant">Apprenant</span></td>
+                            <td><span class="badge-role badge-en-attente">En attente</span></td>
+                            <td>2025-01-20</td>
+                            <td>--</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="users-profile.html"><i
+                                                    class="fas fa-eye me-2"></i> Voir profil</a></li>
+                                        <li><a class="dropdown-item" href="users-edit.html"><i
+                                                    class="fas fa-edit me-2"></i> Modifier</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(5)"><i
+                                                    class="fas fa-trash me-2"></i> Supprimer</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" href="#">Précédent</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Suivant</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let userToDelete = null;
+
+        function deleteUser(userId) {
+            userToDelete = userId;
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        function confirmDelete() {
+            if (userToDelete) {
+                // TODO: API call to delete user
+                // await apiRequest(`/users/delete/${userToDelete}`, 'GET');
+                showToast('Utilisateur supprimé avec succès', 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                modal.hide();
+                userToDelete = null;
+            }
+        }
+    </script>
+</body>
+
+</html>

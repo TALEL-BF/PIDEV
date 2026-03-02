@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.effect.DropShadow?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Controller.EventPlanningUserController"
+      spacing="15"
+      style="-fx-background-color: linear-gradient(to bottom right, #f5f0ff, #ffffff);
+             -fx-background-radius: 30;
+             -fx-padding: 25;
+             -fx-border-color: #c4b5fd;
+             -fx-border-width: 3;
+             -fx-border-radius: 30;
+             -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 25, 0, 0, 10);"
+      prefWidth="550" prefHeight="550"
+      alignment="TOP_CENTER">
+
+    <!-- Titre avec fond violet clair -->
+    <Label text="📅 MON PLANNING"
+           style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: #5b21b6;
+                  -fx-background-color: #ede9fe;
+                  -fx-padding: 10 25;
+                  -fx-background-radius: 50;
+                  -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 5, 0, 0, 2);"/>
+
+    <!-- Ligne séparatrice colorée -->
+    <Separator style="-fx-background-color: #c4b5fd; -fx-padding: 5 0;"/>
+
+    <!-- Planning avec fond légèrement coloré -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background: transparent; -fx-background-color: #faf5ff;
+                       -fx-background-radius: 20; -fx-border-color: #e9d5ff;
+                       -fx-border-width: 2; -fx-border-radius: 20;
+                       -fx-padding: 10;">
+        <VBox fx:id="planningContainer" spacing="10" alignment="CENTER_LEFT"
+              style="-fx-padding: 10;">
+            <!-- Les activités seront ajoutées dynamiquement -->
+        </VBox>
+    </ScrollPane>
+
+    <!-- État vide (si pas de planning) -->
+    <VBox fx:id="emptyStateContainer" alignment="CENTER" spacing="10"
+          visible="false" managed="false"
+          style="-fx-background-color: #faf5ff; -fx-background-radius: 20; -fx-padding: 30;">
+        <Label text="📅" style="-fx-font-size: 60px; -fx-text-fill: #8b5cf6;"/>
+        <Label text="Pas de planning disponible"
+               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+        <Label text="Le planning sera bientôt prêt !"
+               style="-fx-font-size: 13px; -fx-text-fill: #a78bfa; -fx-font-style: italic;"/>
+    </VBox>
+
+    <!-- Bouton Fermer avec dégradé -->
+    <Button fx:id="closeButton" text="FERMER"
+            style="-fx-background-color: linear-gradient(to right, #8b5cf6, #c084fc);
+                   -fx-text-fill: white;
+                   -fx-font-size: 14px;
+                   -fx-font-weight: bold;
+                   -fx-background-radius: 25;
+                   -fx-padding: 8 30;
+                   -fx-cursor: hand;
+                   -fx-min-width: 120;
+                   -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0, 0, 3);"
+            HBox.hgrow="NEVER"/>
+</VBox>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.TextFlow?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Glow?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="Controller.ShowEventController"
+           stylesheets="@styles/app.css"
+           prefWidth="1508" prefHeight="848">
+
+    <!-- ================= CONTENU PRINCIPAL (BORDERPANE) ================= -->
+    <BorderPane style="-fx-background-color: #f8fafc;">
+
+        <!-- ================= SIDEBAR (violet) ================= -->
+        <left>
+            <VBox prefWidth="240.0"
+                  minWidth="240.0"
+                  maxWidth="240.0"
+                  spacing="15"
+                  style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 20 15;">
+
+                <!-- Logo + Titre -->
+                <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding: 5 0 10 0;">
+                    <ImageView fitWidth="65" fitHeight="65" preserveRatio="true">
+                        <image>
+                            <Image url="@assets/logo.png"/>
+                        </image>
+                    </ImageView>
+                    <VBox>
+                        <Label text="AutiCare" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: 900;"/>
+                        <Label text="✨ Plateforme éducative ✨" style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 12px; -fx-font-style: italic;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Connecté en tant qu'étudiant -->
+                <VBox spacing="4" style="-fx-padding: 5 0 5 0;">
+                    <Label text="Connecté en tant que" style="-fx-text-fill: #F0E6FF; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                    <Label text="👤 Élève Magicien"
+                           style="-fx-background-color: rgba(255,255,255,0.2);
+                                  -fx-text-fill: white;
+                                  -fx-padding: 8 15;
+                                  -fx-background-radius: 30;
+                                  -fx-font-weight: bold;
+                                  -fx-font-size: 15px;
+                                  -fx-border-color: white;
+                                  -fx-border-width: 1;
+                                  -fx-border-radius: 30;"/>
+                </VBox>
+
+                <Separator style="-fx-background-color: rgba(255,255,255,0.2); -fx-padding: 5 0;"/>
+
+                <!-- Menu -->
+                <VBox spacing="8" style="-fx-padding: 5 0;">
+                    <Button text="📚 Nos cours"
+                            style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white;
+                                   -fx-alignment: CENTER_LEFT; -fx-padding: 10 15; -fx-background-radius: 12;
+                                   -fx-font-size: 14px; -fx-font-weight: 600; -fx-cursor: hand;"/>
+
+                    <Button text="🗓️ Emploi du temps"
+                            style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white;
+                                   -fx-alignment: CENTER_LEFT; -fx-padding: 10 15; -fx-background-radius: 12;
+                                   -fx-font-size: 14px; -fx-font-weight: 600; -fx-cursor: hand;"/>
+
+                    <Button text="🩺 Nos consultations"
+                            style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white;
+                                   -fx-alignment: CENTER_LEFT; -fx-padding: 10 15; -fx-background-radius: 12;
+                                   -fx-font-size: 14px; -fx-font-weight: 600; -fx-cursor: hand; -fx-wrap-text: true;"/>
+
+                    <!-- Événements en surbrillance -->
+                    <Button text="🎉 Nos événements"
+                            style="-fx-background-color: rgba(255,255,255,0.3); -fx-text-fill: white;
+                                   -fx-alignment: CENTER_LEFT; -fx-padding: 10 15; -fx-background-radius: 12;
+                                   -fx-font-weight: bold; -fx-font-size: 14px; -fx-cursor: hand;"/>
+
+                    <Button text="🎮 Nos jeux éducatifs"
+                            style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white;
+                                   -fx-alignment: CENTER_LEFT; -fx-padding: 10 15; -fx-background-radius: 12;
+                                   -fx-font-size: 14px; -fx-font-weight: 600; -fx-cursor: hand;"/>
+                </VBox>
+
+                <VBox VBox.vgrow="ALWAYS" />
+
+                <!-- Déconnexion -->
+                <Button text="Déconnexion"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white;
+                               -fx-alignment: CENTER_LEFT; -fx-padding: 8 15; -fx-background-radius: 12;
+                               -fx-font-size: 13px; -fx-font-weight: 600; -fx-cursor: hand;"/>
+
+                <!-- Message inspirant -->
+                <Label text="💫Un espace pensé pour chaque autiste💫"
+                       wrapText="true"
+                       style="-fx-text-fill: #E0D7FF; -fx-font-size: 12px; -fx-font-style: italic;
+                              -fx-padding: 10 0 5 0;
+                              -fx-alignment: CENTER;"/>
+            </VBox>
+        </left>
+
+        <!-- ================= CONTENU PRINCIPAL ================= -->
+        <center>
+            <ScrollPane fitToWidth="true" fitToHeight="true"
+                        style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-background: #f8fafc;">
+
+                <VBox spacing="20" alignment="TOP_CENTER" style="-fx-padding: 30; -fx-background-color: transparent;">
+
+
+                    <!-- ========== EN-TÊTE AVEC IMAGE EN CERCLE ========== -->
+                    <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #F9F5FF, #FFFFFF); -fx-padding: 30; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 10, 0, 0, 5);">
+
+                        <HBox alignment="CENTER_LEFT" spacing="25">
+                            <StackPane>
+                                <ImageView fitHeight="100.0" fitWidth="100.0" preserveRatio="true">
+                                    <image><Image url="@assets/cercle2.png"/></image>
+                                    <effect><DropShadow color="#7B2FF7" radius="10" spread="0.2"/></effect>
+                                </ImageView>
+                                <clip><Circle radius="50" centerX="50" centerY="50"/></clip>
+                            </StackPane>
+
+                            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                <Label text="Bienvenue dans nos activités inclusives🌈"
+                                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;"/>
+                                <Label text="Où chaque émotion trouve son activité, où chaque enfant trouve sa place dans AutiCare"
+                                       wrapText="true" style="-fx-font-size: 16px; -fx-text-fill: #666666;"/>
+                            </VBox>
+                        </HBox>
+
+                    </VBox>
+
+
+
+
+                    <!-- ========== TITRE AVEC BOUTON HUMEUR À DROITE ========== -->
+                    <VBox spacing="3" alignment="CENTER_LEFT" style="-fx-padding: 0 0 5 0;">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="🤝 Nos Événements"
+                                   style="-fx-font-size: 32px; -fx-font-weight: 900; -fx-text-fill: #000000;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+
+                            <!-- BOUTON HUMEUR EN HAUT À DROITE -->
+                            <Button fx:id="detectHumeurBtn" text="😊 DÉTECTER MON HUMEUR"
+                                    style="-fx-background-color: #008000; -fx-text-fill: white;
+                                           -fx-background-radius: 40; -fx-padding: 12 25;
+                                           -fx-font-weight: bold; -fx-font-size: 14px;
+                                           -fx-cursor: hand; -fx-border-color: transparent;
+                                           -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 8, 0, 0, 3);"/>
+                        </HBox>
+                        <Label text="Chaque enfant a son étoile, chaque étoile son événement 💜"
+                               style="-fx-font-size: 15px; -fx-text-fill: #919191; -fx-font-style: italic;"/>
+                    </VBox>
+
+                    <!-- ========== BARRE DE RECHERCHE ========== -->
+                    <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 10 0 20 0;">
+                        <TextField fx:id="searchField" promptText="🔍 Rechercher un événement..."
+                                   style="-fx-background-color: white; -fx-background-radius: 40;
+                                          -fx-padding: 12 20; -fx-font-size: 14px;
+                                          -fx-border-color: #e0d7ff; -fx-border-radius: 40;
+                                          -fx-border-width: 2; -fx-pref-width: 1380;"/>
+                    </HBox>
+
+                    <!-- ========== FILTRES ========== -->
+                    <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding: 0 0 20 0;">
+                        <Button fx:id="filterAll" text=" TOUS"
+                                style="-fx-background-color: white; -fx-text-fill: #8b5cf6;
+                                       -fx-background-radius: 25; -fx-padding: 5 13;
+                                       -fx-font-weight: bold; -fx-font-size: 12px;
+                                       -fx-cursor: hand; -fx-border-color: #8b5cf6;
+                                       -fx-border-width: 2; -fx-border-radius: 25;"/>
+
+                        <Button fx:id="filterSensory" text="🎨 WORKSHOP"
+                                style="-fx-background-color: white; -fx-text-fill: #8b5cf6;
+                                       -fx-background-radius: 25; -fx-padding: 5 13;
+                                       -fx-font-weight: bold; -fx-font-size: 12px;
+                                       -fx-cursor: hand; -fx-border-color: #8b5cf6;
+                                       -fx-border-width: 2; -fx-border-radius: 25;"/>
+
+                        <Button fx:id="filterSupport" text="📚 TRAINING"
+                                style="-fx-background-color: white; -fx-text-fill: #8b5cf6;
+                                       -fx-background-radius: 25; -fx-padding: 5 13;
+                                       -fx-font-weight: bold; -fx-font-size: 12px;
+                                       -fx-cursor: hand; -fx-border-color: #8b5cf6;
+                                       -fx-border-width: 2; -fx-border-radius: 25;"/>
+
+                        <Button fx:id="filterSocial" text="🎤 CONFERENCE"
+                                style="-fx-background-color: white; -fx-text-fill: #8b5cf6;
+                                       -fx-background-radius: 25; -fx-padding: 5 13;
+                                       -fx-font-weight: bold; -fx-font-size: 12px;
+                                       -fx-cursor: hand; -fx-border-color: #8b5cf6;
+                                       -fx-border-width: 2; -fx-border-radius: 25;"/>
+
+                        <Button fx:id="filterWorkshops" text="👥 SOCIAL"
+                                style="-fx-background-color: white; -fx-text-fill: #8b5cf6;
+                                       -fx-background-radius: 25; -fx-padding: 5 13;
+                                       -fx-font-weight: bold; -fx-font-size: 12px;
+                                       -fx-cursor: hand; -fx-border-color: #8b5cf6;
+                                       -fx-border-width: 2; -fx-border-radius: 25;"/>
+                    </HBox>
+
+                    <!-- ========== GRILLE DE CARTES ========== -->
+                    <GridPane fx:id="eventsGrid" hgap="15" vgap="15" alignment="CENTER_LEFT">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="33"/>
+                            <ColumnConstraints percentWidth="33"/>
+                            <ColumnConstraints percentWidth="33"/>
+                        </columnConstraints>
+                    </GridPane>
+
+                    <!-- ========== PAGINATION ========== -->
+                    <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20 0;">
+                        <Button fx:id="prevPageBtn" text="◀ Précédent" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;"/>
+                        <Label fx:id="pageIndicator" text="Page 1 / 3" style="-fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #8b5cf6;"/>
+                        <Button fx:id="nextPageBtn" text="Suivant ▶" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-padding: 8 25; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <!-- ========== STATISTIQUES ========== -->
+                    <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10 0 20 0;">
+                        <HBox spacing="4" alignment="CENTER">
+                            <ImageView fitWidth="43" fitHeight="43" preserveRatio="true"><image><Image url="@assets/event11.png"/></image></ImageView>
+                            <Label fx:id="eventsStatLabel" text="0 Événements" style="-fx-text-fill: #4a5568; -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                        </HBox>
+                        <Label text="|" style="-fx-text-fill: #E2E8F0; -fx-font-size: 14px;"/>
+                        <HBox spacing="4" alignment="CENTER">
+                            <ImageView fitWidth="37" fitHeight="37" preserveRatio="true"><image><Image url="@assets/membre1.png"/></image></ImageView>
+                            <Label fx:id="membersStatLabel" text="0 Membres" style="-fx-text-fill: #4a5568; -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                        </HBox>
+                        <Label text="|" style="-fx-text-fill: #E2E8F0; -fx-font-size: 14px;"/>
+                        <HBox spacing="4" alignment="CENTER">
+                            <ImageView fitWidth="38" fitHeight="38" preserveRatio="true"><image><Image url="@assets/lieu1.png"/></image></ImageView>
+                            <Label fx:id="locationsStatLabel" text="0 Lieux" style="-fx-text-fill: #4a5568; -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+    </BorderPane>
+
+
+
+
+</StackPane>

@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.shape.Circle?>
+<BorderPane fx:id="root" styleClass="appRoot" stylesheets="@styles/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auticare.Controller.ParentSuiviController">
+
+    <!-- ✅ SIDEBAR (inchangée) -->
+    <left>
+        <VBox prefWidth="260"
+              minWidth="260"
+              maxWidth="260"
+              spacing="10"
+              style="-fx-background-color: linear-gradient(to bottom, #7c3aed, #64009D);
+                 -fx-background-radius: 25;
+                 -fx-padding: 25 15;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
+
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 0 0 15 5;">
+                <ImageView fitHeight="40.0" fitWidth="40.0" preserveRatio="true">
+                    <Image url="@assets/logo.png" />
+                </ImageView>
+                <VBox spacing="2">
+                    <Label text="AutiCare" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    <Label text="Parent" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+
+            <Separator style="-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;"/>
+
+            <!-- Profil utilisateur -->
+            <VBox alignment="CENTER" spacing="10"
+                  style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 15; -fx-padding: 15;">
+                <Circle radius="30" fill="white" />
+                <VBox alignment="CENTER" spacing="2">
+                    <Label fx:id="userNameLabel" text="Parent"
+                           style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label fx:id="userEmailLabel" text="parent@test.com"
+                           style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12px;"/>
+                    <Label text="👤 Parent"
+                           style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 11px; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 3 8; -fx-background-radius: 10;"/>
+                </VBox>
+            </VBox>
+
+            <!-- ===== MENU PARENT ===== -->
+            <VBox spacing="8" style="-fx-padding: 10 0 20 0;">
+
+                <!-- 🏠 Accueil -->
+                <Button text="🏠 Accueil"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showDashboard"/>
+
+                <!-- 👤 Mon Profil -->
+                <Button text="👤 Mon Profil"
+                        onAction="#goToProfile"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"/>
+
+                <!-- 📅 Emploi du temps -->
+                <Button text="📅 Emploi du temps"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showSchedule"/>
+
+                <!-- 📚 Cours -->
+                <Button text="📚 Cours"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showCourses"/>
+
+                <!-- 📚 Articles & Conseils (page active) -->
+                <Button text="📚 Articles &amp; Conseils"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showArticles"/>
+
+                <!-- 📊 Suivi thérapeutique -->
+                <Button text="📊 Suivi thérapeutique"
+                        style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showTherapeuticFollowUp"/>
+
+                <!-- 🎉 Événements -->
+                <Button text="🎉 Événements"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showEvents"/>
+
+                <!-- 🎮 Jeux -->
+                <Button text="🎮 Jeux"
+                        style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"
+                        maxWidth="Infinity"
+                        onAction="#showGames"/>
+
+            </VBox>
+
+            <VBox VBox.vgrow="ALWAYS" />
+
+            <!-- Déconnexion -->
+            <Button text="🚪 Déconnexion"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;"
+                    maxWidth="Infinity"
+                    onAction="#handleLogout"/>
+        </VBox>
+    </left>
+    <!-- ✅ CENTER - INTERFACE AMÉLIORÉE -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="pageScroll" vbarPolicy="AS_NEEDED">
+            <VBox prefWidth="980" spacing="20" styleClass="page">
+                <padding>
+                    <Insets bottom="26" left="26" right="26" top="22" />
+                </padding>
+
+                <!-- ✅ HERO AVEC ILLUSTRATION -->
+                <HBox alignment="CENTER_LEFT" spacing="20" styleClass="heroCardPremium">
+                    <StackPane minHeight="100" minWidth="100" prefHeight="100" prefWidth="100" styleClass="heroImagePremium">
+                        <ImageView fitHeight="100" fitWidth="100" preserveRatio="true">
+                            <image><Image url="@assets/therapie.png" /></image>
+                        </ImageView>
+                    </StackPane>
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label styleClass="heroTitlePremium" text="Espace Parent — Suivi thérapeutique" />
+                        <Label styleClass="heroSubPremium" text="Suivez l'évolution de votre enfant (Humeur • Stress • Attention) et accédez à tous les comptes rendus en un clic." wrapText="true" />
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label styleClass="premiumBadge" text="🔍 Conseils personnalisés" />
+                            <Label styleClass="premiumBadgePink" text="+ PDF" />
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- ✅ SECTION EMAIL AVEC RECHERCHE -->
+                <HBox alignment="CENTER_LEFT" spacing="16" styleClass="emailSection">
+                    <StackPane styleClass="avatarWrapper">
+                        <ImageView fitHeight="48" fitWidth="48" preserveRatio="true">
+                            <image><Image url="@assets/parent-avatar.png" /></image>
+                        </ImageView>
+                    </StackPane>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label styleClass="inputLabel" text="Email parent" />
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <TextField fx:id="tfEmailParent" prefHeight="44.0" promptText="ex: parent@gmail.com" styleClass="searchIconField" HBox.hgrow="ALWAYS" />
+                            <Button fx:id="btnChercher" onAction="#onChercher" prefHeight="44.0" prefWidth="120.0" styleClass="btnPremium" text="Chercher">
+                                <graphic>
+                                    <ImageView fitHeight="16" fitWidth="16">
+                                        <image><Image url="@assets/search.png" /></image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- ✅ SECTION ENFANT - AVEC IMAGE ENFANT.PNG -->
+                <HBox alignment="CENTER_LEFT" spacing="20" styleClass="enfantSection">
+                    <StackPane styleClass="enfantBadge">
+                        <ImageView fitHeight="48" fitWidth="48" preserveRatio="true">  <!-- Changé de 32 à 48 -->
+                            <image><Image url="@assets/enfant.png" /></image>
+                        </ImageView>
+                    </StackPane>
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label styleClass="inputLabel" text="Sélectionner un enfant" />
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <ComboBox fx:id="cbEnfants" prefHeight="40.0" prefWidth="300.0" promptText="Choisir un enfant..." styleClass="premiumCombo" />
+                            <Button fx:id="btnVoirSuivi" onAction="#onVoirSuivi" prefHeight="40.0" prefWidth="124.0" styleClass="btnPremiumSecondary" text="Voir suivi">
+                                <graphic>
+                                    <ImageView fitHeight="16" fitWidth="16">
+                                        <image><Image url="@assets/eye.png" /></image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- ✅ STATS BANNER -->
+                <HBox fx:id="statsBanner" alignment="CENTER_LEFT" managed="false" styleClass="statsBanner" visible="false">
+                    <Label fx:id="lblStatsInfo" styleClass="statsBannerText" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label styleClass="statsBannerIcon" text="✨" />
+                </HBox>
+
+                <!-- ✅ MINI STATISTIQUES RAPIDES -->
+                <HBox fx:id="miniStatsRow" alignment="CENTER" managed="false" spacing="15" styleClass="miniStatsRow" visible="false">
+                    <VBox styleClass="miniStatCard">
+                        <Label styleClass="miniStatValue, miniStatHumeur" text="85" />
+                        <Label styleClass="miniStatLabel" text="Humeur" />
+                    </VBox>
+                    <VBox styleClass="miniStatCard">
+                        <Label styleClass="miniStatValue, miniStatStress" text="42" />
+                        <Label styleClass="miniStatLabel" text="Stress" />
+                    </VBox>
+                    <VBox styleClass="miniStatCard">
+                        <Label styleClass="miniStatValue, miniStatAttention" text="78" />
+                        <Label styleClass="miniStatLabel" text="Attention" />
+                    </VBox>
+                    <VBox styleClass="miniStatCard">
+                        <Label styleClass="miniStatValue" text="7" />
+                        <Label styleClass="miniStatLabel" text="Consultations" />
+                    </VBox>
+                </HBox>
+
+                <!-- ✅ PROGRESS BARS -->
+                <VBox fx:id="progressBarsRow" managed="false" spacing="8" styleClass="quickTipsCard" visible="false">
+                    <Label styleClass="quickTipsTitle" text="📊 Scores actuels" />
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="scoreProgressRow">
+                        <Label styleClass="scoreLabel" text="Humeur" />
+                        <StackPane styleClass="progressBarTrack">
+                            <Region fx:id="progressHumeur" styleClass="progressBarFill, progressHumeur" />
+                        </StackPane>
+                        <Label text="85%" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="scoreProgressRow">
+                        <Label styleClass="scoreLabel" text="Stress" />
+                        <StackPane styleClass="progressBarTrack">
+                            <Region fx:id="progressStress" styleClass="progressBarFill, progressStress" />
+                        </StackPane>
+                        <Label text="42%" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="scoreProgressRow">
+                        <Label styleClass="scoreLabel" text="Attention" />
+                        <StackPane styleClass="progressBarTrack">
+                            <Region fx:id="progressAttention" styleClass="progressBarFill, progressAttention" />
+                        </StackPane>
+                        <Label text="78%" />
+                    </HBox>
+                </VBox>
+
+                <!-- ✅ GRAPHE + CARTE -->
+                <GridPane hgap="20" vgap="20">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="60" />
+                        <ColumnConstraints minWidth="380" percentWidth="40" prefWidth="400" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                    </rowConstraints>
+
+                    <!-- Chart à gauche -->
+                    <VBox spacing="10" styleClass="chartContainer" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label styleClass="chartTitle" text="📊 Évolution des scores" />
+                            <Label styleClass="chartSubtitle" text="5 dernières consultations" />
+                        </HBox>
+                        <LineChart fx:id="lineChart" animated="false" minHeight="340.0" prefHeight="340.0" styleClass="chartCard">
+                            <xAxis>
+                                <CategoryAxis label="Consultations" fx:id="xAxis" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxis" label="Score" lowerBound="0" upperBound="100" />
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+
+                    <!-- Carte droite - AVEC ICÔNE DOCUMENT -->
+                    <VBox fx:id="lastCard" spacing="16" styleClass="premiumCard" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <!-- Header avec icône -->
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <StackPane styleClass="cardIconWrapper">
+                                <Label styleClass="cardIcon" text="📝" />
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label styleClass="cardTitle" text="Dernière consultation" />
+                                <Label styleClass="cardSubtitle" text="Résumé du dernier suivi" />
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label styleClass="infoTagViolet" text="Nouveau" />
+                        </HBox>
+
+                        <!-- Détails en grid -->
+                        <GridPane hgap="16" styleClass="detailsGrid" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="130" prefWidth="130" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                                <RowConstraints />
+                            </rowConstraints>
+
+                            <!-- Psychologue -->
+                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <Label styleClass="detailIcon" text="👤" />
+                                <Label styleClass="details-key" text="Psychologue" />
+                            </HBox>
+                            <Label fx:id="lblPsy" styleClass="details-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                            <!-- État -->
+                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <Label styleClass="detailIcon" text="📊" />
+                                <Label styleClass="details-key" text="État" />
+                            </HBox>
+                            <Label fx:id="lblEtat" styleClass="details-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <!-- Date/Heure -->
+                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <Label styleClass="detailIcon" text="📅" />
+                                <Label styleClass="details-key" text="Date/Heure" />
+                            </HBox>
+                            <Label fx:id="lblDateHeure" styleClass="details-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                            <!-- Scores -->
+                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                <Label styleClass="detailIcon" text="📈" />
+                                <Label styleClass="details-key" text="Scores (H/S/A)" />
+                            </HBox>
+                            <Label fx:id="lblScores" styleClass="details-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                            <!-- Exercice -->
+                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                                <Label styleClass="detailIcon" text="🏃" />
+                                <Label styleClass="details-key" text="Exercice" />
+                            </HBox>
+                            <Label fx:id="lblExercice" styleClass="details-value" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                            <!-- Observation -->
+                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="5">
+                                <Label styleClass="detailIcon" text="💬" />
+                                <Label styleClass="details-key" text="Observation" />
+                            </HBox>
+                            <Label fx:id="lblObs" styleClass="details-value" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        </GridPane>
+
+                        <!-- Actions -->
+                        <VBox spacing="10" styleClass="actionsContainer">
+                            <Button fx:id="btnDownloadPdf" maxWidth="Infinity" onAction="#onDownloadPdf" styleClass="btnActionPrimary" text="Télécharger le compte rendu">
+                                <graphic>
+                                    <ImageView fitHeight="18" fitWidth="18">
+                                        <image><Image url="@assets/pdf.png" /></image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+
+                            <Button fx:id="btnAi" maxWidth="Infinity" onAction="#onGenererConseilsIA" styleClass="btnActionSecondary" text="Générer conseils personnalisés">
+                                <graphic>
+                                    <ImageView fitHeight="18" fitWidth="18">
+                                        <image><Image url="@assets/ai.png" /></image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+
+                            <Button fx:id="btnUploadParentPdf" maxWidth="Infinity" onAction="#onUploadParentPdf" styleClass="btnActionGhost" text="Envoyer un document">
+                                <graphic>
+                                    <ImageView fitHeight="18" fitWidth="18">
+                                        <image><Image url="@assets/upload.png" /></image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </VBox>
+                    </VBox>
+                </GridPane>
+
+                <!-- ✅ CARTE CONSEILS PERSONNALISÉS -->
+                <VBox fx:id="quickTipsCard" managed="false" spacing="12" styleClass="quickTipsCard" visible="false">
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label styleClass="quickTipsTitle" text="💡 Conseils personnalisés du jour" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label styleClass="infoTagRose" text="Basé sur les scores" />
+                    </HBox>
+                    <VBox spacing="8" styleClass="quickTipsText">
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tipItem">
+                            <Region styleClass="tipBullet" />
+                            <Label text="Maintenir une routine stable pour réduire le stress" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tipItem">
+                            <Region styleClass="tipBullet" />
+                            <Label text="Exercice de respiration avant les repas" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tipItem">
+                            <Region styleClass="tipBullet" />
+                            <Label text="Temps calme de 15 min après l'école" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="tipItem">
+                            <Region styleClass="tipBullet" />
+                            <Label text="Utiliser des pictogrammes pour les transitions" />
+                        </HBox>
+                    </VBox>
+                    <Button maxWidth="Infinity" styleClass="btnActionGhost" text="Voir tous les conseils">
+                        <graphic>
+                            <ImageView fitHeight="16" fitWidth="16">
+                                <image><Image url="@assets/arrow-right.jpg" /></image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </VBox>
+
+                <!-- ✅ MESSAGE D'INFO -->
+                <Label fx:id="lblInfo" styleClass="infoMessage" text="Veuillez saisir votre email." />
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

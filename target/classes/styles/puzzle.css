@@ -1,0 +1,164 @@
+/* ===================== STYLES GÉNÉRAUX ===================== */
+.root {
+    -fx-font-family: 'System';
+    -fx-background-color: #f5f0ff;
+}
+
+/* ===================== PIÈCES DU PUZZLE ===================== */
+.piece-image {
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-transition: all 0.2s ease;
+    -fx-background-color: white;
+    -fx-border-color: #e0d7ff;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+.piece-image:hover {
+    -fx-effect: dropshadow(gaussian, #8b5cf6, 10, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-border-color: #8b5cf6;
+}
+
+.piece-image:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* ===================== GRILLE DU PUZZLE ===================== */
+#puzzleGrid {
+    -fx-background-color: #ede9fe;
+    -fx-background-radius: 15;
+    -fx-padding: 10;
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+    -fx-border-color: #c4b5fd;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+/* ===================== BOUTONS ===================== */
+.button {
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+    -fx-transition: all 0.2s ease;
+}
+
+.button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.3), 10, 0, 0, 5);
+    -fx-translate-y: -1;
+}
+
+.button:pressed {
+    -fx-translate-y: 0;
+}
+
+/* Bouton VALIDER */
+#checkButton {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30;
+    -fx-padding: 12 30;
+}
+
+#checkButton:hover {
+    -fx-background-color: #7c3aed;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 15, 0, 0, 8);
+}
+
+/* Bouton MÉLANGER */
+#shuffleButton {
+    -fx-background-color: #c4b5fd;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30;
+    -fx-padding: 12 30;
+}
+
+#shuffleButton:hover {
+    -fx-background-color: #a78bfa;
+}
+
+/* Bouton RETOUR */
+#backButton {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b5cf6;
+    -fx-font-size: 16px;
+    -fx-underline: true;
+}
+
+#backButton:hover {
+    -fx-text-fill: #7c3aed;
+    -fx-effect: none;
+}
+
+/* ===================== TIMER ===================== */
+#timerLabel {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8b5cf6;
+    -fx-font-family: 'Monospaced';
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-padding: 10 25;
+    -fx-border-color: #c4b5fd;
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.1), 8, 0, 0, 3);
+}
+
+/* ===================== APERÇU DE L'IMAGE ===================== */
+#previewImage {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-border-color: #c4b5fd;
+    -fx-border-width: 3;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* ===================== TITRE ===================== */
+#eventTitleLabel {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8b5cf6;
+    -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.2), 5, 0, 0, 2);
+}
+
+/* ===================== LABELS ===================== */
+.label {
+    -fx-text-fill: #4a5568;
+}
+
+/* ===================== ALERTES ===================== */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #c4b5fd;
+    -fx-border-width: 2;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #f5f0ff;
+    -fx-background-radius: 20 20 0 0;
+}
+
+.dialog-pane .content {
+    -fx-text-fill: #4a5568;
+    -fx-font-size: 14px;
+}
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.puzzle-grid {
+    -fx-animation: fadeIn 0.5s ease;
+}

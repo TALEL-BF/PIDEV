@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.effect.DropShadow?>
+
+<AnchorPane prefWidth="1300.0" prefHeight="800.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllers.CoursAffichage">
+
+    <children>
+
+        <HBox prefWidth="1300.0" prefHeight="800.0">
+
+            <!-- ================= SIDEBAR AMÉLIORÉE ================= -->
+            <VBox prefWidth="260.0"
+                  minWidth="260.0"
+                  maxWidth="260.0"
+                  spacing="10"
+                  style="-fx-background-color: linear-gradient(to bottom, #7B2FF7, #5F0FFF); -fx-padding: 25 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
+
+                <!-- ===== LOGO SANS CADRE ===== -->
+                <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 0 0 15 5;">
+                    <ImageView fitHeight="40.0" fitWidth="40.0" preserveRatio="true">
+                        <image>
+                            <Image url="@images/logo.png"/>
+                        </image>
+                    </ImageView>
+
+                    <VBox spacing="2">
+                        <Label text="AutiCare" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                        <Label text="Espace éducatif" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 11px;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- ===== SÉPARATEUR ÉLÉGANT ===== -->
+                <Separator style="-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;"/>
+
+                <!-- ===== MENU DE NAVIGATION ===== -->
+                <VBox spacing="8" style="-fx-padding: 10 0 20 0;">
+
+                    <Button text="📚 Nos cours" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 1; -fx-border-radius: 10;"/>
+
+                    <!-- Emplois du temps -->
+                    <Button text="📅 Emplois du temps" style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"/>
+
+                    <!-- Événements -->
+                    <Button text="🎉 Événements" style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"/>
+
+                    <!-- Suivi consultation -->
+                    <Button text="📞 Suivi consultation" style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10; -fx-wrap-text: true;"/>
+
+                    <!-- Jeux éducatifs -->
+                    <Button text="🎮 Jeux éducatifs" style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.8); -fx-cursor: hand; -fx-padding: 12 15; -fx-alignment: CENTER_LEFT; -fx-font-size: 14px; -fx-background-radius: 10;"/>
+
+                </VBox>
+
+                <!-- ===== ESPACE FLEXIBLE ===== -->
+                <VBox VBox.vgrow="ALWAYS" />
+
+                <!-- ===== BOUTON DÉCONNEXION ===== -->
+                <Button text="🚪 Déconnexion" style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 10; -fx-padding: 12 15; -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;"/>
+            </VBox>
+
+            <!-- ================= CONTENU PRINCIPAL (AFFICHAGE COURS) ================= -->
+            <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS"
+                        style="-fx-background: white; -fx-border-width: 0;">
+                <content>
+                    <VBox spacing="25" style="-fx-background-color: white; -fx-padding: 30;">
+
+                        <!-- ========== EN-TÊTE AVEC IMAGE EN CERCLE ========== -->
+                        <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #F9F5FF, #FFFFFF); -fx-padding: 30; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #7B2FF7; -fx-border-width: 2; -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.1), 10, 0, 0, 5);">
+
+                            <HBox alignment="CENTER_LEFT" spacing="25">
+                                <!-- Image en cercle avec effet -->
+                                <StackPane>
+                                    <ImageView fitHeight="100.0" fitWidth="100.0" preserveRatio="true">
+                                        <image>
+                                            <Image url="@images/cours-bienvenue.png"/>
+                                        </image>
+                                        <effect>
+                                            <DropShadow color="#7B2FF7" radius="10" spread="0.2"/>
+                                        </effect>
+                                    </ImageView>
+                                    <clip>
+                                        <Circle radius="50" centerX="48" centerY="60" />
+                                    </clip>
+                                </StackPane>
+
+                                <VBox spacing="8">
+                                    <Label text="Bienvenue dans nos cours adaptés 🎓"
+                                           style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;"/>
+                                    <Label text="Découvrez des programmes éducatifs conçus avec bienveillance pour les apprenants AutiCare"
+                                           style="-fx-font-size: 16px; -fx-text-fill: #666666; -fx-wrap-text: true;"/>
+
+                                    <!-- Badge optionnel -->
+                                    <HBox style="-fx-padding: 10 0 0 0;">
+                                        <Label text="✨ Nouveaux cours disponibles"
+                                               style="-fx-background-color: #F0E6FF; -fx-text-fill: #7B2FF7; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- ========== HEADER AVEC BOUTONS DE NAVIGATION ========== -->
+                        <HBox alignment="CENTER_LEFT" spacing="20">
+                            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                <Label text="📚 Nos Cours Éducatifs"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;" />
+                                <Label text="Ensemble, découvrons des cours amusants pour apprendre en douceur 💜"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #666666;" />
+                            </VBox>
+
+                            <HBox spacing="15" alignment="CENTER_RIGHT">
+                                <!-- NOUVEAU BOUTON IA IMAGE -->
+                                <Button text="🤖 IA Image"
+                                        fx:id="iaImageButton"
+                                        style="-fx-background-color: #FF4444;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(255,68,68,0.3), 10, 0, 0, 5);"/>
+
+                                <!-- BOUTON ESPACE DESSIN -->
+                                <Button text="🎨 Espace dessin"
+                                        fx:id="drawingSpaceButton"
+                                        style="-fx-background-color: #FF6B6B;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(255,107,107,0.3), 10, 0, 0, 5);"/>
+
+                                <!-- BOUTON POUR AJOUTER UN COURS -->
+                                <Button text="+"
+                                        fx:id="ajouterCoursButton"
+                                        style="-fx-background-color: #7B2FF7;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(123,47,247,0.3), 10, 0, 0, 5);"/>
+
+                                <!-- BOUTON POUR AJOUTER UNE ÉVALUATION -->
+                                <Button text="📝"
+                                        fx:id="ajouterEvaluationButton"
+                                        style="-fx-background-color: #28A745;
+                                               -fx-text-fill: white;
+                                               -fx-background-radius: 20;
+                                               -fx-padding: 12 25;
+                                               -fx-font-weight: bold;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(40,167,69,0.3), 10, 0, 0, 5);"/>
+                            </HBox>
+                        </HBox>
+
+                        <!-- Barre de recherche -->
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <TextField fx:id="searchField"
+                                       promptText="Rechercher un cours..."
+                                       HBox.hgrow="ALWAYS"
+                                       style="-fx-background-radius: 25;
+                                             -fx-border-radius: 25;
+                                             -fx-padding: 12 20;
+                                             -fx-background-color: #F5F5F5;
+                                             -fx-border-color: transparent;
+                                             -fx-font-size: 14px;"/>
+                            <Button text="Rechercher"
+                                    style="-fx-background-color: #7B2FF7;
+                                           -fx-text-fill: white;
+                                           -fx-background-radius: 25;
+                                           -fx-padding: 12 30;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <!-- Filtres par catégorie -->
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Button fx:id="academicButton"
+                                    text="Académique"
+                                    style="-fx-background-color: #7B2FF7;
+                                           -fx-text-fill: white;
+                                           -fx-background-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                            <Button fx:id="socialButton"
+                                    text="Social"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 1.5;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                            <Button fx:id="autonomieButton"
+                                    text="Autonomie"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 1.5;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                            <Button fx:id="creativiteButton"
+                                    text="Créativité"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-color: #7B2FF7;
+                                           -fx-border-width: 1.5;
+                                           -fx-text-fill: #7B2FF7;
+                                           -fx-background-radius: 20;
+                                           -fx-border-radius: 20;
+                                           -fx-padding: 8 20;
+                                           -fx-font-size: 14px;
+                                           -fx-font-weight: bold;
+                                           -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <!-- Compteur de cours -->
+                        <Label fx:id="coursCountLabel"
+                               text="0 Cours disponibles"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;" />
+
+                        <!-- Grille des cours -->
+                        <FlowPane fx:id="coursFlowPane"
+                                  hgap="20" vgap="20"
+                                  style="-fx-padding: 0 0 20 0;" />
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+        </HBox>
+
+    </children>
+
+</AnchorPane>
